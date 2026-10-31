@@ -2,7 +2,8 @@ import { http, HttpResponse } from 'msw';
 import { alterarNft, type MudancaNft } from '../banco/alteracoes';
 import { lerBanco, resetarBanco, salvarBanco, type ResolucaoPagamento } from '../banco/estado';
 import { resolverPedido } from '../banco/pedidos';
-import { responderErro } from '../rest/respostas';
+import { cenarioSchema, definirCenario } from '../cenarios/cenarios';
+import { lerCorpo, responderErro } from '../rest/respostas';
 import { derrubarConexoes, publicarEvento } from '../socket/conexoes';
 
 // ====================================================================
@@ -13,6 +14,18 @@ import { derrubarConexoes, publicarEvento } from '../socket/conexoes';
 export const handlersControle = [
   http.post('/api/__mock/resetar', () => {
     resetarBanco();
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post('/api/__mock/cenario', async ({ request }) => {
+    const leitura = await lerCorpo(request, cenarioSchema);
+
+    if ('erro' in leitura) {
+      return leitura.erro;
+    }
+
+    definirCenario(leitura.dados);
 
     return new HttpResponse(null, { status: 204 });
   }),

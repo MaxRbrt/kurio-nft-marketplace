@@ -1,5 +1,7 @@
 import { setupWorker } from 'msw/browser';
 import { retomarPedidosPendentes } from './banco/pedidos';
+import { aplicarCenarioDaUrl } from './cenarios/cenarios';
+import { handlersCenarios } from './cenarios/handlers';
 import { handlersControle } from './controle/handlers';
 import { handlersFavoritos } from './rest/catalogo/favoritos';
 import { handlersNfts } from './rest/catalogo/nfts';
@@ -13,6 +15,7 @@ import { handlersSocket } from './socket/conexoes';
 
 export const worker = setupWorker(
   ...handlersControle,
+  ...handlersCenarios,
   ...handlersSessao,
   ...handlersPerfil,
   ...handlersCarteiras,
@@ -24,4 +27,5 @@ export const worker = setupWorker(
   ...handlersSocket,
 );
 
+aplicarCenarioDaUrl();
 retomarPedidosPendentes();

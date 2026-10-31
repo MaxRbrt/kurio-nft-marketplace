@@ -1,5 +1,6 @@
 import type { Cotacao, EntradaCotacao } from '@/contracts/compra/cotacao';
 import type { Pedido } from '@/contracts/compra/pedidos';
+import type { Cenario } from '../cenarios/cenarios';
 import { criarCarteirasIniciais, type CarteiraBanco } from '../fixtures/carteiras';
 import { criarCuponsIniciais, type Cupom } from '../fixtures/cupons';
 import { criarNftsIniciais, type NftBanco } from '../fixtures/nfts';
@@ -44,6 +45,7 @@ export type EstadoBanco = {
   idempotencia: Record<string, { conteudo: string; pedidoId: string }>;
   resolucaoPagamento: ResolucaoPagamento;
   timeoutNoProximoPedido: boolean;
+  cenario: Cenario;
   proximoEvento: number;
   proximoPedido: number;
 };
@@ -66,6 +68,7 @@ function criarEstadoInicial(): EstadoBanco {
     idempotencia: {},
     resolucaoPagamento: 'confirmar',
     timeoutNoProximoPedido: false,
+    cenario: { nome: 'padrao', vezes: null, rota: null },
     proximoEvento: 1,
     proximoPedido: 1,
   };
