@@ -1,15 +1,15 @@
 import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
 
 export const Route = createRootRoute({
-  component: RootLayout,
-  notFoundComponent: NotFoundPage,
+  component: LayoutRaiz,
+  notFoundComponent: PaginaNaoEncontrada,
 });
 
-function RootLayout() {
+function LayoutRaiz() {
   return <Outlet />;
 }
 
-function NotFoundPage() {
+function PaginaNaoEncontrada() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-medium">Página não encontrada</h1>

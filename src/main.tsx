@@ -12,6 +12,23 @@ declare module '@tanstack/react-router' {
   }
 }
 
+// ====================================================================
+// 1. MOCKS
+// Ativados só por VITE_ENABLE_MOCKS. O worker sobe antes do React para
+// a primeira requisição já ser interceptada.
+// ====================================================================
+async function ativarMocks() {
+  if (import.meta.env.VITE_ENABLE_MOCKS !== 'true') {
+    return;
+  }
+
+  const { worker } = await import('./mocks/browser');
+
+  await worker.start({ onUnhandledRequest: 'bypass', quiet: true });
+}
+
+await ativarMocks();
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
