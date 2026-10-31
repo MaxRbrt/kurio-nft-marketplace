@@ -62,7 +62,7 @@ test.describe('desktop 1440', () => {
 
   test('cores, fonte e contagem real do carrinho', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByTestId('nfts-total')).toHaveText('48');
+    await expect(page.getByTestId('cartao-nft').first()).toBeVisible();
     await chamarApi(page, 'POST', '/api/__mock/resetar');
     await expect(page.getByTestId('cabecalho-badge')).toHaveCount(0);
 
@@ -90,7 +90,7 @@ test.describe('desktop 1440', () => {
 
 test('badge soma quantidades do carrinho da API', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByTestId('nfts-total')).toHaveText('48');
+  await expect(page.getByTestId('cartao-nft').first()).toBeVisible();
   await chamarApi(page, 'POST', '/api/__mock/resetar');
 
   const visitante = await page.evaluate(() => localStorage.getItem('kurio:visitante'));
@@ -150,7 +150,7 @@ for (const largura of [390, 768, 1440]) {
   test(`sem overflow horizontal em ${largura}`, async ({ page }) => {
     await page.setViewportSize({ width: largura, height: 900 });
     await page.goto('/');
-    await expect(page.getByTestId('socket-estado')).toBeVisible();
+    await expect(page.getByTestId('cartao-nft').first()).toBeVisible();
 
     const excesso = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

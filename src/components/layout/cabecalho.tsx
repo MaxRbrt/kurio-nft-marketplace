@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { obterCarrinho } from '@/features/compra/api/carrinho';
-import { IconeBusca, IconeCarrinho, IconeEntrar } from '../icones/icones';
+import { BuscaDesktop } from '@/features/catalogo/components/busca-desktop';
+import { IconeCarrinho, IconeEntrar } from '../icones/icones';
 import { AcaoIndisponivel } from './acao-indisponivel';
 
 const LINKS_INDISPONIVEIS = [
@@ -58,12 +59,7 @@ export function Cabecalho() {
         </nav>
 
         <div data-testid="cabecalho-acoes" className="flex h-[35px] items-center gap-7">
-          <AcaoIndisponivel
-            aria-label="Buscar"
-            className="size-5 cursor-not-allowed text-foreground"
-          >
-            <IconeBusca />
-          </AcaoIndisponivel>
+          <BuscaDesktop />
 
           <Link to="/carrinho" aria-label={rotuloCarrinho} className="relative h-6 w-[31px]">
             <IconeCarrinho className="text-foreground" />

@@ -13,7 +13,7 @@ import { lerBanco } from '../../banco/estado';
 import type { NftBanco } from '../../fixtures/nfts';
 import { responderErro } from '../respostas';
 
-const TAMANHO_PAGINA_PADRAO = 12;
+const TAMANHO_PAGINA_PADRAO = 9;
 const INICIO_NOVOS_LANCAMENTOS = '2026-10-01T00:00:00.000Z';
 
 // ====================================================================

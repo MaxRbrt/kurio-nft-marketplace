@@ -69,7 +69,7 @@ export function Rodape() {
   return (
     <footer
       data-testid="rodape"
-      className="mx-auto mt-24 hidden w-full max-w-[1200px] pb-6 lg:block"
+      className="mx-auto mt-24 hidden w-full max-w-[1200px] px-4 pb-6 lg:block xl:px-0"
     >
       <section
         data-testid="rodape-servicos"

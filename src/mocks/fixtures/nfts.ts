@@ -1,6 +1,6 @@
 import Big from 'big.js';
-import type { Rede } from '@/contracts/comum/valores';
 import type { Categoria, Edicao, NftDetalhe } from '@/contracts/catalogo/nfts';
+import type { Rede } from '@/contracts/comum/valores';
 
 // ====================================================================
 // 1. NFT DO BANCO
@@ -24,28 +24,44 @@ const REDES: Rede[] = ['ethereum', 'polygon', 'solana'];
 
 // ====================================================================
 // 2. NFTS DO FIGMA
-// Nomes e preços dos frames vêm primeiro. Violet Nomad usa o token
-// #0314: um NFT só tem um token, e os frames divergem nesse dado.
+// Mesma ordem, preço e imagem da grade do frame. Violet Nomad usa o
+// token #0314: um NFT só tem um token, e os frames divergem nesse dado.
 // ====================================================================
-const NFTS_DO_LAYOUT: Array<[nome: string, tokenId: string, preco: string]> = [
-  ['Emerald Ape #042', '#0042', '1.19'],
-  ['Sage Nomad #009', '#0009', '1.69'],
-  ['Neon Vessel #552', '#0552', '1.99'],
-  ['Golden Frequency #071', '#0071', '0.59'],
-  ['Cosmic Bloom #118', '#0118', '1.29'],
-  ['Violet Nomad #314', '#0314', '1.39'],
-  ['Ivory Baron #088', '#0088', '1.79'],
-  ['Golden Beat #207', '#0207', '0.99'],
-  ['Golden Signal #160', '#0160', '0.39'],
+type NftDoLayout = {
+  nome: string;
+  tokenId: string;
+  preco: string;
+  arte: number;
+  precoAnterior?: string;
+  raro?: boolean;
+};
+
+const NFTS_DO_LAYOUT: NftDoLayout[] = [
+  { nome: 'Emerald Ape #042', tokenId: '#0042', preco: '1.19', arte: 1 },
+  { nome: 'Sage Nomad #009', tokenId: '#0009', preco: '1.69', arte: 2 },
+  {
+    nome: 'Neon Vessel #552',
+    tokenId: '#0552',
+    preco: '1.99',
+    arte: 3,
+    precoAnterior: '2.29',
+    raro: true,
+  },
+  { nome: 'Cosmic Bloom #118', tokenId: '#0118', preco: '1.29', arte: 2 },
+  { nome: 'Violet Nomad #314', tokenId: '#0314', preco: '1.39', arte: 2 },
+  { nome: 'Ivory Baron #088', tokenId: '#0088', preco: '1.79', arte: 3 },
+  { nome: 'Golden Beat #207', tokenId: '#0207', preco: '0.99', arte: 4 },
+  { nome: 'Golden Frequency #071', tokenId: '#0071', preco: '0.59', arte: 4 },
+  { nome: 'Golden Signal #160', tokenId: '#0160', preco: '0.39', arte: 4 },
 ];
 
 // ====================================================================
 // 3. VARIEDADE PARA FILTROS E PAGINAÇÃO
-// 48 NFTs dão as 4 páginas do layout com 12 por página. A geração é
-// determinística: mesmo resultado em toda execução, com a faixa de
-// preço do layout (0.02 a 12.30) coberta nas pontas.
+// 36 NFTs dão as 4 páginas do layout com 9 por página. A geração é
+// determinística, com a faixa de preço do layout (0.02 a 12.30) coberta
+// nas pontas. Rede não acompanha a categoria, para os filtros combinarem.
 // ====================================================================
-const TOTAL_NFTS = 48;
+const TOTAL_NFTS = 36;
 const PRIMEIROS_NOMES = ['Amber', 'Onyx', 'Crimson', 'Azure', 'Jade', 'Silver', 'Copper', 'Indigo'];
 const SEGUNDOS_NOMES = ['Echo', 'Relic', 'Mirage', 'Totem', 'Pulse', 'Atlas'];
 
@@ -58,7 +74,7 @@ function precoGerado(indice: number) {
     return '0.02';
   }
 
-  return new Big(indice).times('0.23').plus('0.11').toFixed(2);
+  return new Big(indice).times('0.29').plus('0.11').toFixed(2);
 }
 
 function dataDeLancamento(indice: number) {
@@ -82,32 +98,34 @@ function criarEdicoes(id: string, preco: string, esgotadoTotal: boolean): Edicao
 }
 
 function criarNft(indice: number): NftBanco {
-  const doLayout = NFTS_DO_LAYOUT[indice];
+  const doLayout = NFTS_DO_LAYOUT.at(indice);
   const primeiro = PRIMEIROS_NOMES[indice % PRIMEIROS_NOMES.length];
   const segundo = SEGUNDOS_NOMES[indice % SEGUNDOS_NOMES.length];
   const numero = String(100 + indice * 7);
-  const nome = doLayout?.[0] ?? `${primeiro} ${segundo} #${numero}`;
-  const tokenId = doLayout?.[1] ?? `#${numero.padStart(4, '0')}`;
-  const preco = doLayout?.[2] ?? precoGerado(indice);
+  const nome = doLayout?.nome ?? `${primeiro} ${segundo} #${numero}`;
+  const tokenId = doLayout?.tokenId ?? `#${numero.padStart(4, '0')}`;
+  const preco = doLayout?.preco ?? precoGerado(indice);
+  const arte = doLayout?.arte ?? (indice % 4) + 1;
   const id = `nft-${String(indice + 1).padStart(2, '0')}`;
   const esgotado = indice === TOTAL_NFTS - 3;
   const edicoes = criarEdicoes(id, preco, esgotado);
-  const imagem = { url: `/nfts/${id}.webp`, alt: nome };
+  const imagem = { url: `/nfts/arte-${arte}-640.webp`, alt: nome };
 
   return {
     id,
     nome,
     tokenId,
     preco,
+    precoAnterior: doLayout?.precoAnterior ?? null,
     imagem,
     imagens: [imagem],
     edicoes,
     disponivel: edicoes.reduce((total, edicao) => total + edicao.disponivel, 0),
-    raro: indice % 5 === 0,
+    raro: doLayout ? (doLayout.raro ?? false) : indice % 7 === 0,
     categoria: CATEGORIAS[indice % CATEGORIAS.length],
     rede: REDES[(indice + Math.floor(indice / CATEGORIAS.length)) % REDES.length],
     nomeColecao: 'Kurio Apes',
-    descricao: `Um colecionável digital finalizado à mão da coleção Kurio Editions.`,
+    descricao: 'Um colecionável digital finalizado à mão da coleção Kurio Editions.',
     atributos: ['Óculos', 'Esmeralda', 'Raro'],
     avaliacoes: { total: 19, nota: 4.8 },
     contrato: '0x7A42...19E8',

@@ -2,6 +2,7 @@ import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
 import { BarraNavegacao } from '@/components/layout/barra-navegacao';
 import { Cabecalho } from '@/components/layout/cabecalho';
 import { Toaster } from '@/components/ui/sonner';
+import { ProvedorTempoReal } from '@/lib/tempo-real/provedor';
 
 export const Route = createRootRoute({
   component: LayoutRaiz,
@@ -15,6 +16,7 @@ function LayoutRaiz() {
       <Outlet />
       <BarraNavegacao />
       <Toaster />
+      <ProvedorTempoReal />
     </>
   );
 }

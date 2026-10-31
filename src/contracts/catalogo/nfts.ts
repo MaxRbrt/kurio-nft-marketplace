@@ -48,6 +48,7 @@ export const nftResumoSchema = z.object({
   nome: z.string(),
   imagem: imagemSchema,
   preco: valorEthSchema,
+  precoAnterior: valorEthSchema.nullable(),
   disponivel: z.number().int().nonnegative(),
   raro: z.boolean(),
   categoria: categoriaSchema,

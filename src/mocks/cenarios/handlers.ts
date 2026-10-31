@@ -104,7 +104,7 @@ export const handlersCenarios = [
           return HttpResponse.json(
             listaNftsSchema.parse({
               itens: [],
-              paginacao: { pagina: 1, tamanhoPagina: 12, totalItens: 0, totalPaginas: 0 },
+              paginacao: { pagina: 1, tamanhoPagina: 9, totalItens: 0, totalPaginas: 0 },
               facetas: zerarFacetas(),
             }),
           );
