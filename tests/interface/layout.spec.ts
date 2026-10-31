@@ -121,7 +121,8 @@ test('links reais levam às rotas', async ({ page }) => {
   await page.goto('/');
   await page.getByTestId('cabecalho-entrar').click();
   await expect(page).toHaveURL(/\/login$/);
-  await page.getByTestId('cabecalho-logo').click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.keyboard.press('Escape');
   await expect(page).toHaveURL(/\/$/);
 });
 

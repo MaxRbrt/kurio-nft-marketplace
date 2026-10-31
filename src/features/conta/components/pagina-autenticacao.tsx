@@ -1,0 +1,175 @@
+import { Link, useNavigate } from '@tanstack/react-router';
+import { X } from 'lucide-react';
+import { useSyncExternalStore } from 'react';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { PaginaInicial } from '@/features/catalogo/components/pagina-inicial';
+import { cn } from '@/lib/utils';
+import type { BuscaAutenticacao } from '../destino';
+import { FormularioCadastro } from './formulario-cadastro';
+import { FormularioLogin } from './formulario-login';
+
+type Modo = 'login' | 'cadastro';
+
+const CONSULTA_DESKTOP = '(min-width: 1024px)';
+
+function useTelaDesktop() {
+  return useSyncExternalStore(
+    (avisar) => {
+      const consulta = window.matchMedia(CONSULTA_DESKTOP);
+
+      consulta.addEventListener('change', avisar);
+
+      return () => consulta.removeEventListener('change', avisar);
+    },
+    () => window.matchMedia(CONSULTA_DESKTOP).matches,
+  );
+}
+
+const TEXTOS: Record<Modo, { titulo: string; subtitulo: string }> = {
+  login: {
+    titulo: 'Entrar',
+    subtitulo: 'Entre para gerenciar sua carteira, coleção e perfil de criador.',
+  },
+  cadastro: {
+    titulo: 'Criar conta',
+    subtitulo: 'Crie seu perfil de colecionador e conecte uma carteira quando quiser.',
+  },
+};
+
+// ====================================================================
+// 1. MODAL DO DESKTOP
+// Nos frames, login e cadastro são abas de um modal sobre a tela inicial.
+// O Radix prende o foco e fecha com Esc; a rota continua sendo própria,
+// então acesso direto e refresh funcionam.
+// ====================================================================
+function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo) {
+  const aba = (destino: Modo, rotulo: string) => (
+    <Link
+      to={destino === 'login' ? '/login' : '/cadastro'}
+      search={busca}
+      aria-current={modo === destino ? 'page' : undefined}
+      className={cn(
+        'text-xl leading-4 font-medium',
+        modo === destino ? 'text-texto-destaque' : 'text-foreground',
+      )}
+    >
+      {rotulo}
+    </Link>
+  );
+
+  return (
+    <Dialog open onOpenChange={(aberto) => !aberto && aoFechar()}>
+      <DialogContent
+        showCloseButton={false}
+        onOpenAutoFocus={(evento) => {
+          evento.preventDefault();
+          document.querySelector<HTMLInputElement>('[role=dialog] input')?.focus();
+        }}
+        data-testid="modal-autenticacao"
+        className={cn(
+          'block w-[500px] max-w-[500px] translate-y-0 gap-0 rounded-none bg-card p-0 ring-0 sm:max-w-[500px]',
+          modo === 'login' ? 'top-[160px] min-h-[600px]' : 'top-[158px] min-h-[656px] rounded-lg',
+        )}
+      >
+        <DialogClose
+          aria-label="Fechar"
+          className="absolute top-[11px] right-3 size-[18px] text-primary"
+        >
+          <X aria-hidden className="size-[18px]" />
+        </DialogClose>
+
+        <div className="flex items-center justify-center gap-2 pt-12">
+          {aba('login', 'Entrar')}
+          <span aria-hidden className="h-5 w-px bg-texto-coral" />
+          {aba('cadastro', 'Criar conta')}
+        </div>
+
+        <DialogTitle className="sr-only">{TEXTOS[modo].titulo}</DialogTitle>
+        <DialogDescription className="mx-auto mt-10 w-[404px] text-center text-[13px] leading-4 text-foreground">
+          {TEXTOS[modo].subtitulo}
+        </DialogDescription>
+
+        <div className="px-20 pt-6 pb-[43px]">
+          {modo === 'login' ? (
+            <FormularioLogin aoEntrar={aoConcluir} />
+          ) : (
+            <FormularioCadastro aoCriar={aoConcluir} />
+          )}
+        </div>
+        <div aria-hidden className="absolute inset-x-0 bottom-0 h-2.5 bg-primary" />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ====================================================================
+// 2. TELA DO MOBILE
+// Nos frames mobile é tela inteira, com logotipo e sem barra inferior.
+// ====================================================================
+function TelaMobile({ modo, busca, aoConcluir }: PropsConteudo) {
+  return (
+    <main data-testid="tela-autenticacao" className="mx-auto w-full max-w-[414px] px-7 pb-6">
+      <p className="pt-[127px] text-center text-[32px] leading-[42px] font-bold tracking-[0.1em]">
+        KURIO
+      </p>
+      <h1
+        className={cn(
+          'mt-[87px] text-center font-bold',
+          modo === 'login' ? 'text-xl/4' : 'text-lg/4',
+        )}
+      >
+        {modo === 'login' ? 'Entrar' : 'Criar perfil de colecionador'}
+      </h1>
+      <div className="mt-10">
+        {modo === 'login' ? (
+          <FormularioLogin aoEntrar={aoConcluir} />
+        ) : (
+          <FormularioCadastro aoCriar={aoConcluir} />
+        )}
+      </div>
+      <p className="mt-10 text-center text-[15px] leading-5 text-muted-foreground">
+        {modo === 'login' ? (
+          <Link to="/cadastro" search={busca}>
+            Novo na Kurio? Crie uma conta
+          </Link>
+        ) : (
+          <Link to="/login" search={busca}>
+            Já tem uma conta? Entre
+          </Link>
+        )}
+      </p>
+    </main>
+  );
+}
+
+type PropsConteudo = {
+  modo: Modo;
+  busca: BuscaAutenticacao;
+  aoConcluir: () => void;
+  aoFechar: () => void;
+};
+
+export function PaginaAutenticacao({ modo, busca }: { modo: Modo; busca: BuscaAutenticacao }) {
+  const navigate = useNavigate();
+  const desktop = useTelaDesktop();
+  const aoConcluir = () => void navigate({ to: busca.redirect ?? '/' });
+  const aoFechar = () => void navigate({ to: '/' });
+  const propriedades = { modo, busca, aoConcluir, aoFechar };
+
+  if (!desktop) {
+    return <TelaMobile {...propriedades} />;
+  }
+
+  return (
+    <>
+      <PaginaInicial />
+      <ModalAutenticacao {...propriedades} />
+    </>
+  );
+}

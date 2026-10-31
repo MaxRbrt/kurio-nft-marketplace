@@ -1,10 +1,11 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router';
+import type { QueryClient } from '@tanstack/react-query';
+import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router';
 import { BarraNavegacao } from '@/components/layout/barra-navegacao';
 import { Cabecalho } from '@/components/layout/cabecalho';
 import { Toaster } from '@/components/ui/sonner';
 import { ProvedorTempoReal } from '@/lib/tempo-real/provedor';
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<{ clienteConsultas: QueryClient }>()({
   component: LayoutRaiz,
   notFoundComponent: PaginaNaoEncontrada,
 });

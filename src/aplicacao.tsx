@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { clienteConsultas } from './lib/api/consultas';
 import { routeTree } from './routeTree.gen';
 
-const router = createRouter({ routeTree });
+const router = createRouter({ routeTree, context: { clienteConsultas } });
 
 declare module '@tanstack/react-router' {
   interface Register {

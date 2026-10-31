@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation } from '@tanstack/react-router';
 import { obterCarrinho } from '@/features/compra/api/carrinho';
 import { BuscaDesktop } from '@/features/catalogo/components/busca-desktop';
+import { useSessao } from '@/features/conta/usar-sessao';
 import { IconeCarrinho, IconeEntrar } from '../icones/icones';
 import { AcaoIndisponivel } from './acao-indisponivel';
 
@@ -18,8 +19,11 @@ const LINKS_INDISPONIVEIS = [
 // soma as quantidades vindas da API.
 // ====================================================================
 export function Cabecalho() {
+  const sessao = useSessao();
+  const { pathname } = useLocation();
+  const inicioAtivo = ['/', '/login', '/cadastro'].includes(pathname);
   const { data: carrinho } = useQuery({
-    queryKey: ['carrinho'],
+    queryKey: ['carrinho', sessao?.usuario.id ?? 'visitante'],
     queryFn: ({ signal }) => obterCarrinho(signal),
   });
   const totalItens = carrinho?.itens.reduce((total, item) => total + item.quantidade, 0) ?? 0;
@@ -39,12 +43,12 @@ export function Cabecalho() {
         <nav aria-label="Principal" data-testid="cabecalho-nav" className="flex gap-10">
           <Link
             to="/"
-            className="relative h-[45px] w-[58px] text-base leading-[21px] text-foreground"
-            activeOptions={{ exact: true }}
-            activeProps={{
-              className:
-                "font-bold text-texto-destaque after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[3px] after:bg-primary after:content-['']",
-            }}
+            aria-current={inicioAtivo ? 'page' : undefined}
+            className={`relative h-[45px] w-[58px] text-base leading-[21px] ${
+              inicioAtivo
+                ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[3px] after:bg-primary after:content-['']"
+                : 'text-foreground'
+            }`}
           >
             Início
           </Link>
@@ -73,14 +77,25 @@ export function Cabecalho() {
             )}
           </Link>
 
-          <Link
-            to="/login"
-            data-testid="cabecalho-entrar"
-            className="flex h-[35px] w-[100px] items-center justify-center gap-1 rounded-md bg-primary text-base font-medium text-primary-foreground hover:bg-primaria-clara"
-          >
-            <IconeEntrar />
-            Entrar
-          </Link>
+          {sessao ? (
+            <Link
+              to="/perfil"
+              aria-label={`Perfil de ${sessao.usuario.nomeExibicao}`}
+              data-testid="cabecalho-conta"
+              className="flex size-[35px] items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground"
+            >
+              {sessao.usuario.nomeExibicao.charAt(0).toUpperCase()}
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              data-testid="cabecalho-entrar"
+              className="flex h-[35px] w-[100px] items-center justify-center gap-1 rounded-md bg-primary text-base font-medium text-primary-foreground hover:bg-primaria-clara"
+            >
+              <IconeEntrar />
+              Entrar
+            </Link>
+          )}
         </div>
       </div>
       <div className="h-px bg-primary/30" />

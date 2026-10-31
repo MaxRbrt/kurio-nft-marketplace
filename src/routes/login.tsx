@@ -1,9 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
+import { consultaSessao } from '@/features/conta/api/sessao';
+import { PaginaAutenticacao } from '@/features/conta/components/pagina-autenticacao';
+import { buscaAutenticacaoSchema } from '@/features/conta/destino';
 
 export const Route = createFileRoute('/login')({
-  component: () => (
-    <main className="mx-auto max-w-[1200px] py-10">
-      <h1 className="text-2xl font-bold">Entrar</h1>
-    </main>
-  ),
+  validateSearch: (busca) => buscaAutenticacaoSchema.parse(busca),
+  beforeLoad: async ({ context, search }) => {
+    if (await context.clienteConsultas.ensureQueryData(consultaSessao)) {
+      throw redirect({ to: search.redirect ?? '/' });
+    }
+  },
+  component: Pagina,
 });
+
+function Pagina() {
+  return <PaginaAutenticacao modo="login" busca={Route.useSearch()} />;
+}

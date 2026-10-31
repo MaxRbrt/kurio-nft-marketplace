@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation } from '@tanstack/react-router';
 import { AcaoIndisponivel } from './acao-indisponivel';
 
 const CLASSE_AREA = 'absolute top-[57%] size-11 -translate-x-1/2 -translate-y-1/2 rounded-full';
@@ -10,6 +10,12 @@ const CLASSE_AREA = 'absolute top-[57%] size-11 -translate-x-1/2 -translate-y-1/
 // acompanhar a escala do desenho em telas menores que 414 px.
 // ====================================================================
 export function BarraNavegacao() {
+  const { pathname } = useLocation();
+
+  if (pathname === '/login' || pathname === '/cadastro') {
+    return null;
+  }
+
   return (
     <nav
       aria-label="Navegação inferior"
@@ -102,7 +108,7 @@ export function BarraNavegacao() {
           style={{ left: '73%', top: '66%' }}
         />
         <Link
-          to="/login"
+          to="/perfil"
           aria-label="Conta"
           className={CLASSE_AREA}
           style={{ left: '87.9%', top: '66%' }}
