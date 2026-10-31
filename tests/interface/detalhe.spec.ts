@@ -108,6 +108,8 @@ test.describe('desktop 1440', () => {
     const cartao = page.getByTestId('cartao-nft').nth(1);
     const acoes = cartao.getByTestId('cartao-acoes');
 
+    await page.mouse.move(0, 0);
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
     await expect(acoes).toHaveCSS('opacity', '0');
     await cartao.hover();
     await expect(acoes).toHaveCSS('opacity', '1');
