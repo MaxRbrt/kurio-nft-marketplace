@@ -50,7 +50,6 @@ export function FormularioCadastro({ aoCriar }: { aoCriar: () => void }) {
           rotulo="Nome de usuário"
           placeholder="Nome de usuário"
           autoComplete="username"
-          className="max-lg:placeholder:text-center"
           erro={errors.nomeUsuario?.message}
           {...register('nomeUsuario')}
         />
@@ -100,7 +99,7 @@ export function FormularioCadastro({ aoCriar }: { aoCriar: () => void }) {
         <span className="hidden lg:inline">Criar conta</span>
       </button>
 
-      <EntradasSociais espacamento="gap-4" />
+      <EntradasSociais espacamento="gap-4" espacamentoTopo="mt-3 lg:mt-4" />
     </form>
   );
 }

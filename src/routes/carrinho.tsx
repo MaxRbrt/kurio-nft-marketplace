@@ -1,9 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { buscaCompraSchema } from '@/features/compra/busca';
+import { PaginaCarrinho } from '@/features/compra/components/pagina-carrinho';
 
 export const Route = createFileRoute('/carrinho')({
-  component: () => (
-    <main className="mx-auto max-w-[1200px] py-10">
-      <h1 className="text-2xl font-bold">Carrinho de NFTs</h1>
-    </main>
-  ),
+  validateSearch: (busca) => buscaCompraSchema.parse(busca),
+  component: Pagina,
 });
+
+function Pagina() {
+  const { cupom } = Route.useSearch();
+
+  return <PaginaCarrinho cupom={cupom} />;
+}

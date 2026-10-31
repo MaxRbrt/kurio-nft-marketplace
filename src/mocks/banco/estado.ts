@@ -12,12 +12,12 @@ import { criarUsuariosIniciais, type UsuarioBanco } from '../fixtures/usuarios';
 // Fonte única de REST e eventos. Roda na página, em memória, e é salvo
 // no localStorage para sobreviver ao refresh. Cada aba tem sua cópia.
 // ====================================================================
-export type SessaoBanco = {
+type SessaoBanco = {
   usuarioId: string;
   expiraEm: string;
 };
 
-export type ItemCarrinhoBanco = {
+type ItemCarrinhoBanco = {
   id: string;
   nftId: string;
   edicaoId: string;
@@ -31,7 +31,7 @@ export type CotacaoBanco = Cotacao & {
 
 export type ResolucaoPagamento = 'confirmar' | 'recusar' | 'manual';
 
-export type EstadoBanco = {
+type EstadoBanco = {
   nfts: NftBanco[];
   usuarios: UsuarioBanco[];
   sessoes: Record<string, SessaoBanco>;

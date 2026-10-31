@@ -7,7 +7,7 @@ import { redeSchema } from '../comum/valores';
 // pede endereço 0x em todas as redes, então a regra vale para todas.
 // ====================================================================
 export const tipoCarteiraSchema = z.enum(['metamask', 'walletconnect', 'coinbase']);
-export const papelCarteiraSchema = z.enum(['principal', 'secundaria']);
+const papelCarteiraSchema = z.enum(['principal', 'secundaria']);
 
 const camposCarteiraSchema = z.object({
   nomeExibicao: z.string().trim().min(1, 'Informe o nome de exibição'),
@@ -32,4 +32,3 @@ export const conexaoCarteiraSchema = z.object({
   carteiraId: z.string(),
   estado: z.enum(['conectada', 'desconectada']),
 });
-export type ConexaoCarteira = z.infer<typeof conexaoCarteiraSchema>;

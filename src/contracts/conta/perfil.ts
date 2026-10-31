@@ -27,7 +27,6 @@ export type EntradaPerfil = z.infer<typeof entradaPerfilSchema>;
 export const entradaAvatarSchema = z.object({
   avatarUrl: z.string().startsWith('data:image/', 'Imagem inválida').nullable(),
 });
-export type EntradaAvatar = z.infer<typeof entradaAvatarSchema>;
 
 export const entradaSenhaSchema = z
   .object({

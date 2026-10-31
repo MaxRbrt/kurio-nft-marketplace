@@ -1,5 +1,4 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { X } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 import {
   Dialog,
@@ -8,10 +7,11 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { PaginaInicial } from '@/features/catalogo/components/pagina-inicial';
+import { IconeFechar } from '@/components/icones/icones';
 import { cn } from '@/lib/utils';
 import type { BuscaAutenticacao } from '../destino';
 import { FormularioCadastro } from './formulario-cadastro';
+import { FundoAutenticacao } from './fundo-autenticacao';
 import { FormularioLogin } from './formulario-login';
 
 type Modo = 'login' | 'cadastro';
@@ -45,8 +45,8 @@ const TEXTOS: Record<Modo, { titulo: string; subtitulo: string }> = {
 // ====================================================================
 // 1. MODAL DO DESKTOP
 // Nos frames, login e cadastro são abas de um modal sobre a tela inicial.
-// O Radix prende o foco e fecha com Esc; a rota continua sendo própria,
-// então acesso direto e refresh funcionam.
+// O foco entra no próprio diálogo, sem destacar campo que o frame não
+// destaca. Radix prende o foco e fecha com Esc; a rota segue própria.
 // ====================================================================
 function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo) {
   const aba = (destino: Modo, rotulo: string) => (
@@ -69,7 +69,7 @@ function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo)
         showCloseButton={false}
         onOpenAutoFocus={(evento) => {
           evento.preventDefault();
-          document.querySelector<HTMLInputElement>('[role=dialog] input')?.focus();
+          (evento.currentTarget as HTMLElement | null)?.focus();
         }}
         data-testid="modal-autenticacao"
         className={cn(
@@ -79,9 +79,12 @@ function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo)
       >
         <DialogClose
           aria-label="Fechar"
-          className="absolute top-[11px] right-3 size-[18px] text-primary"
+          className={cn(
+            'absolute top-[11px] size-[18px] text-primary',
+            modo === 'login' ? 'right-3' : 'right-[13px]',
+          )}
         >
-          <X aria-hidden className="size-[18px]" />
+          <IconeFechar />
         </DialogClose>
 
         <div className="flex items-center justify-center gap-2 pt-12">
@@ -115,7 +118,7 @@ function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo)
 function TelaMobile({ modo, busca, aoConcluir }: PropsConteudo) {
   return (
     <main data-testid="tela-autenticacao" className="mx-auto w-full max-w-[414px] px-7 pb-6">
-      <p className="pt-[127px] text-center text-[32px] leading-[42px] font-bold tracking-[0.1em]">
+      <p className="pt-[127px] pl-[0.1em] text-center text-[32px] leading-[42px] font-bold tracking-[0.1em]">
         KURIO
       </p>
       <h1
@@ -168,7 +171,7 @@ export function PaginaAutenticacao({ modo, busca }: { modo: Modo; busca: BuscaAu
 
   return (
     <>
-      <PaginaInicial />
+      <FundoAutenticacao />
       <ModalAutenticacao {...propriedades} />
     </>
   );

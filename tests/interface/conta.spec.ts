@@ -8,7 +8,7 @@ import { ANA, BRUNO, chamarApi } from '../apoio/api';
 const cartaoInicial = (pagina: Page) => pagina.getByTestId('cartao-nome').first();
 
 async function preencherLogin(pagina: Page, credenciais: { email: string; senha: string }) {
-  await pagina.getByRole('textbox', { name: 'E-mail' }).fill(credenciais.email);
+  await pagina.getByRole('textbox', { name: 'E-mail', exact: true }).fill(credenciais.email);
   await pagina.getByLabel('Senha', { exact: true }).fill(credenciais.senha);
   await pagina.getByRole('button', { name: 'Entrar', exact: true }).click();
 }
@@ -108,7 +108,7 @@ test.describe('login', () => {
     await page.goto('/login');
     await page.getByRole('button', { name: 'Entrar', exact: true }).click();
 
-    const email = page.getByRole('textbox', { name: 'E-mail' });
+    const email = page.getByRole('textbox', { name: 'E-mail', exact: true });
 
     await expect(email).toHaveAttribute('aria-invalid', 'true');
     await expect(email).toHaveAttribute('aria-describedby', 'login-email-erro');
@@ -174,10 +174,10 @@ test.describe('rotas privadas', () => {
     await preencherLogin(page, ANA);
 
     await expect(page).toHaveURL(/\/perfil$/);
-    await expect(page.getByTestId('perfil-usuario')).toHaveText('Ana Colecionadora');
+    await expect(page.getByLabel('Nome de exibição')).toHaveValue('Ana Colecionadora');
 
     await page.reload();
-    await expect(page.getByTestId('perfil-usuario')).toHaveText('Ana Colecionadora');
+    await expect(page.getByLabel('Nome de exibição')).toHaveValue('Ana Colecionadora');
   });
 
   test('destino externo é ignorado', async ({ page }) => {
@@ -199,7 +199,7 @@ test.describe('rotas privadas', () => {
   test('sessão expirada volta ao login guardando o destino', async ({ page }) => {
     await page.goto('/login?redirect=%2Fperfil');
     await preencherLogin(page, ANA);
-    await expect(page.getByTestId('perfil-usuario')).toBeVisible();
+    await expect(page.getByLabel('Nome de exibição')).toBeVisible();
 
     await chamarApi(page, 'POST', '/api/__mock/sessoes/expirar');
     await page.reload();
@@ -263,7 +263,7 @@ test.describe('cadastro', () => {
 
   async function preencherCadastro(pagina: Page, email: string, confirmar: string) {
     await pagina.getByLabel('Nome de usuário').fill(entrada.usuario);
-    await pagina.getByRole('textbox', { name: 'E-mail' }).fill(email);
+    await pagina.getByRole('textbox', { name: 'E-mail', exact: true }).fill(email);
     await pagina.getByLabel('Senha', { exact: true }).fill(entrada.senha);
     await pagina.getByLabel('Confirmar senha', { exact: true }).fill(confirmar);
     await pagina.getByRole('button', { name: 'Criar conta', exact: true }).click();

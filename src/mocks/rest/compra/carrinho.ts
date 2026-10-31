@@ -6,28 +6,14 @@ import {
 } from '@/contracts/compra/carrinho';
 import { donoUsuario, donoVisitante, lerEdicao, montarCarrinho } from '../../banco/carrinhos';
 import { lerBanco, salvarBanco } from '../../banco/estado';
-import { autenticar, lerToken } from '../conta/autenticacao';
+import { autenticar } from '../conta/autenticacao';
 import { lerCorpo, responderErro } from '../respostas';
+import { lerDono } from './dono';
 
 // ====================================================================
-// 1. QUEM É O DONO
-// Com token, o carrinho é do usuário, e token vencido é erro de sessão.
-// Sem token, é do visitante identificado pelo cabeçalho.
+// 1. ESTOQUE INSUFICIENTE
+// Conflito com a quantidade disponível, para a interface mostrar o limite.
 // ====================================================================
-function lerDono(request: Request): { dono: string } | { erro: Response } {
-  if (lerToken(request)) {
-    const sessao = autenticar(request);
-
-    return 'erro' in sessao ? sessao : { dono: donoUsuario(sessao.usuario.id) };
-  }
-
-  const visitanteId = request.headers.get(CABECALHO_VISITANTE);
-
-  return visitanteId
-    ? { dono: donoVisitante(visitanteId) }
-    : { erro: responderErro(422, 'VALIDACAO', 'Visitante não identificado') };
-}
-
 function responderIndisponivel(disponivel: number) {
   return HttpResponse.json(
     {

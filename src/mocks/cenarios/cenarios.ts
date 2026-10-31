@@ -29,7 +29,7 @@ export const cenarioSchema = z.object({
 });
 export type Cenario = z.infer<typeof cenarioSchema>;
 
-export const CENARIO_PADRAO: Cenario = { nome: 'padrao', vezes: null, rota: null };
+const CENARIO_PADRAO: Cenario = { nome: 'padrao', vezes: null, rota: null };
 
 // ====================================================================
 // 2. SELEÇÃO

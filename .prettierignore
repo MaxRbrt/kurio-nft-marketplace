@@ -6,3 +6,4 @@ public/mockServiceWorker.js
 src/components/ui
 src/routeTree.gen.ts
 test-results
+lighthouse/relatorios

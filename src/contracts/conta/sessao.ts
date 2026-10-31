@@ -6,7 +6,7 @@ import { dataIsoSchema } from '../comum/valores';
 // A senha nunca volta da API. O token identifica a sessão, que pode
 // expirar durante a navegação ou o checkout.
 // ====================================================================
-export const usuarioSchema = z.object({
+const usuarioSchema = z.object({
   id: z.string(),
   nomeUsuario: z.string(),
   email: z.email(),

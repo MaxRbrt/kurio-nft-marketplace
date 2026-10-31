@@ -1,6 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { ChevronRight, Search } from 'lucide-react';
-import { IconeCarrinho, IconeFavorito } from '@/components/icones/icones';
+import {
+  IconeCarrinhoAcao,
+  IconeChevronDireita,
+  IconeFavorito,
+  IconeBusca,
+} from '@/components/icones/icones';
 import { useAdicionarAoCarrinho } from '@/features/compra/usar-carrinho';
 import { useFavorito } from '@/features/catalogo/usar-favoritos';
 import { ErroApi } from '@/lib/api/erros';
@@ -12,12 +16,12 @@ const TAMANHO_PAGINA_LAYOUT = 9;
 
 // ====================================================================
 // 1. CARTÃO DO NFT
-// Medidas do frame: 258 x 300 no desktop e 175 x 200 no mobile. As ações
-// aparecem com o mouse ou o foco, como no cartão dos frames de login; no
-// mobile fica só o favorito, como no frame mobile.
+// Frame: 258 x 300 no desktop e 175 x 200 no mobile. A arte fica centrada
+// e o preço 6 px abaixo do nome em todos os cartões: o frame varia isso
+// por cartão, desvio documentado no ARCHITECTURE.md. Sem RARO no desktop,
+// como na Início. Ações do desktop aparecem com mouse ou foco.
 // ====================================================================
-const CLASSE_ACAO =
-  'flex size-[35px] items-center justify-center rounded border border-border bg-muted text-foreground';
+const CLASSE_ACAO = 'flex size-[35px] rounded border border-border bg-muted text-foreground';
 
 function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean }) {
   const { favorito, alternar } = useFavorito(nft.id);
@@ -34,10 +38,10 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
             height={250}
             alt={nft.imagem.alt}
             loading={prioridade ? 'eager' : 'lazy'}
-            className="size-[168px] rounded-2xl object-cover lg:aspect-square lg:size-auto lg:w-[calc(100%-8px)] lg:rounded-[15px]"
+            className="size-[168px] rounded-2xl object-cover lg:size-[250px] lg:rounded-[15px]"
           />
           {nft.raro && (
-            <span className="absolute top-4 left-0 flex h-8 w-[68px] items-center justify-center bg-primary text-[13px] leading-4 font-medium text-primary-foreground lg:top-3.5 lg:h-[29px] lg:w-20 lg:text-base">
+            <span className="absolute top-4 left-0 flex h-8 w-[68px] items-center bg-primary pl-2 lg:hidden text-[13px] leading-4 font-medium text-primary-foreground lg:top-3.5 lg:h-[29px] lg:w-20 lg:text-base">
               RARO
             </span>
           )}
@@ -48,7 +52,7 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
         >
           {nft.nome}
         </h3>
-        <p className="pl-2 lg:mt-1.5 lg:flex lg:gap-3 lg:pl-0">
+        <p className="pl-2 leading-4 lg:mt-1.5 lg:flex lg:gap-3 lg:pl-0">
           <span
             data-testid="cartao-preco"
             className="text-base leading-4 font-bold text-texto-destaque lg:text-lg"
@@ -56,10 +60,10 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
             {nft.preco} ETH
           </span>
           {nft.precoAnterior && (
-            <s className="ml-2 text-sm leading-4 text-secundaria lg:ml-0 lg:text-lg">
+            <span className="ml-2 text-sm leading-4 text-secundaria lg:ml-0 lg:text-lg">
               <span className="sr-only">Preço anterior: </span>
               {nft.precoAnterior} ETH
-            </s>
+            </span>
           )}
         </p>
       </Link>
@@ -84,16 +88,16 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
           onClick={() =>
             adicionar.mutate({ nftId: nft.id, edicaoId: nft.edicaoInicialId, quantidade: 1 })
           }
-          className={CLASSE_ACAO}
+          className={`${CLASSE_ACAO} pt-[7px] pl-[5px]`}
         >
-          <IconeCarrinho className="size-5" />
+          <IconeCarrinhoAcao />
         </button>
         <button
           type="button"
           aria-label={`Favoritar ${nft.nome}`}
           aria-pressed={favorito}
           onClick={alternar}
-          className={CLASSE_ACAO}
+          className={`${CLASSE_ACAO} pt-[7px] pl-[6px]`}
         >
           <IconeFavorito ativo={favorito} />
         </button>
@@ -101,9 +105,9 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
           to="/nfts/$nftId"
           params={{ nftId: nft.id }}
           aria-label={`Ver ${nft.nome}`}
-          className={CLASSE_ACAO}
+          className={`${CLASSE_ACAO} pt-[6px] pl-[8px]`}
         >
-          <Search aria-hidden className="size-5" />
+          <IconeBusca />
         </Link>
       </div>
     </li>
@@ -142,7 +146,7 @@ function Paginacao({ pagina, totalPaginas }: { pagina: number; totalPaginas: num
   }
 
   return (
-    <nav aria-label="Paginação" className="mt-[88px] flex justify-end gap-2">
+    <nav aria-label="Paginação" className="mt-[94px] flex justify-end gap-2">
       {paginas.map((numero) => (
         <button
           key={numero}
@@ -153,7 +157,7 @@ function Paginacao({ pagina, totalPaginas }: { pagina: number; totalPaginas: num
           className={`size-[35px] rounded text-lg leading-4 ${
             numero === pagina
               ? 'bg-primary font-bold text-primary-foreground'
-              : 'border border-border text-foreground'
+              : 'border border-border pt-[7px] pb-[9px] text-foreground'
           }`}
         >
           {numero}
@@ -164,9 +168,9 @@ function Paginacao({ pagina, totalPaginas }: { pagina: number; totalPaginas: num
         aria-label="Próxima página"
         disabled={pagina >= totalPaginas}
         onClick={() => irParaPagina(pagina + 1)}
-        className="flex size-[35px] items-center justify-center rounded border border-border text-foreground disabled:opacity-40"
+        className="flex size-[35px] rounded border border-border p-[7px] text-foreground disabled:opacity-40"
       >
-        <ChevronRight aria-hidden className="size-[18px]" />
+        <IconeChevronDireita />
       </button>
     </nav>
   );

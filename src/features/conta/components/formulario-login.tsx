@@ -57,6 +57,7 @@ export function FormularioLogin({ aoEntrar }: { aoEntrar: () => void }) {
           placeholder="***********"
           autoComplete="current-password"
           alternarSenha="sempre"
+          className="placeholder:text-base placeholder:text-foreground"
           erro={errors.senha?.message}
           {...register('senha')}
         />

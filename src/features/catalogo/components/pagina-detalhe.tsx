@@ -1,23 +1,31 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { ChevronLeft, Minus, Plus, Search, Star } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
-  IconeCarrinho,
+  IconeBusca,
+  IconeCarrinhoCompra,
+  IconeEstrela,
+  IconeEstrelaPequena,
   IconeFavorito,
-  IconeLinkedin,
-  IconeTwitter,
+  IconeLinkedinPequeno,
+  IconeMais,
+  IconeMenos,
+  IconeMensagem,
+  IconeTwitterPequeno,
+  IconeVoltarDetalhe,
 } from '@/components/icones/icones';
 import { AcaoIndisponivel } from '@/components/layout/acao-indisponivel';
 import { Rodape } from '@/components/layout/rodape';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { Edicao, NftDetalhe } from '@/contracts/catalogo/nfts';
+import { BotaoQuantidade } from '@/features/compra/components/botao-quantidade';
 import { useAdicionarAoCarrinho } from '@/features/compra/usar-carrinho';
 import { ErroApi } from '@/lib/api/erros';
 import { cn } from '@/lib/utils';
 import { obterNft } from '../api/detalhe';
 import { useFavorito } from '../usar-favoritos';
 import { ImagemNft } from './imagem-nft';
+import { VitrineNfts } from './vitrine-nfts';
 
 // ====================================================================
 // 1. ESTADO DA COMPRA
@@ -129,6 +137,7 @@ function AvisoEstoque({ compra }: { compra: Compra }) {
 function Galeria({ nft }: { nft: NftDetalhe }) {
   const [indice, setIndice] = useState(Math.min(1, nft.imagens.length - 1));
   const [ampliada, setAmpliada] = useState(false);
+  const botaoAmpliar = useRef<HTMLButtonElement>(null);
   const imagem = nft.imagens[indice];
 
   return (
@@ -170,17 +179,24 @@ function Galeria({ nft }: { nft: NftDetalhe }) {
           className="size-[404px] rounded-3xl object-cover"
         />
         <button
+          ref={botaoAmpliar}
           type="button"
           aria-label="Ampliar imagem"
           onClick={() => setAmpliada(true)}
           className="absolute top-[13px] right-3 flex size-[30px] items-center justify-center rounded-full border border-border bg-muted text-foreground"
         >
-          <Search aria-hidden className="size-5" />
+          <IconeBusca />
         </button>
       </div>
 
       <Dialog open={ampliada} onOpenChange={setAmpliada}>
-        <DialogContent className="w-[640px] max-w-[90vw] bg-card p-4 sm:max-w-[640px]">
+        <DialogContent
+          className="w-[640px] max-w-[90vw] bg-card p-4 sm:max-w-[640px]"
+          onCloseAutoFocus={(evento) => {
+            evento.preventDefault();
+            botaoAmpliar.current?.focus();
+          }}
+        >
           <DialogTitle className="text-base">{nft.nome}</DialogTitle>
           <ImagemNft
             url={imagem.url}
@@ -214,7 +230,7 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
 
         <section
           data-testid="detalhe-produto"
-          className="mt-3 flex flex-col gap-[33px] xl:h-[448px] xl:flex-row"
+          className="mt-3 flex flex-col gap-8 xl:h-[448px] xl:flex-row"
         >
           <Galeria nft={nft} />
 
@@ -228,17 +244,19 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
                 {compra.edicao.preco} ETH
               </p>
               <p className="flex items-center gap-1 text-[15px] leading-5">
-                <span className="flex gap-1" aria-hidden>
+                <span className="flex gap-1 text-primary" aria-hidden>
                   {Array.from({ length: 5 }, (_, indice) => (
-                    <Star key={indice} className="size-[15px] fill-primary text-primary" />
+                    <IconeEstrela key={indice} />
                   ))}
                 </span>
-                <span className="ml-1">{nft.avaliacoes.total} avaliações de colecionadores</span>
+                <span className="w-[280px]">
+                  {nft.avaliacoes.total} avaliações de colecionadores
+                </span>
               </p>
             </div>
-            <hr className="mt-3 w-[573px] max-w-full border-primary/30" />
+            <hr className="mt-[11px] w-[573px] max-w-full border-primary/25" />
 
-            <h2 className="mt-3 text-[15px] leading-4 font-bold">Sobre este NFT:</h2>
+            <h2 className="mt-[13px] text-[15px] leading-4 font-bold">Sobre este NFT:</h2>
             <p className="mt-3 h-[66px] w-[574px] max-w-full text-sm leading-6 text-muted-foreground">
               {nft.descricao}
             </p>
@@ -251,16 +269,16 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
               <div
                 role="group"
                 aria-label="Quantidade"
-                className="flex h-[50px] w-[103px] items-center justify-between"
+                className="flex h-[49.5px] w-[103px] items-center justify-between"
               >
                 <button
                   type="button"
                   aria-label="Diminuir quantidade"
                   disabled={compra.quantidade <= 1}
                   onClick={compra.diminuir}
-                  className="flex h-[50px] w-[33px] items-center justify-center rounded-[33px] border border-background bg-primary text-black disabled:cursor-not-allowed"
+                  className="flex h-[49.5px] w-[33px] items-center justify-center rounded-[33px] border border-background bg-primary text-black disabled:cursor-not-allowed"
                 >
-                  <Minus aria-hidden className="size-[18px]" />
+                  <IconeMenos className="size-[26.4px]" />
                 </button>
                 <output
                   data-testid="detalhe-quantidade"
@@ -274,9 +292,9 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
                   aria-label="Aumentar quantidade"
                   disabled={compra.esgotada || compra.quantidade >= compra.edicao.disponivel}
                   onClick={compra.aumentar}
-                  className="flex h-[50px] w-[33px] items-center justify-center rounded-[33px] border border-background bg-primary text-black disabled:opacity-50"
+                  className="flex h-[49.5px] w-[33px] items-center justify-center rounded-[33px] border border-background bg-primary text-black disabled:opacity-50"
                 >
-                  <Plus aria-hidden className="size-[18px]" />
+                  <IconeMais className="size-[26.4px]" />
                 </button>
               </div>
 
@@ -303,27 +321,35 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
               </div>
             </div>
 
-            <div className="mt-[13px]">
+            <div className="mt-[13.5px]">
               <DadosToken nft={nft} />
             </div>
 
-            <div className="mt-3 flex items-center gap-2">
-              <span className="text-[15px] leading-4 font-bold">Compartilhar este NFT:</span>
+            <div className="mt-3 flex h-[18px] items-center gap-2">
+              <span className="w-[199px] text-[15px] leading-4 font-bold">
+                Compartilhar este NFT:
+              </span>
               <AcaoIndisponivel
                 aria-label="Compartilhar no LinkedIn"
                 className="cursor-not-allowed"
               >
-                <IconeLinkedin className="size-[15px]" />
+                <IconeLinkedinPequeno />
+              </AcaoIndisponivel>
+              <AcaoIndisponivel
+                aria-label="Compartilhar por mensagem"
+                className="cursor-not-allowed"
+              >
+                <IconeMensagem />
               </AcaoIndisponivel>
               <AcaoIndisponivel aria-label="Compartilhar no X" className="cursor-not-allowed">
-                <IconeTwitter className="size-4" />
+                <IconeTwitterPequeno />
               </AcaoIndisponivel>
             </div>
           </div>
         </section>
 
         <section className="mt-24" aria-label="Mais informações">
-          <div role="tablist" className="flex h-7 gap-8 border-b border-primary/30">
+          <div role="tablist" className="flex h-7 items-start gap-8 border-b border-primary/25">
             <button
               type="button"
               role="tab"
@@ -332,9 +358,9 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
               aria-controls="painel-nft"
               onClick={() => setAba('detalhes')}
               className={cn(
-                'relative h-7 text-[17px] leading-4',
+                'relative flex h-7 w-[161px] items-start text-left text-[17px] leading-4',
                 aba === 'detalhes'
-                  ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:-bottom-px after:h-[3px] after:bg-primary after:content-['']"
+                  ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:bg-primary after:content-['']"
                   : '',
               )}
             >
@@ -348,9 +374,9 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
               aria-controls="painel-nft"
               onClick={() => setAba('avaliacoes')}
               className={cn(
-                'relative h-7 text-[17px] leading-4',
+                'relative flex h-7 w-[337px] items-start text-left text-[17px] leading-4',
                 aba === 'avaliacoes'
-                  ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:-bottom-px after:h-[3px] after:bg-primary after:content-['']"
+                  ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:bg-primary after:content-['']"
                   : '',
               )}
             >
@@ -383,42 +409,7 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
           </div>
         </section>
 
-        <section className="mt-24" aria-labelledby="relacionados-titulo">
-          <h2
-            id="relacionados-titulo"
-            className="h-7 border-b border-primary/30 text-[17px] leading-4 font-bold text-texto-destaque"
-          >
-            Mais desta coleção
-          </h2>
-          <ul className="mt-8 grid grid-cols-5 gap-[26px]">
-            {nft.relacionados.map((relacionado) => (
-              <li key={relacionado.id} data-testid="relacionado">
-                <Link to="/nfts/$nftId" params={{ nftId: relacionado.id }} className="block">
-                  <div className="flex aspect-[219/255] items-center justify-center bg-card">
-                    <ImagemNft
-                      url={relacionado.imagem.url}
-                      sizes="212px"
-                      width={212}
-                      height={212}
-                      alt={relacionado.imagem.alt}
-                      loading="lazy"
-                      className="aspect-square w-[calc(100%-7px)] rounded-[13px] object-cover"
-                    />
-                  </div>
-                  <h3 className="mt-3 truncate text-[15px] leading-5">{relacionado.nome}</h3>
-                  <p className="text-base leading-4 font-bold text-texto-destaque">
-                    {relacionado.preco} ETH
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div aria-hidden className="mt-8 flex justify-center gap-2">
-            <span className="size-3 rounded-full border border-primary" />
-            <span className="size-3 rounded-full bg-primary" />
-            <span className="size-3 rounded-full border border-primary" />
-          </div>
-        </section>
+        <VitrineNfts titulo="Mais desta coleção" nfts={nft.relacionados} variante="detalhe" />
       </main>
       <Rodape />
     </div>
@@ -437,8 +428,8 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
     'flex size-[35px] items-center justify-center rounded-full border border-border bg-muted text-texto-destaque';
 
   return (
-    <main data-testid="detalhe-mobile" className="mx-auto max-w-[414px] pb-[176px] lg:hidden">
-      <div className="relative h-[506px] bg-linear-to-b from-card to-background px-7 pt-[23px]">
+    <main data-testid="detalhe-mobile" className="mx-auto max-w-[414px] lg:hidden">
+      <div className="relative h-[506px] bg-linear-to-b from-card to-muted px-7 pt-[23px]">
         <div className="flex justify-between">
           <button
             type="button"
@@ -446,7 +437,7 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
             onClick={() => void navigate({ to: '/' })}
             className={classeRedonda}
           >
-            <ChevronLeft aria-hidden className="size-5" />
+            <IconeVoltarDetalhe className="text-secundaria" />
           </button>
           <button
             type="button"
@@ -455,7 +446,7 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
             onClick={alternar}
             className={classeRedonda}
           >
-            <IconeFavorito ativo={favorito} className="size-[18px]" />
+            <IconeFavorito ativo={favorito} className="size-4" />
           </button>
         </div>
         <ImagemNft
@@ -471,17 +462,23 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
 
       <section
         data-testid="detalhe-painel"
-        className="relative z-10 -mt-[114px] rounded-t-[32px] bg-card px-6 pt-8 pb-6"
+        className="relative z-10 -mt-[114px] min-h-[504px] rounded-t-[31px] bg-card px-6 pt-8 pb-[176px]"
       >
         <div className="flex items-center justify-between">
           <h1 className="text-xl leading-4 font-bold">{nft.nome}</h1>
-          <p className="flex h-[27px] w-20 items-center justify-center gap-0.5 rounded-[32px] border border-primary text-sm leading-4">
-            <Star aria-hidden className="size-3.5 fill-primary text-primary" />
-            <span className="font-medium">{nft.avaliacoes.nota}</span>
-            <span className="text-muted-foreground">({nft.avaliacoes.total})</span>
+          <p className="relative mr-[2.42px] h-[27px] w-[80.16px] shrink-0 rounded-[32px] border border-primary text-sm leading-4">
+            <IconeEstrelaPequena className="absolute top-[5px] left-[4.58px] text-ambar" />
+            <span className="absolute top-[5px] left-[22.58px] font-medium">
+              {nft.avaliacoes.nota}
+            </span>
+            <span className="absolute top-[5px] left-[47.58px] text-muted-foreground">
+              ({nft.avaliacoes.total})
+            </span>
           </p>
         </div>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">{nft.descricaoCurta}</p>
+        <p className="mt-3 h-[71px] text-sm leading-6 text-muted-foreground">
+          {nft.descricaoCurta}
+        </p>
         <div className="mt-3">
           <SeletorEdicao nft={nft} compra={compra} />
         </div>
@@ -492,35 +489,29 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
 
       <div
         data-testid="barra-compra"
-        className="fixed inset-x-0 bottom-0 z-40 mx-auto h-[164px] max-w-[414px] rounded-t-[32px] bg-card px-6 pt-5"
+        className="fixed inset-x-0 bottom-0 z-40 mx-auto h-[164px] max-w-[414px] rounded-t-[40px] bg-card px-6 pt-5 shadow-[0_0_20px_rgba(10,6,4,0.45)]"
       >
         <div className="flex h-[30px] items-center justify-between">
           <div role="group" aria-label="Quantidade" className="flex items-center gap-2">
             <span className="text-[15px] leading-4 font-medium text-muted-foreground">Qtd.</span>
-            <button
-              type="button"
-              aria-label="Diminuir quantidade"
-              disabled={compra.quantidade <= 1}
-              onClick={compra.diminuir}
-              className="flex h-[30px] w-5 items-center justify-center rounded-[20px] border border-background bg-primary text-black disabled:cursor-not-allowed"
-            >
-              <Minus aria-hidden className="size-3" />
-            </button>
-            <output
-              aria-live="polite"
-              className="w-[19px] text-center text-lg leading-[25px] font-medium"
-            >
-              {compra.quantidade}
-            </output>
-            <button
-              type="button"
-              aria-label="Aumentar quantidade"
-              disabled={compra.esgotada || compra.quantidade >= compra.edicao.disponivel}
-              onClick={compra.aumentar}
-              className="flex h-[30px] w-5 items-center justify-center rounded-[20px] border border-background bg-primary text-black disabled:opacity-50"
-            >
-              <Plus aria-hidden className="size-3" />
-            </button>
+            <div className="flex items-center gap-3">
+              <BotaoQuantidade
+                acao="diminuir"
+                disabled={compra.quantidade <= 1}
+                onClick={compra.diminuir}
+              />
+              <output
+                aria-live="polite"
+                className="w-[11px] text-center text-lg leading-[25px] font-medium"
+              >
+                {compra.quantidade}
+              </output>
+              <BotaoQuantidade
+                acao="aumentar"
+                disabled={compra.esgotada || compra.quantidade >= compra.edicao.disponivel}
+                onClick={compra.aumentar}
+              />
+            </div>
           </div>
           <p
             data-testid="detalhe-preco-mobile"
@@ -534,7 +525,7 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
             type="button"
             disabled={compra.esgotada || compra.ocupado}
             onClick={compra.comprar}
-            className="h-[60px] w-[196px] rounded-[40px] bg-primary text-base leading-5 font-bold text-primary-foreground disabled:opacity-50"
+            className="h-[60px] w-[196px] rounded-[40px] bg-[linear-gradient(100.37deg,rgb(210_138_76)_-3.96%,rgb(210_138_76/0.8)_121.97%)] pr-[45px] pl-[47px] text-base leading-5 font-bold whitespace-nowrap text-primary-foreground disabled:opacity-50"
           >
             Comprar NFT
           </button>
@@ -545,7 +536,7 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
             onClick={compra.adicionarAoCarrinho}
             className="flex size-[60px] items-center justify-center rounded-[40px] border border-border bg-muted text-secundaria disabled:opacity-50"
           >
-            <IconeCarrinho className="size-5" />
+            <IconeCarrinhoCompra />
           </button>
         </div>
       </div>

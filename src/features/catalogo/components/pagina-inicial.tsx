@@ -19,7 +19,9 @@ function BannerDestaque() {
       data-testid="banner-destaque"
       className="relative mt-6 h-[470px] overflow-hidden bg-linear-to-b from-primary/10 to-primary/3 pt-6"
     >
-      <p className="px-5 text-2xl leading-8 font-bold text-texto-destaque">NFT EM DESTAQUE</p>
+      <p className="px-5 text-center text-2xl leading-8 font-bold text-texto-destaque">
+        NFT EM DESTAQUE
+      </p>
       <p className="mt-4 text-center text-[22px] leading-4 font-bold">OFERTA LIMITADA</p>
       <ImagemNft
         url="/nfts/arte-2-640.webp"
@@ -32,11 +34,11 @@ function BannerDestaque() {
       />
       <div
         aria-hidden
-        className="absolute top-[105px] left-[38px] size-[15px] rounded-[29px] bg-linear-to-b from-primary to-primary/0"
+        className="absolute top-[105px] left-[38px] size-[15px] rounded-[29px] bg-[linear-gradient(146deg,rgb(210_138_76/0.69),rgb(210_138_76/0.02))]"
       />
       <div
         aria-hidden
-        className="absolute top-[343px] left-[248px] size-[45px] rounded-[29px] bg-linear-to-b from-primary to-primary/0"
+        className="absolute top-[343px] left-[248px] size-[45px] rounded-[29px] bg-[linear-gradient(146deg,rgb(210_138_76/0.69),rgb(210_138_76/0.02))]"
       />
     </aside>
   );
@@ -67,7 +69,7 @@ export function PaginaInicial() {
 
           <div data-testid="coluna-grade" className="min-w-0 flex-1">
             <div className="mb-[18px] flex min-h-[18px] flex-wrap items-center justify-between gap-y-3 lg:mb-8">
-              <AbasCatalogo className="max-lg:gap-3 max-lg:text-sm" />
+              <AbasCatalogo />
               <div className="hidden lg:block">
                 <OrdemCatalogo />
               </div>

@@ -1,12 +1,11 @@
-import { ArrowRight } from 'lucide-react';
+import { IconeSetaDireitaPequena } from '@/components/icones/icones';
 import { ImagemNft } from './imagem-nft';
 
 const ARTE_PRINCIPAL = '/nfts/arte-1-960.webp';
-const ARTE_SECUNDARIA = '/nfts/arte-2-320.webp';
 
 function PontosCarrossel({ className }: { className: string }) {
   return (
-    <div aria-hidden className={`flex gap-2 ${className}`}>
+    <div aria-hidden className={`flex ${className}`}>
       <span className="size-2 rounded-full bg-primary" />
       <span className="size-2 rounded-full bg-primary" />
       <span className="size-2 rounded-full bg-primary" />
@@ -46,7 +45,7 @@ export function Hero() {
             EXPLORAR
           </a>
         </div>
-        <PontosCarrossel className="absolute top-[399px] left-[600px]" />
+        <PontosCarrossel className="absolute top-[399px] left-[600px] gap-2" />
         <ImagemNft
           url={ARTE_PRINCIPAL}
           sizes="450px"
@@ -61,30 +60,30 @@ export function Hero() {
       <section
         aria-label="Destaque"
         data-testid="hero-mobile"
-        className="relative mx-6 mt-4 h-[190px] overflow-hidden rounded-xl bg-linear-to-b from-primary/20 to-primary/10 lg:hidden"
+        className="relative mx-6 mt-4 h-[190px] overflow-hidden rounded-[30px] bg-[linear-gradient(116.88deg,rgb(210_138_76/0.2)_1.08%,rgb(210_138_76/0.1)_99.23%)] lg:hidden"
       >
         <div
           aria-hidden
-          className="absolute top-[-31px] left-[-80px] size-[248px] rounded-full bg-linear-to-b from-primaria-clara/40 to-primary/5"
+          className="absolute top-[-31px] left-[-80px] size-[248px] rounded-full bg-[linear-gradient(160.25deg,rgb(221_154_95/0.43)_22.1%,rgb(210_138_76/0.04)_87.42%)]"
         />
         <div
           aria-hidden
-          className="absolute top-[-10px] left-[73px] size-[248px] rounded-full bg-linear-to-b from-primaria-clara/35 to-primary/0"
+          className="absolute top-[-10px] left-[73px] size-[248px] rounded-full bg-[linear-gradient(160.25deg,rgb(221_154_95/0.37)_22.1%,rgb(210_138_76/0)_87.42%)]"
         />
-        <div className="relative px-4 pt-1.5">
+        <div className="relative px-4 pt-[5.5px]">
           <p className="text-xs leading-4 font-medium">Bem-vindo à Kurio</p>
           <p className="mt-1.5 text-lg leading-[29px] font-bold whitespace-pre-line">
             {'SEJA DONO DA\nCULTURA DIGITAL'}
           </p>
-          <p className="mt-1.5 w-[188px] max-w-[52%] text-xs leading-[18px] text-muted-foreground">
+          <p className="mt-1.5 w-[188px] text-xs leading-[18px] text-muted-foreground">
             Descubra NFTs selecionados de criadores do mundo todo.
           </p>
           <a
             href="#catalogo"
-            className="mt-0.5 flex items-center gap-2 text-xs leading-[14px] font-bold text-texto-destaque"
+            className="flex items-center gap-2 text-xs leading-[14px] font-bold text-texto-destaque"
           >
-            EXPLORAR
-            <ArrowRight className="size-4" aria-hidden />
+            <span className="w-[58px]">EXPLORAR</span>
+            <IconeSetaDireitaPequena className="text-primary" />
           </a>
         </div>
         <ImagemNft
@@ -93,17 +92,9 @@ export function Hero() {
           width={138}
           height={138}
           alt=""
-          className="absolute top-[11px] right-4 size-[138px] rounded-2xl object-cover"
+          className="absolute top-[10.5px] right-4 size-[138px] rounded-2xl object-cover"
         />
-        <ImagemNft
-          url={ARTE_SECUNDARIA}
-          sizes="58px"
-          width={58}
-          height={58}
-          alt=""
-          className="absolute top-[99px] right-[82px] size-[58px] rounded-2xl object-cover"
-        />
-        <PontosCarrossel className="absolute bottom-1 left-1/2 -translate-x-1/2 [&>span]:size-[7px]" />
+        <PontosCarrossel className="absolute bottom-[5.5px] left-1/2 -translate-x-1/2 gap-1.5 [&>span]:size-[7px]" />
       </section>
     </>
   );
