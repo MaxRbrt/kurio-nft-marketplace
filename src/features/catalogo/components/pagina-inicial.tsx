@@ -67,7 +67,7 @@ export function PaginaInicial() {
 
           <div data-testid="coluna-grade" className="min-w-0 flex-1">
             <div className="mb-[18px] flex min-h-[18px] flex-wrap items-center justify-between gap-y-3 lg:mb-8">
-              <AbasCatalogo className="max-lg:gap-3 max-lg:text-sm" />
+              <AbasCatalogo />
               <div className="hidden lg:block">
                 <OrdemCatalogo />
               </div>

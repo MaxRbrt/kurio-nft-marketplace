@@ -14,9 +14,9 @@ const LINKS_INDISPONIVEIS = [
 
 // ====================================================================
 // 1. CABEÇALHO
-// Medidas do frame Desktop / Início: 1200 de largura, 45 de altura e
-// divisória de 0,3 px com a aba ativa sobre ela. A contagem do carrinho
-// soma as quantidades vindas da API.
+// Frame Desktop / Início: 1200 x 45. A divisória de 0,3 px rende na
+// última linha, a 25%, sem ocupar altura; a aba ativa cobre as três
+// últimas linhas. A contagem do carrinho soma as quantidades da API.
 // ====================================================================
 export function Cabecalho() {
   const sessao = useSessao();
@@ -32,11 +32,12 @@ export function Cabecalho() {
 
   return (
     <header className="mx-auto mt-6 hidden w-full max-w-[1200px] px-4 lg:block xl:px-0">
-      <div className="flex h-[45px] items-start justify-between">
+      <div className="relative flex h-[45px] items-start justify-between">
+        <div aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-primary/25" />
         <Link
           to="/"
           data-testid="cabecalho-logo"
-          className="flex h-[34px] w-[160px] items-center text-sm font-bold tracking-[0.1em] text-foreground"
+          className="flex h-[34.3px] w-[160px] items-center text-sm font-bold tracking-[0.1em] text-foreground"
         >
           KURIO
         </Link>
@@ -47,7 +48,7 @@ export function Cabecalho() {
             aria-current={inicioAtivo ? 'page' : undefined}
             className={`relative h-[45px] w-[58px] text-base leading-[21px] ${
               inicioAtivo
-                ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[3px] after:bg-primary after:content-['']"
+                ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:bg-primary after:content-['']"
                 : 'text-foreground'
             }`}
           >
@@ -59,7 +60,7 @@ export function Cabecalho() {
               aria-current={rotulo === 'Mercado' && mercadoAtivo ? 'page' : undefined}
               className={`${largura} relative flex h-[45px] cursor-not-allowed items-start self-start text-left text-base leading-[21px] ${
                 rotulo === 'Mercado' && mercadoAtivo
-                  ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[3px] after:bg-primary after:content-['']"
+                  ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:bg-primary after:content-['']"
                   : 'text-foreground'
               }`}
             >
@@ -104,7 +105,6 @@ export function Cabecalho() {
           )}
         </div>
       </div>
-      <div className="h-px bg-primary/30" />
     </header>
   );
 }

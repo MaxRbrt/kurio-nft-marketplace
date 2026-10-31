@@ -1,10 +1,12 @@
-import { ArrowRight } from 'lucide-react';
+import { IconeSetaDireita, IconeSetaTexto } from '@/components/icones/icones';
 import { AcaoIndisponivel } from '@/components/layout/acao-indisponivel';
 import { ImagemNft } from './imagem-nft';
 
 // ====================================================================
 // 1. PROMOÇÕES
-// Dois cartões de 586 x 250 do frame. O botão leva à grade do catálogo.
+// Dois cartões de 586 x 250 do frame, com os recuos do primeiro: no frame
+// o segundo difere de 4 a 9 px, desvio documentado no ARCHITECTURE.md.
+// A arte mantém o corte de cada cartão. O botão leva à grade do catálogo.
 // ====================================================================
 const PROMOCOES = [
   {
@@ -53,16 +55,18 @@ export function Promocoes() {
             aria-hidden
             className="absolute top-[134px] left-[-199px] size-64 rounded-full border border-primary"
           />
-          <div className="absolute top-[37px] right-[30px] w-[263px] text-right">
-            <h2 className="text-lg leading-6 font-bold whitespace-pre-line">{promocao.titulo}</h2>
-            <p className="mt-[9px] text-sm leading-6 text-muted-foreground">{promocao.texto}</p>
-          </div>
+          <h2 className="absolute top-[37px] right-[30px] text-right text-lg leading-6 font-bold whitespace-pre-line">
+            {promocao.titulo}
+          </h2>
+          <p className="absolute top-[94px] right-[30px] w-[263px] text-right text-sm leading-6 text-muted-foreground">
+            {promocao.texto}
+          </p>
           <a
             href="#catalogo"
-            className="absolute right-[30px] bottom-[46px] flex h-10 w-[140px] items-center justify-center gap-1 rounded-md bg-primary text-sm leading-5 font-medium text-primary-foreground hover:bg-primaria-clara"
+            className="absolute right-[30px] bottom-[46px] flex h-10 w-[140px] items-center justify-center rounded-md bg-primary text-sm leading-5 font-medium text-primary-foreground hover:bg-primaria-clara"
           >
-            Explorar
-            <ArrowRight aria-hidden className="size-[18px]" />
+            <span className="w-[68px]">Explorar</span>
+            <IconeSetaDireita />
           </a>
         </article>
       ))}
@@ -134,12 +138,15 @@ export function DiarioCunhagem() {
               <p className="text-xs leading-4 font-medium whitespace-pre-wrap text-muted-foreground">
                 {artigo.meta}
               </p>
-              <h3 className="mt-2 text-base font-bold">{artigo.titulo}</h3>
+              <h3 className="mt-2 text-base leading-[21px] font-bold">{artigo.titulo}</h3>
               <p className="mt-2 text-xs leading-4 font-medium text-muted-foreground">
                 {artigo.texto}
               </p>
-              <AcaoIndisponivel className="mt-2 cursor-not-allowed text-xs leading-[14px] font-bold text-texto-destaque">
-                Ler mais →
+              <AcaoIndisponivel className="mt-2 flex cursor-not-allowed items-start gap-1 text-xs text-texto-destaque">
+                <span className="leading-[14px] font-bold">Ler mais</span>
+                <span aria-hidden className="relative h-4 w-3">
+                  <IconeSetaTexto className="absolute top-[7.49px] left-[1.85px]" />
+                </span>
               </AcaoIndisponivel>
             </div>
           </li>

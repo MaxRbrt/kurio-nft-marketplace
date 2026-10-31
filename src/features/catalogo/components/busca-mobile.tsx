@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal } from 'lucide-react';
+import { IconeBuscaMobile, IconeFiltro } from '@/components/icones/icones';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useCampoBusca } from '../usar-campo-busca';
 import { OrdemCatalogo } from './barra-catalogo';
@@ -15,7 +15,7 @@ export function BuscaMobile() {
   return (
     <div className="mx-6 mt-10 flex h-[45px] gap-2 lg:hidden">
       <label className="flex flex-1 items-center gap-2 rounded-[10px] bg-card px-3">
-        <Search aria-hidden className="size-[22px] text-secundaria" />
+        <IconeBuscaMobile className="shrink-0 text-secundaria" />
         <span className="sr-only">Buscar NFTs</span>
         <input
           type="search"
@@ -29,9 +29,9 @@ export function BuscaMobile() {
       <Sheet>
         <SheetTrigger
           aria-label="Abrir filtros"
-          className="flex size-[45px] shrink-0 items-center justify-center rounded-[14px] bg-linear-to-b from-primary/45 to-primary text-foreground"
+          className="flex size-[45px] shrink-0 items-center justify-center rounded-[14px] bg-[linear-gradient(137.05deg,rgb(210_138_76/0.45)_-24.6%,rgb(210_138_76)_100%)] text-primary-foreground"
         >
-          <SlidersHorizontal aria-hidden className="size-[22px]" />
+          <IconeFiltro />
         </SheetTrigger>
         <SheetContent className="w-[320px] overflow-y-auto bg-card p-0">
           <SheetTitle className="px-5 pt-5 text-lg font-bold">Filtros</SheetTitle>

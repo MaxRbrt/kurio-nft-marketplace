@@ -52,18 +52,19 @@ const COLUNAS_LINKS = [
   },
 ];
 
-const REDES_SOCIAIS: Array<{ nome: string; icone: ReactNode }> = [
-  { nome: 'Facebook', icone: <IconeFacebook /> },
-  { nome: 'Instagram', icone: <IconeInstagram /> },
-  { nome: 'Twitter', icone: <IconeTwitter /> },
-  { nome: 'LinkedIn', icone: <IconeLinkedin /> },
-  { nome: 'YouTube', icone: <IconeYoutube /> },
+const REDES_SOCIAIS: Array<{ nome: string; icone: ReactNode; recuo: number }> = [
+  { nome: 'Facebook', icone: <IconeFacebook />, recuo: 12 },
+  { nome: 'Instagram', icone: <IconeInstagram />, recuo: 8 },
+  { nome: 'Twitter', icone: <IconeTwitter />, recuo: 8 },
+  { nome: 'LinkedIn', icone: <IconeLinkedin />, recuo: 8 },
+  { nome: 'YouTube', icone: <IconeYoutube />, recuo: 6 },
 ];
 
 // ====================================================================
 // 2. RODAPÉ
 // Medidas do frame Desktop / Início. Em 1200 px segue as colunas exatas;
-// abaixo disso as colunas quebram para não gerar overflow horizontal.
+// abaixo disso quebram, sem overflow. Botões sociais têm borda por fora
+// e ícones no recuo de cada um no frame, sem centralizar.
 // ====================================================================
 export function Rodape() {
   return (
@@ -80,7 +81,7 @@ export function Rodape() {
           {SERVICOS.map((servico) => (
             <div
               key={servico.letra}
-              className="w-full px-4 sm:w-1/2 xl:h-[202px] xl:w-[266px] xl:shrink-0 xl:border-r xl:border-primary"
+              className="w-full px-4 sm:w-1/2 xl:h-[202px] xl:w-[265.67px] xl:shrink-0 xl:border-r xl:border-primary"
             >
               <div className="flex size-[74px] items-center justify-center rounded-full bg-primary text-2xl font-bold text-primary-foreground">
                 {servico.letra}
@@ -101,7 +102,7 @@ export function Rodape() {
             <h2 className="text-lg leading-4 font-bold text-foreground xl:h-8">
               Antecipe-se ao próximo lançamento
             </h2>
-            <div className="mt-4 flex h-10 items-center justify-between overflow-hidden rounded-md bg-secondary pl-3">
+            <div className="mt-4 flex h-10 items-center justify-between overflow-hidden rounded-md bg-secondary pl-3 shadow-[0_0_20px_rgba(10,6,4,0.45)]">
               <label htmlFor="rodape-email" className="sr-only">
                 Seu e-mail
               </label>
@@ -111,7 +112,7 @@ export function Rodape() {
                 placeholder="digite seu e-mail..."
                 className="min-w-0 flex-1 bg-transparent text-sm leading-4 text-foreground outline-none placeholder:text-secundaria"
               />
-              <AcaoIndisponivel className="h-10 w-[85px] shrink-0 cursor-not-allowed bg-primary text-lg leading-4 font-bold text-primary-foreground">
+              <AcaoIndisponivel className="h-10 w-[85px] shrink-0 cursor-not-allowed bg-primary pr-1 pl-4 text-left text-lg leading-4 font-bold text-primary-foreground">
                 Enviar
               </AcaoIndisponivel>
             </div>
@@ -162,7 +163,8 @@ export function Rodape() {
               <li key={rede.nome}>
                 <AcaoIndisponivel
                   aria-label={rede.nome}
-                  className="flex size-[30px] cursor-not-allowed items-center justify-center rounded border border-primary text-primary"
+                  style={{ paddingLeft: rede.recuo }}
+                  className="flex size-[30px] cursor-not-allowed items-start rounded pt-2 text-primary outline outline-primary"
                 >
                   {rede.icone}
                 </AcaoIndisponivel>
@@ -173,7 +175,7 @@ export function Rodape() {
           <h2 className="mt-8 text-lg leading-4 font-bold text-foreground">
             Carteiras compatíveis
           </h2>
-          <p className="mt-3 flex h-[26px] items-center rounded-md border border-borda-suave bg-secondary pl-[11px] text-[9px] font-bold tracking-[0.1px] whitespace-pre text-texto-destaque">
+          <p className="mt-3 flex h-[26px] items-center justify-center rounded-md border border-borda-suave bg-secondary pl-2 text-[9px] font-bold tracking-[0.1px] whitespace-pre text-texto-destaque">
             {'METAMASK  •  WALLETCONNECT  •  COINBASE'}
           </p>
         </div>
