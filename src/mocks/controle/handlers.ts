@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import { alterarNft, type MudancaNft } from '../banco/alteracoes';
-import { resetarBanco } from '../banco/estado';
+import { lerBanco, resetarBanco, salvarBanco } from '../banco/estado';
 import { responderErro } from '../rest/respostas';
 import { derrubarConexoes, publicarEvento } from '../socket/conexoes';
 
@@ -22,6 +22,27 @@ export const handlersControle = [
     if (!nft) {
       return responderErro(404, 'NAO_ENCONTRADO', 'NFT não encontrado');
     }
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post('/api/__mock/sessoes/expirar', () => {
+    const banco = lerBanco();
+
+    for (const sessao of Object.values(banco.sessoes)) {
+      sessao.expiraEm = new Date(0).toISOString();
+    }
+
+    salvarBanco();
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post('/api/__mock/carteiras/recusar-conexao', async ({ request }) => {
+    const { recusar } = (await request.json()) as { recusar: boolean };
+
+    lerBanco().recusarConexaoCarteira = recusar;
+    salvarBanco();
 
     return new HttpResponse(null, { status: 204 });
   }),
