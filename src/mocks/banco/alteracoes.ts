@@ -3,6 +3,15 @@ import { publicarEvento } from '../socket/conexoes';
 import type { NftBanco } from '../fixtures/nfts';
 import { lerBanco, salvarBanco } from './estado';
 
+export function gerarIdEvento() {
+  const banco = lerBanco();
+  const idEvento = `evt-${banco.proximoEvento}`;
+
+  banco.proximoEvento += 1;
+
+  return idEvento;
+}
+
 // ====================================================================
 // 1. ALTERAÇÃO CENTRAL DE NFT
 // Toda mudança passa por aqui: altera o dado, sobe a versão, salva e
@@ -15,8 +24,7 @@ export type MudancaNft = {
 };
 
 export function alterarNft(id: string, mudanca: MudancaNft): NftBanco | null {
-  const banco = lerBanco();
-  const nft = banco.nfts.find((candidato) => candidato.id === id);
+  const nft = lerBanco().nfts.find((candidato) => candidato.id === id);
 
   if (!nft) {
     return null;
@@ -35,8 +43,7 @@ export function alterarNft(id: string, mudanca: MudancaNft): NftBanco | null {
   nft.disponivel = nft.edicoes.reduce((total, edicao) => total + edicao.disponivel, 0);
   nft.versao += 1;
 
-  const idEvento = `evt-${banco.proximoEvento}`;
-  banco.proximoEvento += 1;
+  const idEvento = gerarIdEvento();
   salvarBanco();
 
   publicarEvento(

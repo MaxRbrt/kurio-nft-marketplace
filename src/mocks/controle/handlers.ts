@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { alterarNft, type MudancaNft } from '../banco/alteracoes';
-import { lerBanco, resetarBanco, salvarBanco } from '../banco/estado';
+import { lerBanco, resetarBanco, salvarBanco, type ResolucaoPagamento } from '../banco/estado';
+import { resolverPedido } from '../banco/pedidos';
 import { responderErro } from '../rest/respostas';
 import { derrubarConexoes, publicarEvento } from '../socket/conexoes';
 
@@ -43,6 +44,32 @@ export const handlersControle = [
 
     lerBanco().recusarConexaoCarteira = recusar;
     salvarBanco();
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post('/api/__mock/pagamento', async ({ request }) => {
+    const { resolucao } = (await request.json()) as { resolucao: ResolucaoPagamento };
+
+    lerBanco().resolucaoPagamento = resolucao;
+    salvarBanco();
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post('/api/__mock/pedidos/timeout-no-proximo', () => {
+    lerBanco().timeoutNoProximoPedido = true;
+    salvarBanco();
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.post('/api/__mock/pedidos/:id/resolver', async ({ params, request }) => {
+    const { estado } = (await request.json()) as { estado: 'confirmado' | 'recusado' };
+
+    if (!resolverPedido(String(params.id), estado)) {
+      return responderErro(404, 'NAO_ENCONTRADO', 'Pedido não encontrado');
+    }
 
     return new HttpResponse(null, { status: 204 });
   }),

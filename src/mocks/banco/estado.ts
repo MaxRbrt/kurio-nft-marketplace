@@ -1,4 +1,7 @@
+import type { Cotacao, EntradaCotacao } from '@/contracts/compra/cotacao';
+import type { Pedido } from '@/contracts/compra/pedidos';
 import { criarCarteirasIniciais, type CarteiraBanco } from '../fixtures/carteiras';
+import { criarCuponsIniciais, type Cupom } from '../fixtures/cupons';
 import { criarNftsIniciais, type NftBanco } from '../fixtures/nfts';
 import { criarUsuariosIniciais, type UsuarioBanco } from '../fixtures/usuarios';
 
@@ -12,6 +15,20 @@ export type SessaoBanco = {
   expiraEm: string;
 };
 
+export type ItemCarrinhoBanco = {
+  id: string;
+  nftId: string;
+  edicaoId: string;
+  quantidade: number;
+};
+
+export type CotacaoBanco = Cotacao & {
+  dono: string;
+  entrada: EntradaCotacao;
+};
+
+export type ResolucaoPagamento = 'confirmar' | 'recusar' | 'manual';
+
 export type EstadoBanco = {
   nfts: NftBanco[];
   usuarios: UsuarioBanco[];
@@ -20,7 +37,15 @@ export type EstadoBanco = {
   carteiras: CarteiraBanco[];
   carteirasConectadas: string[];
   recusarConexaoCarteira: boolean;
+  carrinhos: Record<string, ItemCarrinhoBanco[]>;
+  cupons: Cupom[];
+  cotacoes: Record<string, CotacaoBanco>;
+  pedidos: Record<string, Pedido>;
+  idempotencia: Record<string, { conteudo: string; pedidoId: string }>;
+  resolucaoPagamento: ResolucaoPagamento;
+  timeoutNoProximoPedido: boolean;
   proximoEvento: number;
+  proximoPedido: number;
 };
 
 const CHAVE_ARMAZENAMENTO = 'kurio:banco:v1';
@@ -34,7 +59,15 @@ function criarEstadoInicial(): EstadoBanco {
     carteiras: criarCarteirasIniciais(),
     carteirasConectadas: [],
     recusarConexaoCarteira: false,
+    carrinhos: {},
+    cupons: criarCuponsIniciais(),
+    cotacoes: {},
+    pedidos: {},
+    idempotencia: {},
+    resolucaoPagamento: 'confirmar',
+    timeoutNoProximoPedido: false,
     proximoEvento: 1,
+    proximoPedido: 1,
   };
 }
 

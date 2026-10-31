@@ -6,6 +6,8 @@ import { quantidadeSchema, valorEthSchema, versaoSchema } from '../comum/valores
 // Vive na API, inclusive para visitante. Subtotais vêm prontos: a
 // interface mostra os valores da resposta e não recalcula nada.
 // ====================================================================
+export const CABECALHO_VISITANTE = 'X-Visitante-Id';
+
 export const itemCarrinhoSchema = z.object({
   id: z.string(),
   nftId: z.string(),
