@@ -7,7 +7,10 @@ import type { Rede } from '@/contracts/comum/valores';
 // O campo emAlta é interno e alimenta a aba "Em alta". A resposta da
 // API passa pelo schema do contrato, que o remove antes de sair.
 // ====================================================================
-export type NftBanco = NftDetalhe & { emAlta: boolean };
+export type NftBanco = Omit<NftDetalhe, 'relacionados'> & {
+  emAlta: boolean;
+  relacionadosIds: string[];
+};
 
 const CATEGORIAS: Categoria[] = [
   'arte-digital',
@@ -62,6 +65,7 @@ const NFTS_DO_LAYOUT: NftDoLayout[] = [
 // nas pontas. Rede não acompanha a categoria, para os filtros combinarem.
 // ====================================================================
 const TOTAL_NFTS = 36;
+const IDS_RELACIONADOS = ['nft-04', 'nft-05', 'nft-06', 'nft-07', 'nft-09'];
 const PRIMEIROS_NOMES = ['Amber', 'Onyx', 'Crimson', 'Azure', 'Jade', 'Silver', 'Copper', 'Indigo'];
 const SEGUNDOS_NOMES = ['Echo', 'Relic', 'Mirage', 'Totem', 'Pulse', 'Atlas'];
 
@@ -118,20 +122,28 @@ function criarNft(indice: number): NftBanco {
     preco,
     precoAnterior: doLayout?.precoAnterior ?? null,
     imagem,
-    imagens: [imagem],
+    imagens: Array.from({ length: 4 }, () => imagem),
     edicoes,
     disponivel: edicoes.reduce((total, edicao) => total + edicao.disponivel, 0),
+    edicaoInicialId: edicoes[2].id,
     raro: doLayout ? (doLayout.raro ?? false) : indice % 7 === 0,
     categoria: CATEGORIAS[indice % CATEGORIAS.length],
     rede: REDES[(indice + Math.floor(indice / CATEGORIAS.length)) % REDES.length],
     nomeColecao: 'Kurio Apes',
-    descricao: 'Um colecionável digital finalizado à mão da coleção Kurio Editions.',
+    descricao:
+      'Um colecionável digital finalizado à mão da coleção Kurio Editions, verificado na Ethereum, com arte desbloqueável e acesso para colecionadores.',
+    descricaoCurta:
+      'Um colecionável digital 1/50 finalizado à mão da coleção Kurio Editions, verificado na Ethereum.',
+    descricaoCompleta: `${nome} é uma obra digital 1/50 finalizada à mão da coleção Kurio Editions. Cada atributo fica armazenado nos metadados do token e verificado na Ethereum. A obra explora identidade, movimento e luz em um mundo digital sem fronteiras.\n\nA propriedade inclui a arte em alta resolução, lançamentos exclusivos para colecionadores e um registro permanente de procedência registrada na rede. Nova Sato recebe 5% de direitos autorais nas vendas secundárias, apoiando novos trabalhos e lançamentos da comunidade.`,
+    textoRede: 'Cunhado na Ethereum com procedência imutável e metadados armazenados no IPFS.',
     atributos: ['Óculos', 'Esmeralda', 'Raro'],
     avaliacoes: { total: 19, nota: 4.8 },
-    contrato: '0x7A42...19E8',
-    direitosAutorais: '5% nas vendas secundárias',
+    contrato: '0x7A42...19E8 • Contrato inteligente ERC-721 verificado.',
+    direitosAutorais:
+      'Direitos autorais do criador: 5% nas vendas secundárias, pagos automaticamente pelos mercados compatíveis.',
     lancadoEm: dataDeLancamento(indice),
     emAlta: indice % 4 === 0,
+    relacionadosIds: IDS_RELACIONADOS.filter((relacionado) => relacionado !== id),
     versao: 1,
   };
 }

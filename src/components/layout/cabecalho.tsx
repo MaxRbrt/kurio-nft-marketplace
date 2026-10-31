@@ -22,6 +22,7 @@ export function Cabecalho() {
   const sessao = useSessao();
   const { pathname } = useLocation();
   const inicioAtivo = ['/', '/login', '/cadastro'].includes(pathname);
+  const mercadoAtivo = pathname.startsWith('/nfts/');
   const { data: carrinho } = useQuery({
     queryKey: ['carrinho', sessao?.usuario.id ?? 'visitante'],
     queryFn: ({ signal }) => obterCarrinho(signal),
@@ -55,7 +56,12 @@ export function Cabecalho() {
           {LINKS_INDISPONIVEIS.map(({ rotulo, largura }) => (
             <AcaoIndisponivel
               key={rotulo}
-              className={`${largura} cursor-not-allowed self-start text-left text-base leading-[21px] text-foreground`}
+              aria-current={rotulo === 'Mercado' && mercadoAtivo ? 'page' : undefined}
+              className={`${largura} relative flex h-[45px] cursor-not-allowed items-start self-start text-left text-base leading-[21px] ${
+                rotulo === 'Mercado' && mercadoAtivo
+                  ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[3px] after:bg-primary after:content-['']"
+                  : 'text-foreground'
+              }`}
             >
               {rotulo}
             </AcaoIndisponivel>

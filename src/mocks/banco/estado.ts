@@ -51,7 +51,7 @@ export type EstadoBanco = {
   proximoPedido: number;
 };
 
-const CHAVE_ARMAZENAMENTO = 'kurio:banco:v2';
+const CHAVE_ARMAZENAMENTO = 'kurio:banco:v3';
 
 function criarEstadoInicial(): EstadoBanco {
   return {
@@ -91,7 +91,12 @@ function carregarEstado(): EstadoBanco {
   try {
     const lido = JSON.parse(salvo) as Partial<EstadoBanco>;
 
-    if (!nftDetalheSchema.array().safeParse(lido.nfts).success) {
+    const nftsValidos = nftDetalheSchema
+      .omit({ relacionados: true })
+      .array()
+      .safeParse(lido.nfts).success;
+
+    if (!nftsValidos) {
       return criarEstadoInicial();
     }
 

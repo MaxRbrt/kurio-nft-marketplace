@@ -141,7 +141,7 @@ test('dado alterado sobrevive ao refresh e reset restaura o cenário', async ({ 
 test('banco salvo guarda só hash, nunca a senha', async ({ page }) => {
   await chamarApi(page, 'POST', '/api/__mock/resetar');
 
-  const salvo = await page.evaluate(() => localStorage.getItem('kurio:banco:v2'));
+  const salvo = await page.evaluate(() => localStorage.getItem('kurio:banco:v3'));
 
   expect(salvo).toContain('hashSenha');
   expect(salvo).not.toContain('Kurio@2026');

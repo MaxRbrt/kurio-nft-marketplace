@@ -1,6 +1,8 @@
 import { Link } from '@tanstack/react-router';
-import { ChevronRight, Heart } from 'lucide-react';
-import { AcaoIndisponivel } from '@/components/layout/acao-indisponivel';
+import { ChevronRight, Search } from 'lucide-react';
+import { IconeCarrinho, IconeFavorito } from '@/components/icones/icones';
+import { useAdicionarAoCarrinho } from '@/features/compra/usar-carrinho';
+import { useFavorito } from '@/features/catalogo/usar-favoritos';
 import { ErroApi } from '@/lib/api/erros';
 import type { NftResumo } from '@/contracts/catalogo/nfts';
 import { useFiltrosCatalogo, useListaNfts } from '../usar-catalogo';
@@ -10,14 +12,21 @@ const TAMANHO_PAGINA_LAYOUT = 9;
 
 // ====================================================================
 // 1. CARTÃO DO NFT
-// Medidas do frame: 258 x 300 no desktop e 175 x 200 no mobile. O selo
-// RARO e o favorito só aparecem no frame mobile, então seguem assim.
+// Medidas do frame: 258 x 300 no desktop e 175 x 200 no mobile. As ações
+// aparecem com o mouse ou o foco, como no cartão dos frames de login; no
+// mobile fica só o favorito, como no frame mobile.
 // ====================================================================
+const CLASSE_ACAO =
+  'flex size-[35px] items-center justify-center rounded border border-border bg-muted text-foreground';
+
 function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean }) {
+  const { favorito, alternar } = useFavorito(nft.id);
+  const adicionar = useAdicionarAoCarrinho();
+
   return (
-    <li data-testid="cartao-nft" className="relative">
+    <li data-testid="cartao-nft" className="group relative">
       <Link to="/nfts/$nftId" params={{ nftId: nft.id }} className="block">
-        <div className="relative flex h-[200px] items-center justify-center rounded-[20px] bg-linear-to-b from-card to-muted lg:h-[300px] lg:rounded-none lg:bg-card lg:bg-none">
+        <div className="relative flex h-[200px] items-center justify-center rounded-[20px] bg-linear-to-b from-card to-muted group-focus-within:lg:border-t group-hover:lg:border-t lg:h-[300px] lg:rounded-none lg:border-primary lg:bg-card lg:bg-none">
           <ImagemNft
             url={nft.imagem.url}
             sizes="(min-width: 1024px) 250px, 168px"
@@ -28,7 +37,7 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
             className="size-[168px] rounded-2xl object-cover lg:aspect-square lg:size-auto lg:w-[calc(100%-8px)] lg:rounded-[15px]"
           />
           {nft.raro && (
-            <span className="absolute top-4 left-0 flex h-8 w-[68px] items-center justify-center bg-primary text-[13px] leading-4 font-medium text-primary-foreground lg:hidden">
+            <span className="absolute top-4 left-0 flex h-8 w-[68px] items-center justify-center bg-primary text-[13px] leading-4 font-medium text-primary-foreground lg:top-3.5 lg:h-[29px] lg:w-20 lg:text-base">
               RARO
             </span>
           )}
@@ -54,12 +63,49 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
           )}
         </p>
       </Link>
-      <AcaoIndisponivel
+
+      <button
+        type="button"
         aria-label={`Favoritar ${nft.nome}`}
-        className="absolute top-3 right-[10px] flex size-7 items-center justify-center rounded-full border border-border bg-muted lg:hidden"
+        aria-pressed={favorito}
+        onClick={alternar}
+        className="absolute top-3 right-[10px] flex size-7 items-center justify-center rounded-full border border-border bg-muted text-texto-destaque lg:hidden"
       >
-        <Heart aria-hidden className="size-3.5 text-texto-destaque" />
-      </AcaoIndisponivel>
+        <IconeFavorito ativo={favorito} className="size-3.5" />
+      </button>
+
+      <div
+        data-testid="cartao-acoes"
+        className="absolute top-[258px] right-[66px] hidden gap-2.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none lg:flex"
+      >
+        <button
+          type="button"
+          aria-label={`Adicionar ${nft.nome} ao carrinho`}
+          onClick={() =>
+            adicionar.mutate({ nftId: nft.id, edicaoId: nft.edicaoInicialId, quantidade: 1 })
+          }
+          className={CLASSE_ACAO}
+        >
+          <IconeCarrinho className="size-5" />
+        </button>
+        <button
+          type="button"
+          aria-label={`Favoritar ${nft.nome}`}
+          aria-pressed={favorito}
+          onClick={alternar}
+          className={CLASSE_ACAO}
+        >
+          <IconeFavorito ativo={favorito} />
+        </button>
+        <Link
+          to="/nfts/$nftId"
+          params={{ nftId: nft.id }}
+          aria-label={`Ver ${nft.nome}`}
+          className={CLASSE_ACAO}
+        >
+          <Search aria-hidden className="size-5" />
+        </Link>
+      </div>
     </li>
   );
 }

@@ -183,12 +183,12 @@ test.describe('estado na URL', () => {
 test.describe('estados', () => {
   test('banco salvo de versão antiga não trava a tela', async ({ page }) => {
     await page.evaluate(() =>
-      localStorage.setItem('kurio:banco:v2', JSON.stringify({ nfts: [{ id: 'antigo' }] })),
+      localStorage.setItem('kurio:banco:v3', JSON.stringify({ nfts: [{ id: 'antigo' }] })),
     );
     await page.reload();
     await expect(nomes(page).first()).toHaveText('Emerald Ape #042');
 
-    await page.evaluate(() => localStorage.setItem('kurio:banco:v2', '{corrompido'));
+    await page.evaluate(() => localStorage.setItem('kurio:banco:v3', '{corrompido'));
     await page.reload();
     await expect(nomes(page).first()).toHaveText('Emerald Ape #042');
   });

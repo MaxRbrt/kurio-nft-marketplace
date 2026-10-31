@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import type { Sessao } from '@/contracts/conta/sessao';
 import { apagarToken, salvarToken } from '@/lib/api/identidade';
+import { liberarAvisoDeSessao } from '@/lib/api/sessao-expirada';
 import {
   CHAVE_SESSAO,
   consultaSessao,
@@ -24,6 +25,7 @@ export function useAbrirSessao() {
 
   return async (sessao: Sessao) => {
     salvarToken(sessao.token);
+    liberarAvisoDeSessao();
     clienteConsultas.setQueryData(CHAVE_SESSAO, sessao);
     await mesclarCarrinhoVisitante().catch(() => undefined);
     await clienteConsultas.invalidateQueries({ queryKey: ['carrinho'] });

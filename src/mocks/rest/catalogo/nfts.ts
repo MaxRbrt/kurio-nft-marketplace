@@ -169,6 +169,10 @@ export const handlersNfts = [
       return responderErro(404, 'NAO_ENCONTRADO', 'NFT não encontrado');
     }
 
-    return HttpResponse.json(nftDetalheSchema.parse(nft));
+    const relacionados = lerBanco().nfts.filter((candidato) =>
+      nft.relacionadosIds.includes(candidato.id),
+    );
+
+    return HttpResponse.json(nftDetalheSchema.parse({ ...nft, relacionados }));
   }),
 ];
