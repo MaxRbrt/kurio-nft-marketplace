@@ -15,11 +15,11 @@ test('lista paginada segue o contrato e tem as 4 páginas do layout', async ({ p
   const lista = listaNftsSchema.parse(corpo);
 
   expect(status).toBe(200);
-  expect(lista.itens).toHaveLength(12);
+  expect(lista.itens).toHaveLength(9);
   expect(lista.paginacao).toEqual({
     pagina: 1,
-    tamanhoPagina: 12,
-    totalItens: 48,
+    tamanhoPagina: 9,
+    totalItens: 36,
     totalPaginas: 4,
   });
   expect(corpo.itens[0]).not.toHaveProperty('emAlta');
@@ -29,19 +29,19 @@ test('filtros combinam e facetas ignoram categoria e rede', async ({ page }) => 
   const { corpo } = await chamarApi(
     page,
     'GET',
-    '/api/nfts?categorias=musica&categorias=jogos&redes=polygon&tamanhoPagina=48',
+    '/api/nfts?categorias=musica&categorias=jogos&redes=polygon&tamanhoPagina=36',
   );
   const lista = listaNftsSchema.parse(corpo);
 
   expect(lista.itens.length).toBeGreaterThan(0);
-  expect(lista.itens.length).toBeLessThan(48);
+  expect(lista.itens.length).toBeLessThan(36);
   for (const nft of lista.itens) {
     expect(['musica', 'jogos']).toContain(nft.categoria);
     expect(nft.rede).toBe('polygon');
   }
 
   const somaFacetas = Object.values(lista.facetas.redes).reduce((a, b) => a + b, 0);
-  expect(somaFacetas).toBe(48);
+  expect(somaFacetas).toBe(36);
 });
 
 test('busca, vazio e faixa de preço incluem as pontas', async ({ page }) => {
@@ -66,7 +66,7 @@ test('busca, vazio e faixa de preço incluem as pontas', async ({ page }) => {
 });
 
 test('ordena preço como decimal, não como texto', async ({ page }) => {
-  const { corpo } = await chamarApi(page, 'GET', '/api/nfts?ordem=maior-preco&tamanhoPagina=48');
+  const { corpo } = await chamarApi(page, 'GET', '/api/nfts?ordem=maior-preco&tamanhoPagina=36');
   const lista = listaNftsSchema.parse(corpo);
   const precos = lista.itens.map((nft) => Number(nft.preco));
 
@@ -84,7 +84,7 @@ test('parâmetro inválido devolve erro no formato do contrato', async ({ page }
 test('detalhe, NFT inexistente e edição esgotada', async ({ page }) => {
   const detalhe = await chamarApi(page, 'GET', '/api/nfts/nft-01');
   const inexistente = await chamarApi(page, 'GET', '/api/nfts/nao-existe');
-  const esgotado = nftDetalheSchema.parse((await chamarApi(page, 'GET', '/api/nfts/nft-46')).corpo);
+  const esgotado = nftDetalheSchema.parse((await chamarApi(page, 'GET', '/api/nfts/nft-34')).corpo);
 
   expect(nftDetalheSchema.parse(detalhe.corpo).nome).toBe('Emerald Ape #042');
   expect(inexistente.status).toBe(404);
@@ -141,7 +141,7 @@ test('dado alterado sobrevive ao refresh e reset restaura o cenário', async ({ 
 test('banco salvo guarda só hash, nunca a senha', async ({ page }) => {
   await chamarApi(page, 'POST', '/api/__mock/resetar');
 
-  const salvo = await page.evaluate(() => localStorage.getItem('kurio:banco:v1'));
+  const salvo = await page.evaluate(() => localStorage.getItem('kurio:banco:v3'));
 
   expect(salvo).toContain('hashSenha');
   expect(salvo).not.toContain('Kurio@2026');

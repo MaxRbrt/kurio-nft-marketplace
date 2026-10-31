@@ -1,3 +1,4 @@
+import { nftDetalheSchema } from '@/contracts/catalogo/nfts';
 import type { Cotacao, EntradaCotacao } from '@/contracts/compra/cotacao';
 import type { Pedido } from '@/contracts/compra/pedidos';
 import type { Cenario } from '../cenarios/cenarios';
@@ -50,7 +51,7 @@ export type EstadoBanco = {
   proximoPedido: number;
 };
 
-const CHAVE_ARMAZENAMENTO = 'kurio:banco:v1';
+const CHAVE_ARMAZENAMENTO = 'kurio:banco:v3';
 
 function criarEstadoInicial(): EstadoBanco {
   return {
@@ -76,8 +77,9 @@ function criarEstadoInicial(): EstadoBanco {
 
 // ====================================================================
 // 2. CARGA E PERSISTÊNCIA
-// Conteúdo salvo corrompido não derruba a aplicação: volta ao cenário
-// conhecido das fixtures. Campo novo ausente recebe o valor inicial.
+// Conteúdo salvo corrompido ou de outra versão não derruba a aplicação:
+// volta ao cenário conhecido. Mudou a forma dos dados? Suba a versão da
+// chave, ou quem já abriu o site ficaria com o banco antigo.
 // ====================================================================
 function carregarEstado(): EstadoBanco {
   const salvo = localStorage.getItem(CHAVE_ARMAZENAMENTO);
@@ -87,7 +89,18 @@ function carregarEstado(): EstadoBanco {
   }
 
   try {
-    return { ...criarEstadoInicial(), ...(JSON.parse(salvo) as Partial<EstadoBanco>) };
+    const lido = JSON.parse(salvo) as Partial<EstadoBanco>;
+
+    const nftsValidos = nftDetalheSchema
+      .omit({ relacionados: true })
+      .array()
+      .safeParse(lido.nfts).success;
+
+    if (!nftsValidos) {
+      return criarEstadoInicial();
+    }
+
+    return { ...criarEstadoInicial(), ...lido };
   } catch {
     return criarEstadoInicial();
   }

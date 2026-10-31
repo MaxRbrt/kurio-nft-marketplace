@@ -48,7 +48,9 @@ export const nftResumoSchema = z.object({
   nome: z.string(),
   imagem: imagemSchema,
   preco: valorEthSchema,
+  precoAnterior: valorEthSchema.nullable(),
   disponivel: z.number().int().nonnegative(),
+  edicaoInicialId: z.string(),
   raro: z.boolean(),
   categoria: categoriaSchema,
   rede: redeSchema,
@@ -60,6 +62,9 @@ export const nftDetalheSchema = nftResumoSchema.extend({
   tokenId: z.string(),
   nomeColecao: z.string(),
   descricao: z.string(),
+  descricaoCurta: z.string(),
+  descricaoCompleta: z.string(),
+  textoRede: z.string(),
   atributos: z.array(z.string()),
   imagens: z.array(imagemSchema).min(1),
   edicoes: z.array(edicaoSchema).min(1),
@@ -67,6 +72,7 @@ export const nftDetalheSchema = nftResumoSchema.extend({
   contrato: z.string(),
   direitosAutorais: z.string(),
   lancadoEm: dataIsoSchema,
+  relacionados: z.array(nftResumoSchema),
 });
 export type NftDetalhe = z.infer<typeof nftDetalheSchema>;
 

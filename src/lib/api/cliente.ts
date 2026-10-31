@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { CABECALHO_VISITANTE } from '@/contracts/compra/carrinho';
-import { converterErro } from './erros';
+import { converterErro, ErroApi } from './erros';
 import { lerToken, lerVisitanteId } from './identidade';
+import { avisarSessaoExpirada } from './sessao-expirada';
 
 // ====================================================================
 // 1. CLIENTE HTTP
@@ -34,5 +35,14 @@ clienteApi.interceptors.request.use((configuracao) => {
 
 clienteApi.interceptors.response.use(
   (resposta) => resposta,
-  (erro: unknown) => Promise.reject(converterErro(erro)),
+  (erro: unknown) => {
+    const convertido = converterErro(erro);
+    const rota = axios.isAxiosError(erro) ? (erro.config?.url ?? '') : '';
+
+    if (convertido instanceof ErroApi && convertido.status === 401 && !rota.startsWith('/auth/')) {
+      avisarSessaoExpirada();
+    }
+
+    return Promise.reject(convertido);
+  },
 );

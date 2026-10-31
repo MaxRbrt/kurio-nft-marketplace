@@ -120,7 +120,7 @@ test('cenário sobrevive ao refresh e reset volta ao padrão', async ({ page }) 
 
 test('cenário pode ser escolhido pela URL', async ({ page }) => {
   await page.goto('/?cenario=vazio');
-  await expect(page.getByTestId('nfts-primeiro')).toHaveText('Nenhum resultado');
+  await expect(page.getByTestId('nfts-vazio')).toBeVisible();
 });
 
 test.describe('durante a compra', () => {
