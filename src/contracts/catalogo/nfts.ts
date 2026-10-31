@@ -41,7 +41,7 @@ export const edicaoSchema = z.object({
 });
 export type Edicao = z.infer<typeof edicaoSchema>;
 
-export const imagemSchema = z.object({ url: z.string(), alt: z.string() });
+const imagemSchema = z.object({ url: z.string(), alt: z.string() });
 
 export const nftResumoSchema = z.object({
   id: z.string(),

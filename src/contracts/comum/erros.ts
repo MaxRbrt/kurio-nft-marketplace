@@ -5,7 +5,7 @@ import { z } from 'zod';
 // Toda falha da API usa este corpo. A interface decide pelo código,
 // nunca pelo texto. Erro de formulário vem por campo em "campos".
 // ====================================================================
-export const codigoErroSchema = z.enum([
+const codigoErroSchema = z.enum([
   'VALIDACAO',
   'SESSAO_INVALIDA',
   'SESSAO_EXPIRADA',
@@ -33,4 +33,3 @@ export const respostaErroSchema = z.object({
     detalhes: z.unknown().optional(),
   }),
 });
-export type RespostaErro = z.infer<typeof respostaErroSchema>;

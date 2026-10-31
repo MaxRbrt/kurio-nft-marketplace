@@ -45,7 +45,7 @@ function LinhaFiltro({ rotulo, contagem, ativo, contagemNegrito, aoAlternar }: P
       aria-pressed={ativo}
       onClick={aoAlternar}
       className={`flex h-10 w-full items-center justify-between pl-3 text-[15px] leading-10 ${
-        ativo ? 'text-texto-destaque' : 'text-muted-foreground'
+        ativo ? 'text-texto-destaque underline' : 'text-muted-foreground'
       } hover:text-texto-destaque`}
     >
       <span>{rotulo}</span>

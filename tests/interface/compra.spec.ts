@@ -354,6 +354,26 @@ test.describe('compra no desktop', () => {
     await expect(page.getByTestId('recibo-total')).toHaveCount(0);
   });
 
+  test('sessão expirada no checkout volta ao login e preserva o que foi digitado', async ({
+    page,
+  }) => {
+    await prepararSessao(page);
+    await expect(page.getByTestId('pagamento-total')).toHaveText('10.736 ETH');
+    await preencherCodigo(page);
+    await page.getByLabel('Código de indicação').fill('RETOMAR');
+    await controlar(page, 'sessoes/expirar');
+    await page.getByRole('button', { name: 'Confirmar compra' }).click();
+
+    await expect(page).toHaveURL(/\/login\?redirect=/);
+    await page.getByRole('textbox', { name: 'E-mail', exact: true }).fill(ANA.email);
+    await page.getByLabel('Senha', { exact: true }).fill(ANA.senha);
+    await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+
+    await expect(page).toHaveURL(/\/pagamento/);
+    await expect(page.getByLabel('Código de indicação')).toHaveValue('RETOMAR');
+    await expect(page.getByTestId('pagamento-item')).toHaveCount(2);
+  });
+
   test('visitante é levado ao login e volta ao pagamento', async ({ page }) => {
     await page.goto('/pagamento?cupom=KURIO10');
     await expect(page).toHaveURL(/\/login\?redirect=/);

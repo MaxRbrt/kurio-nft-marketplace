@@ -3,14 +3,7 @@ import {
   conexaoCarteiraSchema,
   type EntradaCarteira,
 } from '@/contracts/conta/carteiras';
-import { perfilSchema } from '@/contracts/conta/perfil';
 import { clienteApi } from '@/lib/api/cliente';
-
-export async function obterPerfil(signal?: AbortSignal) {
-  const { data } = await clienteApi.get('/perfil', { signal });
-
-  return perfilSchema.parse(data);
-}
 
 export async function listarCarteiras(signal?: AbortSignal) {
   const { data } = await clienteApi.get('/carteiras', { signal });
@@ -20,6 +13,12 @@ export async function listarCarteiras(signal?: AbortSignal) {
 
 export async function criarCarteira(entrada: EntradaCarteira) {
   const { data } = await clienteApi.post('/carteiras', entrada);
+
+  return carteiraSchema.parse(data);
+}
+
+export async function atualizarCarteira(id: string, entrada: EntradaCarteira) {
+  const { data } = await clienteApi.patch(`/carteiras/${id}`, entrada);
 
   return carteiraSchema.parse(data);
 }

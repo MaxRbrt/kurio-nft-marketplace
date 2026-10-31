@@ -174,10 +174,10 @@ test.describe('rotas privadas', () => {
     await preencherLogin(page, ANA);
 
     await expect(page).toHaveURL(/\/perfil$/);
-    await expect(page.getByTestId('perfil-usuario')).toHaveText('Ana Colecionadora');
+    await expect(page.getByLabel('Nome de exibição')).toHaveValue('Ana Colecionadora');
 
     await page.reload();
-    await expect(page.getByTestId('perfil-usuario')).toHaveText('Ana Colecionadora');
+    await expect(page.getByLabel('Nome de exibição')).toHaveValue('Ana Colecionadora');
   });
 
   test('destino externo é ignorado', async ({ page }) => {
@@ -199,7 +199,7 @@ test.describe('rotas privadas', () => {
   test('sessão expirada volta ao login guardando o destino', async ({ page }) => {
     await page.goto('/login?redirect=%2Fperfil');
     await preencherLogin(page, ANA);
-    await expect(page.getByTestId('perfil-usuario')).toBeVisible();
+    await expect(page.getByLabel('Nome de exibição')).toBeVisible();
 
     await chamarApi(page, 'POST', '/api/__mock/sessoes/expirar');
     await page.reload();

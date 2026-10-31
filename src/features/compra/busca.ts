@@ -8,5 +8,3 @@ import { z } from 'zod';
 export const buscaCompraSchema = z.object({
   cupom: z.string().trim().min(1).optional().catch(undefined),
 });
-
-export type BuscaCompra = z.infer<typeof buscaCompraSchema>;

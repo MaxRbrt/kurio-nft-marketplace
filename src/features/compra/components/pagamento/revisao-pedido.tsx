@@ -61,6 +61,10 @@ export function RevisaoPedido({
     <Dialog open={aberta} onOpenChange={(abrir) => !abrir && !enviando && aoFechar()}>
       <DialogContent
         data-testid="revisao-pedido"
+        onCloseAutoFocus={(evento) => {
+          evento.preventDefault();
+          document.getElementById('confirmar-compra')?.focus();
+        }}
         className="max-h-[90dvh] w-[578px] max-w-[calc(100vw-32px)] gap-0 overflow-y-auto rounded-none border-0 bg-card p-6 ring-0 sm:max-w-[578px]"
       >
         <DialogTitle className="text-base leading-5 font-bold text-muted-foreground">

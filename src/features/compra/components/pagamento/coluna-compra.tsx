@@ -38,7 +38,7 @@ export function MarcadorOpcao({
 // Só a carteira escolhida mostra o estado. Recusa e desconexão oferecem
 // nova tentativa, e nada disso aparenta sucesso sem resposta da API.
 // ====================================================================
-export function EstadoConexao({ estado }: { estado: EstadoPagamento }) {
+function EstadoConexao({ estado }: { estado: EstadoPagamento }) {
   const { conexao, carteira } = estado;
 
   if (!carteira) {
@@ -252,6 +252,7 @@ export function ColunaCompra({ resumo, estado, confirmar, aviso, ocupado }: Prop
       </div>
 
       <button
+        id="confirmar-compra"
         type="button"
         disabled={ocupado || !dados}
         onClick={confirmar}

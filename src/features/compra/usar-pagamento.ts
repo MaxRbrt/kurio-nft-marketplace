@@ -11,8 +11,9 @@ import {
   criarCarteira,
   desconectarCarteira,
   listarCarteiras,
-  obterPerfil,
 } from '@/features/conta/api/carteiras';
+import { obterPerfil } from '@/features/conta/api/perfil';
+import { SUFIXOS_ENS } from '@/features/conta/ens';
 import { useSessao } from '@/features/conta/usar-sessao';
 import { ErroApi } from '@/lib/api/erros';
 
@@ -26,7 +27,6 @@ export const TIPOS_CARTEIRA = [
   { valor: 'metamask', rotulo: 'MetaMask' },
   { valor: 'coinbase', rotulo: 'Coinbase Wallet' },
 ] as const;
-export const SUFIXOS_ENS = ['.eth', '.kurio.eth'] as const;
 
 const obrigatorio = (mensagem: string) => z.string().trim().min(1, mensagem);
 
@@ -35,7 +35,7 @@ const obrigatorio = (mensagem: string) => z.string().trim().min(1, mensagem);
 // Obrigatórios são os marcados com asterisco no frame. Rede e tipo vêm de
 // listas, e o endereço segue a regra 0x do contrato das carteiras.
 // ====================================================================
-export const formularioPagamentoSchema = z.object({
+const formularioPagamentoSchema = z.object({
   nomeExibicao: obrigatorio('Informe o nome de exibição'),
   nomeUsuario: obrigatorio('Informe o nome de usuário'),
   rede: redeSchema,

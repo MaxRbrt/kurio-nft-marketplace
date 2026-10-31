@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   IconeBusca,
   IconeCarrinhoCompra,
@@ -137,6 +137,7 @@ function AvisoEstoque({ compra }: { compra: Compra }) {
 function Galeria({ nft }: { nft: NftDetalhe }) {
   const [indice, setIndice] = useState(Math.min(1, nft.imagens.length - 1));
   const [ampliada, setAmpliada] = useState(false);
+  const botaoAmpliar = useRef<HTMLButtonElement>(null);
   const imagem = nft.imagens[indice];
 
   return (
@@ -178,6 +179,7 @@ function Galeria({ nft }: { nft: NftDetalhe }) {
           className="size-[404px] rounded-3xl object-cover"
         />
         <button
+          ref={botaoAmpliar}
           type="button"
           aria-label="Ampliar imagem"
           onClick={() => setAmpliada(true)}
@@ -188,7 +190,13 @@ function Galeria({ nft }: { nft: NftDetalhe }) {
       </div>
 
       <Dialog open={ampliada} onOpenChange={setAmpliada}>
-        <DialogContent className="w-[640px] max-w-[90vw] bg-card p-4 sm:max-w-[640px]">
+        <DialogContent
+          className="w-[640px] max-w-[90vw] bg-card p-4 sm:max-w-[640px]"
+          onCloseAutoFocus={(evento) => {
+            evento.preventDefault();
+            botaoAmpliar.current?.focus();
+          }}
+        >
           <DialogTitle className="text-base">{nft.nome}</DialogTitle>
           <ImagemNft
             url={imagem.url}

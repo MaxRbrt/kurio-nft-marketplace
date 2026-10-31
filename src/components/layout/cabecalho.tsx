@@ -20,7 +20,7 @@ const LINKS_INDISPONIVEIS = [
 export function Cabecalho() {
   const sessao = useSessao();
   const { pathname } = useLocation();
-  const inicioAtivo = ['/', '/login', '/cadastro'].includes(pathname);
+  const inicioAtivo = ['/', '/login', '/cadastro', '/perfil', '/carteiras'].includes(pathname);
   const mercadoAtivo =
     pathname.startsWith('/nfts/') || pathname === '/carrinho' || pathname === '/pagamento';
   const { data: carrinho } = useCarrinho();
@@ -70,7 +70,10 @@ export function Cabecalho() {
           ))}
         </nav>
 
-        <div data-testid="cabecalho-acoes" className="flex h-[35px] items-center gap-7">
+        <div
+          data-testid="cabecalho-acoes"
+          className="flex h-[35px] w-[207px] items-center justify-end gap-7"
+        >
           <BuscaDesktop />
 
           <Link to="/carrinho" aria-label={rotuloCarrinho} className="relative h-6 w-[31px]">
@@ -90,9 +93,18 @@ export function Cabecalho() {
               to="/perfil"
               aria-label={`Perfil de ${sessao.usuario.nomeExibicao}`}
               data-testid="cabecalho-conta"
-              className="flex size-[35px] items-center justify-center rounded-full bg-primary text-base font-bold text-primary-foreground"
+              className="flex size-[35px] items-center justify-center overflow-hidden rounded-full bg-primary text-base font-bold text-primary-foreground"
             >
-              {sessao.usuario.nomeExibicao.charAt(0).toUpperCase()}
+              {sessao.usuario.avatarUrl ? (
+                <img
+                  data-testid="cabecalho-avatar"
+                  src={sessao.usuario.avatarUrl}
+                  alt=""
+                  className="size-full object-cover"
+                />
+              ) : (
+                sessao.usuario.nomeExibicao.charAt(0).toUpperCase()
+              )}
             </Link>
           ) : (
             <Link

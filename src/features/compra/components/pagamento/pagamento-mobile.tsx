@@ -227,6 +227,7 @@ export function PagamentoMobile({
       </div>
 
       <button
+        id="confirmar-compra"
         type="button"
         disabled={ocupado || !dados}
         onClick={confirmar}

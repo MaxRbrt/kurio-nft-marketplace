@@ -1,143 +1,15 @@
-import type { ComponentProps, ReactNode } from 'react';
-import { Controller } from 'react-hook-form';
-import { IconeSetaBaixo } from '@/components/icones/icones';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { CampoRotulado, Entrada, Seletor } from '@/components/formulario/campos-formulario';
+import { OPCOES_SUFIXO_ENS } from '@/features/conta/ens';
 import { cn } from '@/lib/utils';
 import {
   REDES,
-  SUFIXOS_ENS,
   TIPOS_CARTEIRA,
   type EstadoPagamento,
   type FormularioPagamento,
 } from '../../usar-pagamento';
 
-type PropsCampoRotulado = {
-  id: string;
-  rotulo: string;
-  obrigatorio?: boolean;
-  rotuloOculto?: boolean;
-  erro?: string;
-  children: ReactNode;
-};
-
 // ====================================================================
-// 1. CAMPO DO FORMULÁRIO
-// Rótulo de 15 px e asterisco coral, em uma faixa de 29 px, como no frame.
-// O campo opcional sem rótulo visível mantém o rótulo para leitor de tela.
-// ====================================================================
-function CampoRotulado({
-  id,
-  rotulo,
-  obrigatorio,
-  rotuloOculto,
-  erro,
-  children,
-}: PropsCampoRotulado) {
-  return (
-    <div>
-      <div className="flex h-[29px] items-center">
-        <label htmlFor={id} className={cn('text-[15px] leading-[15px]', rotuloOculto && 'sr-only')}>
-          {rotulo}
-        </label>
-        {obrigatorio && (
-          <span aria-hidden className="text-[22px] leading-[29px] text-texto-coral">
-            *
-          </span>
-        )}
-      </div>
-      {children}
-      {erro && (
-        <p id={`${id}-erro`} className="mt-1 text-sm leading-5 text-texto-coral">
-          Erro: {erro}
-        </p>
-      )}
-    </div>
-  );
-}
-
-const CLASSE_CAMPO =
-  'h-10 w-full rounded-[3px] border border-border bg-transparent px-3 text-sm leading-[15px] text-foreground outline-none placeholder:text-secundaria focus-visible:border-primary aria-invalid:border-texto-coral';
-
-function Entrada({ erro, id, ...props }: ComponentProps<'input'> & { erro?: string }) {
-  return (
-    <input
-      id={id}
-      aria-invalid={Boolean(erro)}
-      aria-describedby={erro ? `${id}-erro` : undefined}
-      className={CLASSE_CAMPO}
-      {...props}
-    />
-  );
-}
-
-type PropsSeletor = {
-  id: string;
-  nome: 'rede' | 'tipo' | 'sufixoEns';
-  texto: string;
-  opcoes: ReadonlyArray<{ valor: string; rotulo: string }>;
-  estado: EstadoPagamento;
-  erro?: string;
-  aoEscolher?: (valor: string) => void;
-  estreito?: boolean;
-};
-
-// ====================================================================
-// 2. SELETOR
-// Select do shadcn com a aparência do frame: texto a 12 e seta de 18 a
-// 28,5 da borda. O teclado e o foco vêm do Radix.
-// ====================================================================
-function Seletor({ id, nome, texto, opcoes, estado, erro, aoEscolher, estreito }: PropsSeletor) {
-  return (
-    <Controller
-      control={estado.formulario.control}
-      name={nome}
-      render={({ field }) => (
-        <Select
-          value={field.value ?? ''}
-          onValueChange={(valor) => {
-            field.onChange(valor);
-            aoEscolher?.(valor);
-          }}
-        >
-          <SelectTrigger
-            id={id}
-            ref={field.ref}
-            aria-invalid={Boolean(erro)}
-            aria-describedby={erro ? `${id}-erro` : undefined}
-            className={cn(
-              'relative !h-10 rounded-[3px] border-border bg-transparent pl-3 text-sm leading-[15px] text-foreground shadow-none data-placeholder:text-secundaria dark:bg-transparent [&>svg:last-child]:hidden',
-              estreito ? 'w-[78px] pr-0 pl-2.5 text-[15px]' : 'w-full',
-            )}
-          >
-            <SelectValue placeholder={texto} />
-            <IconeSetaBaixo
-              className={cn(
-                'absolute top-[11px] size-[18px]',
-                estreito ? 'right-[6px] text-foreground' : 'right-[27.5px] text-secundaria',
-              )}
-            />
-          </SelectTrigger>
-          <SelectContent className="border-border bg-card">
-            {opcoes.map(({ valor, rotulo }) => (
-              <SelectItem key={valor} value={valor}>
-                {rotulo}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-    />
-  );
-}
-
-// ====================================================================
-// 3. PERFIL DO COLECIONADOR
+// 1. PERFIL DO COLECIONADOR
 // Duas colunas de 369,5 no desktop, com os campos na ordem do frame, e
 // uma coluna na folha do mobile. Carteira cadastrada: endereço somente
 // leitura, pois o pedido usa a carteira da API.
@@ -148,7 +20,6 @@ export function FormularioColecionador({ estado }: { estado: EstadoPagamento }) 
     formState: { errors },
   } = estado.formulario;
   const usarOutra = Boolean(estado.carteira && estado.carteira.papel === 'secundaria');
-  const opcoesSufixo = SUFIXOS_ENS.map((sufixo) => ({ valor: sufixo, rotulo: sufixo }));
 
   return (
     <div className="flex flex-col gap-6">
@@ -185,7 +56,7 @@ export function FormularioColecionador({ estado }: { estado: EstadoPagamento }) 
             nome="rede"
             texto="Selecione uma rede"
             opcoes={REDES}
-            estado={estado}
+            control={estado.formulario.control}
             erro={errors.rede?.message}
           />
         </CampoRotulado>
@@ -237,7 +108,7 @@ export function FormularioColecionador({ estado }: { estado: EstadoPagamento }) 
             nome="tipo"
             texto="Selecione uma carteira"
             opcoes={TIPOS_CARTEIRA}
-            estado={estado}
+            control={estado.formulario.control}
             erro={errors.tipo?.message}
             aoEscolher={(valor) => estado.escolherTipo(valor as FormularioPagamento['tipo'])}
           />
@@ -274,9 +145,10 @@ export function FormularioColecionador({ estado }: { estado: EstadoPagamento }) 
             id="pagamento-ens"
             nome="sufixoEns"
             texto=".eth"
-            opcoes={opcoesSufixo}
-            estado={estado}
-            estreito
+            opcoes={OPCOES_SUFIXO_ENS}
+            control={estado.formulario.control}
+            classeCaixa="w-[78px] pr-0 pl-2.5 text-[15px]"
+            classeSeta="right-[6px] size-[18px] text-foreground"
           />
         </CampoRotulado>
       </div>

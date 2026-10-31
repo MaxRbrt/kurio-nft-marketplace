@@ -14,6 +14,10 @@ async function ativarMocks() {
   const { worker } = await import('./mocks/browser');
 
   await worker.start({ onUnhandledRequest: 'bypass', quiet: true });
+
+  const { montarPainelSeSolicitado } = await import('./mocks/painel/montar-painel');
+
+  montarPainelSeSolicitado();
 }
 
 await ativarMocks();

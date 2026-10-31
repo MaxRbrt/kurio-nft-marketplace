@@ -6,7 +6,7 @@ const tentativaSchema = z.object({
   entrada: entradaPedidoSchema,
   pedidoId: z.string().nullable(),
 });
-export type TentativaPedido = z.infer<typeof tentativaSchema>;
+type TentativaPedido = z.infer<typeof tentativaSchema>;
 
 const chaveLocal = (usuarioId: string) => `kurio:tentativa-pedido:${usuarioId}`;
 
