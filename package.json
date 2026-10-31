@@ -11,7 +11,9 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc -b",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "lighthouse": "node lighthouse/auditar.mjs",
+    "test:visual": "playwright test tests/visual"
   },
   "dependencies": {
     "@fontsource-variable/roboto-mono": "^5.3.0",
@@ -44,6 +46,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "chrome-launcher": "^1.2.2",
     "lighthouse": "^13.6.0",
     "oxlint": "^1.89.0",
     "prettier": "^3.9.10",
