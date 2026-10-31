@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useCallback, useRef, type ReactNode } from 'react';
-import { IconeVoltarDetalhe } from '@/components/icones/icones';
 import { Rodape } from '@/components/layout/rodape';
 import { obterNft } from '@/features/catalogo/api/detalhe';
 import { VitrineNfts } from '@/features/catalogo/components/vitrine-nfts';
 import { useCarrinho } from '../usar-carrinho';
 import { useResumoCompra } from '../usar-cotacao';
+import { CabecalhoMobile, Trilha } from './cabecalho-compra';
 import { ListaCarrinhoMobile, TabelaCarrinho } from './itens-carrinho';
 import { ResumoDesktop, ResumoMobile } from './resumo-carrinho';
 
@@ -35,34 +35,6 @@ function Sugestoes({ nftId }: { nftId: string }) {
   );
 }
 
-function CabecalhoMobile() {
-  const navigate = useNavigate();
-
-  return (
-    <div className="relative h-11">
-      <button
-        type="button"
-        aria-label="Voltar"
-        onClick={() => void navigate({ to: '/' })}
-        className="flex size-[35px] items-center justify-center rounded-full border border-border bg-muted text-secundaria"
-      >
-        <IconeVoltarDetalhe />
-      </button>
-      <h1 className="absolute top-[9px] left-24 text-xl leading-4 font-bold whitespace-nowrap">
-        Carrinho de NFTs
-      </h1>
-    </div>
-  );
-}
-
-function Trilha() {
-  return (
-    <nav aria-label="Trilha" className="h-4 text-[15px] leading-4 font-bold">
-      <Link to="/">Início</Link> / <span>Mercado</span> / <span aria-current="page">Carrinho</span>
-    </nav>
-  );
-}
-
 // ====================================================================
 // 2. ESTADOS SEM LISTA
 // Vazio e erro não têm frame: seguem o padrão visual, com o cabeçalho de
@@ -72,11 +44,11 @@ function MensagemCarrinho({ children }: { children: ReactNode }) {
   return (
     <main>
       <div className="mx-auto mt-8 hidden max-w-[1200px] px-4 lg:block xl:px-0">
-        <Trilha />
+        <Trilha atual="Carrinho" />
         <h1 className="mt-3 text-2xl font-bold">Carrinho de NFTs</h1>
       </div>
       <div className="mx-auto max-w-[414px] px-7 pt-8 lg:hidden">
-        <CabecalhoMobile />
+        <CabecalhoMobile titulo="Carrinho de NFTs" recuo="left-24" />
       </div>
       <div className="flex min-h-[50dvh] flex-col items-center justify-center gap-4 px-4 text-center">
         {children}
@@ -101,7 +73,7 @@ export function PaginaCarrinho({ cupom }: { cupom?: string }) {
     (codigo: string | undefined) => void navigate({ search: { cupom: codigo }, replace: true }),
     [navigate],
   );
-  const resumo = useResumoCompra(cupom, temItens, trocarCupom);
+  const resumo = useResumoCompra({ cupom, habilitada: temItens, trocarCupom });
   const focarConteudo = () => conteudo.current?.focus();
 
   if (carrinho.isError) {
@@ -136,7 +108,7 @@ export function PaginaCarrinho({ cupom }: { cupom?: string }) {
     <>
       <main ref={conteudo} tabIndex={-1} aria-busy={carrinho.isPending} className="outline-none">
         <div className="mx-auto mt-8 hidden w-full max-w-[1200px] px-4 lg:block xl:px-0">
-          <Trilha />
+          <Trilha atual="Carrinho" />
           <h1 className="sr-only">Carrinho de NFTs</h1>
           <div className="mt-3 flex flex-col gap-10 xl:flex-row xl:justify-between xl:gap-0">
             <TabelaCarrinho itens={itens} aoRemover={focarConteudo} />
@@ -147,7 +119,7 @@ export function PaginaCarrinho({ cupom }: { cupom?: string }) {
 
         <div className="mx-auto flex min-h-dvh max-w-[414px] flex-col lg:hidden">
           <div className="px-7 pt-8 pb-1.5">
-            <CabecalhoMobile />
+            <CabecalhoMobile titulo="Carrinho de NFTs" recuo="left-24" />
             <div className="mt-3">
               <ListaCarrinhoMobile itens={itens} aoRemover={focarConteudo} />
             </div>

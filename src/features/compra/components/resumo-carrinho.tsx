@@ -1,15 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import { ErroApi } from '@/lib/api/erros';
-import { formatarEth } from '@/lib/eth';
+import { formatarEth, textoDesconto } from '@/lib/eth';
 import { cn } from '@/lib/utils';
 import type { ResumoCompra } from '../usar-cotacao';
-
-const DESCONTO_ZERADO = /^0(\.0+)?$/;
-
-function textoDesconto(desconto: string) {
-  return DESCONTO_ZERADO.test(desconto) ? '(-) 00.00' : `(-) ${formatarEth(desconto)}`;
-}
 
 type PropsValor = {
   valor?: string;
@@ -17,7 +11,7 @@ type PropsValor = {
   largura: string;
 };
 
-function ValorOuEsqueleto({ valor, className, largura }: PropsValor) {
+export function ValorOuEsqueleto({ valor, className, largura }: PropsValor) {
   if (!valor) {
     return <span data-testid="resumo-esqueleto" className={cn('esqueleto block h-4', largura)} />;
   }
@@ -37,7 +31,7 @@ type PropsCampoCupom = {
 // fica somente leitura e o botão passa a remover. O erro é ligado ao
 // campo e anunciado, e não depende só de cor.
 // ====================================================================
-function CampoCupom({ resumo, sufixo, classes }: PropsCampoCupom) {
+export function CampoCupom({ resumo, sufixo, classes }: PropsCampoCupom) {
   const [digitado, setDigitado] = useState('');
   const aplicado = resumo.cupomAplicado;
   const erroId = `cupom-erro-${sufixo}`;
@@ -95,7 +89,7 @@ function CampoCupom({ resumo, sufixo, classes }: PropsCampoCupom) {
 // Falha transitória oferece nova tentativa. Conflito de estoque só se
 // resolve no carrinho: a mensagem diz qual item, e finalizar fica travado.
 // ====================================================================
-function FalhaCotacao({ resumo }: { resumo: ResumoCompra }) {
+export function FalhaCotacao({ resumo }: { resumo: ResumoCompra }) {
   const { error, refetch } = resumo.cotacao;
 
   if (!(error instanceof ErroApi) || error.codigo.startsWith('CUPOM_')) {

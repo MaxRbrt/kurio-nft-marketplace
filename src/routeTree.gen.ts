@@ -17,6 +17,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AutenticadoPagamentoRouteImport } from './routes/_autenticado/pagamento'
 import { Route as AutenticadoPerfilRouteImport } from './routes/_autenticado/perfil'
 import { Route as NftsNftIdRouteImport } from './routes/nfts.$nftId'
+import { Route as AutenticadoPedidosPedidoIdRouteImport } from './routes/_autenticado/pedidos.$pedidoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,12 @@ const NftsNftIdRoute = NftsNftIdRouteImport.update({
   path: '/nfts/$nftId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AutenticadoPedidosPedidoIdRoute =
+  AutenticadoPedidosPedidoIdRouteImport.update({
+    id: '/pedidos/$pedidoId',
+    path: '/pedidos/$pedidoId',
+    getParentRoute: () => AutenticadoRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByFullPath {
   '/pagamento': typeof AutenticadoPagamentoRoute
   '/perfil': typeof AutenticadoPerfilRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
+  '/pedidos/$pedidoId': typeof AutenticadoPedidosPedidoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +83,7 @@ export interface FileRoutesByTo {
   '/pagamento': typeof AutenticadoPagamentoRoute
   '/perfil': typeof AutenticadoPerfilRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
+  '/pedidos/$pedidoId': typeof AutenticadoPedidosPedidoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,6 +95,7 @@ export interface FileRoutesById {
   '/_autenticado/pagamento': typeof AutenticadoPagamentoRoute
   '/_autenticado/perfil': typeof AutenticadoPerfilRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
+  '/_autenticado/pedidos/$pedidoId': typeof AutenticadoPedidosPedidoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/perfil'
     | '/nfts/$nftId'
+    | '/pedidos/$pedidoId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/perfil'
     | '/nfts/$nftId'
+    | '/pedidos/$pedidoId'
   id:
     | '__root__'
     | '/'
@@ -116,6 +128,7 @@ export interface FileRouteTypes {
     | '/_autenticado/pagamento'
     | '/_autenticado/perfil'
     | '/nfts/$nftId'
+    | '/_autenticado/pedidos/$pedidoId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -185,17 +198,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NftsNftIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_autenticado/pedidos/$pedidoId': {
+      id: '/_autenticado/pedidos/$pedidoId'
+      path: '/pedidos/$pedidoId'
+      fullPath: '/pedidos/$pedidoId'
+      preLoaderRoute: typeof AutenticadoPedidosPedidoIdRouteImport
+      parentRoute: typeof AutenticadoRoute
+    }
   }
 }
 
 interface AutenticadoRouteChildren {
   AutenticadoPagamentoRoute: typeof AutenticadoPagamentoRoute
   AutenticadoPerfilRoute: typeof AutenticadoPerfilRoute
+  AutenticadoPedidosPedidoIdRoute: typeof AutenticadoPedidosPedidoIdRoute
 }
 
 const AutenticadoRouteChildren: AutenticadoRouteChildren = {
   AutenticadoPagamentoRoute: AutenticadoPagamentoRoute,
   AutenticadoPerfilRoute: AutenticadoPerfilRoute,
+  AutenticadoPedidosPedidoIdRoute: AutenticadoPedidosPedidoIdRoute,
 }
 
 const AutenticadoRouteWithChildren = AutenticadoRoute._addFileChildren(

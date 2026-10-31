@@ -184,14 +184,17 @@ test.describe('compra', () => {
     await expect(page.getByTestId('cabecalho-badge')).toHaveText('2');
   });
 
-  test('estoque que acabou depois de abrir a tela mostra o erro', async ({ page }) => {
+  test('evento de estoque e preço atualiza a tela aberta, sem recarregar', async ({ page }) => {
     await page.goto('/nfts/nft-01');
     await expect(titulo(page)).toHaveText('Emerald Ape #042');
-    await chamarApi(page, 'POST', '/api/__mock/nfts/nft-01', { disponivel: 0 });
-    await page.getByRole('button', { name: 'COMPRAR', exact: true }).click();
+    await expect(page.getByTestId('socket-estado')).toHaveText('Conectado');
 
-    await expect(page.getByText('Quantidade maior que a disponível')).toBeVisible();
-    await expect(page).toHaveURL(/\/nfts\/nft-01$/);
+    await chamarApi(page, 'POST', '/api/__mock/nfts/nft-01', { preco: '3.33' });
+    await expect(page.getByTestId('detalhe-preco')).toHaveText('3.33 ETH');
+
+    await chamarApi(page, 'POST', '/api/__mock/nfts/nft-01', { disponivel: 0 });
+    await expect(page.getByRole('button', { name: 'COMPRAR', exact: true })).toBeDisabled();
+    await expect(page.getByText('Edição indisponível').first()).toBeVisible();
   });
 });
 

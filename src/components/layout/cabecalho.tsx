@@ -21,10 +21,15 @@ export function Cabecalho() {
   const sessao = useSessao();
   const { pathname } = useLocation();
   const inicioAtivo = ['/', '/login', '/cadastro'].includes(pathname);
-  const mercadoAtivo = pathname.startsWith('/nfts/') || pathname === '/carrinho';
+  const mercadoAtivo =
+    pathname.startsWith('/nfts/') || pathname === '/carrinho' || pathname === '/pagamento';
   const { data: carrinho } = useCarrinho();
   const totalItens = carrinho?.itens.reduce((total, item) => total + item.quantidade, 0) ?? 0;
   const rotuloCarrinho = totalItens > 0 ? `Carrinho, ${totalItens} itens` : 'Carrinho, nenhum item';
+
+  if (pathname.startsWith('/pedidos/')) {
+    return null;
+  }
 
   return (
     <header className="mx-auto mt-6 hidden w-full max-w-[1200px] px-4 lg:block xl:px-0">

@@ -35,6 +35,14 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 | Carrinho, mobile         | Lixeira só no 3º cartão, sobre o botão "+"                                                      | Lixeira em todos os cartões, acima do "+"                                                                 | O botão ficava encoberto, e remover é função de todo item         |
 | Carrinho, mobile         | Cada arte duplicada, com a de cima em `multiply` e deslocada até 2 px, o que escurece a imagem  | Uma imagem só, com as cores das outras telas                                                              | O mesmo NFT não pode mudar de cor entre telas                     |
 | Carrinho, mobile         | Cartões em y = 88, 208, 330 e 450 (vãos de 20 e 22 px)                                          | Vão de 20 px entre todos                                                                                  | Lista dinâmica não tem posição própria por item                   |
+| Pagamento, desktop       | Linhas de "Seus NFTs" com artes de 70, 66 e 65 px e textos e valores em posições diferentes     | Todas as linhas como a primeira: arte de 70 px e valores alinhados                                        | Mesmo componente com medidas diferentes                           |
+| Pagamento, desktop       | "Total" recuado (957 a 1278) e "Taxa estimada" centrada, fora do alinhamento dos outros valores | Total de ponta a ponta e "Taxa estimada" à direita, como no Carrinho                                      | Valores de uma mesma lista desalinhados                           |
+| Pagamento, desktop       | "Carteira e rede" centrado, com os outros títulos de seção à esquerda                           | À esquerda, como no mobile                                                                                | Títulos iguais com alinhamentos diferentes                        |
+| Pagamento, desktop       | 1ª opção de carteira mostra o selo com as três marcas; opções com recuos diferentes (927 e 931) | 1ª opção é "WalletConnect", como no mobile; recuos e altura do texto iguais nas três                      | Opção sem nome não diz o que se escolhe                           |
+| Pagamento, desktop       | Texto de exemplo de endereço com recuo de 22 px; os demais campos usam 12 px                    | 12 px em todos os campos                                                                                  | Campos iguais com alinhamentos diferentes                         |
+| Pagamento, mobile        | Só a seleção de carteira, sem os campos que o desktop exige                                     | Os mesmos campos abrem em uma folha quando falta dado obrigatório                                         | O enunciado exige validar os campos, e o pedido depende deles     |
+| Confirmação              | Linhas de itens com artes de 70, 66 e 65 px; "16.11 ETH" passa da borda da tabela (970 x 965)   | Todas com arte de 70 px e valores alinhados à direita da tabela                                           | Mesmo componente com medidas diferentes e valor fora da grade     |
+| Confirmação              | Só o estado confirmado                                                                          | Pendente e recusado no mesmo modal, sem transação nem recibo                                              | O enunciado exige os três estados                                 |
 | Carrinho, mobile         | Quantidade 6 px abaixo do centro dos botões                                                     | Quantidade centrada na linha dos botões                                                                   | Item visivelmente fora do centro                                  |
 
 ### Pontos do arquivo verificados e mantidos
@@ -45,6 +53,8 @@ Os comentários deixados no arquivo do Figma foram usados como lista do que conf
 - Início, desktop: os arcos laranja aparecem nos dois cartões de promoção, na mesma posição. É um detalhe decorativo.
 - Carrinho, desktop: a lixeira está centrada na própria caixa de 24 px, e os botões de quantidade são pílulas de 20 x 30 com raio cheio.
 - Carrinho, mobile: botões de quantidade redondos, diferentes dos do desktop. Cada frame segue o seu desenho.
+- Pagamento: a seta dos seletores fica a 28,5 px da borda nos dois seletores, de forma coerente.
+- Confirmação: os rótulos "Taxa de rede" e "Total" começam em x = 644, alinhados entre si.
 - Sem mudança por gosto: ordem das coleções, letras W, C e D nos serviços, controle deslizante de preço e fundo escuro atrás do modal, que reproduz o frame.
 
 ### Reproduzidos como estão no frame
@@ -54,6 +64,12 @@ Os comentários deixados no arquivo do Figma foram usados como lista do que conf
 - Textos e rótulos ficam como desenhados, inclusive "Contrato" e "Direitos autorais" trocados no Detalhe.
 - Violet Nomad aparece com o token #0009 no Carrinho e #0314 no Pagamento. Um NFT tem um token só, e a aplicação usa #0314 nas duas telas.
 - Linhas de 0,3 px do frame são renderizadas como 1 px com 25% de opacidade, que é o resultado visual do Figma.
+
+### Estados sem frame
+
+- Revisão antes do envio: modal no padrão da Confirmação, exigido pelo enunciado.
+- Conexão da carteira: "Desconectar", "Conectar" e a recusa aparecem na opção escolhida, no desktop, e no menu de três pontos, no mobile.
+- Campos obrigatórios seguem os asteriscos do frame, inclusive "Código de indicação".
 
 ### Ajustes de acessibilidade
 
