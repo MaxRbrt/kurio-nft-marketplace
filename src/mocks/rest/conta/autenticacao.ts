@@ -1,6 +1,6 @@
-import { lerBanco } from '../banco/estado';
-import type { UsuarioBanco } from '../fixtures/usuarios';
-import { responderErro } from './respostas';
+import { lerBanco } from '../../banco/estado';
+import type { UsuarioBanco } from '../../fixtures/usuarios';
+import { responderErro } from '../respostas';
 
 // ====================================================================
 // 1. SESSÃO DA REQUISIÇÃO

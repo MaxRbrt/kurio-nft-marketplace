@@ -1,8 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import { favoritosSchema } from '@/contracts/catalogo/favoritos';
-import { lerBanco, salvarBanco } from '../banco/estado';
-import { autenticar } from './autenticacao';
-import { responderErro } from './respostas';
+import { lerBanco, salvarBanco } from '../../banco/estado';
+import { autenticar } from '../conta/autenticacao';
+import { responderErro } from '../respostas';
 
 // ====================================================================
 // 1. FAVORITOS POR USUÁRIO

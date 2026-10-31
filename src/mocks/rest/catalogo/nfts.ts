@@ -9,9 +9,9 @@ import {
   type ParametrosNfts,
 } from '@/contracts/catalogo/nfts';
 import { redeSchema } from '@/contracts/comum/valores';
-import { lerBanco } from '../banco/estado';
-import type { NftBanco } from '../fixtures/nfts';
-import { responderErro } from './respostas';
+import { lerBanco } from '../../banco/estado';
+import type { NftBanco } from '../../fixtures/nfts';
+import { responderErro } from '../respostas';
 
 const TAMANHO_PAGINA_PADRAO = 12;
 const INICIO_NOVOS_LANCAMENTOS = '2026-10-01T00:00:00.000Z';

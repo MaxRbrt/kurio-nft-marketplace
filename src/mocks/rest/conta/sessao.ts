@@ -1,10 +1,10 @@
 import { http, HttpResponse } from 'msw';
 import { entradaCadastroSchema, entradaLoginSchema, sessaoSchema } from '@/contracts/conta/sessao';
-import { lerBanco, salvarBanco } from '../banco/estado';
-import { gerarHashSenha } from '../banco/senhas';
-import type { UsuarioBanco } from '../fixtures/usuarios';
+import { lerBanco, salvarBanco } from '../../banco/estado';
+import { gerarHashSenha } from '../../banco/senhas';
+import type { UsuarioBanco } from '../../fixtures/usuarios';
 import { autenticar, lerToken } from './autenticacao';
-import { lerCorpo, responderErro } from './respostas';
+import { lerCorpo, responderErro } from '../respostas';
 
 const DURACAO_SESSAO_MS = 60 * 60 * 1000;
 

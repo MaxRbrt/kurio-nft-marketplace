@@ -4,11 +4,11 @@ import {
   conexaoCarteiraSchema,
   entradaCarteiraSchema,
 } from '@/contracts/conta/carteiras';
-import { lerBanco, salvarBanco } from '../banco/estado';
-import type { CarteiraBanco } from '../fixtures/carteiras';
-import type { UsuarioBanco } from '../fixtures/usuarios';
+import { lerBanco, salvarBanco } from '../../banco/estado';
+import type { CarteiraBanco } from '../../fixtures/carteiras';
+import type { UsuarioBanco } from '../../fixtures/usuarios';
 import { autenticar } from './autenticacao';
-import { lerCorpo, responderErro } from './respostas';
+import { lerCorpo, responderErro } from '../respostas';
 
 // ====================================================================
 // 1. POSSE DA CARTEIRA

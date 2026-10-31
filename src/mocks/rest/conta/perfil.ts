@@ -5,10 +5,10 @@ import {
   entradaSenhaSchema,
   perfilSchema,
 } from '@/contracts/conta/perfil';
-import { lerBanco, salvarBanco } from '../banco/estado';
-import { gerarHashSenha } from '../banco/senhas';
+import { lerBanco, salvarBanco } from '../../banco/estado';
+import { gerarHashSenha } from '../../banco/senhas';
 import { autenticar } from './autenticacao';
-import { lerCorpo, responderErro } from './respostas';
+import { lerCorpo, responderErro } from '../respostas';
 
 // ====================================================================
 // 1. PERFIL
