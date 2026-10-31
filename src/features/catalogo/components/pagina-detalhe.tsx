@@ -9,9 +9,7 @@ import {
   IconeFavorito,
   IconeLinkedinPequeno,
   IconeMais,
-  IconeMaisPequeno,
   IconeMenos,
-  IconeMenosPequeno,
   IconeMensagem,
   IconeTwitterPequeno,
   IconeVoltarDetalhe,
@@ -20,12 +18,14 @@ import { AcaoIndisponivel } from '@/components/layout/acao-indisponivel';
 import { Rodape } from '@/components/layout/rodape';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { Edicao, NftDetalhe } from '@/contracts/catalogo/nfts';
+import { BotaoQuantidade } from '@/features/compra/components/botao-quantidade';
 import { useAdicionarAoCarrinho } from '@/features/compra/usar-carrinho';
 import { ErroApi } from '@/lib/api/erros';
 import { cn } from '@/lib/utils';
 import { obterNft } from '../api/detalhe';
 import { useFavorito } from '../usar-favoritos';
 import { ImagemNft } from './imagem-nft';
+import { VitrineNfts } from './vitrine-nfts';
 
 // ====================================================================
 // 1. ESTADO DA COMPRA
@@ -401,42 +401,7 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
           </div>
         </section>
 
-        <section className="mt-24" aria-labelledby="relacionados-titulo">
-          <h2
-            id="relacionados-titulo"
-            className="h-7 border-b border-primary/25 text-[17px] leading-4 font-bold text-texto-destaque"
-          >
-            Mais desta coleção
-          </h2>
-          <ul className="mt-8 grid grid-cols-5 gap-[26px] xl:gap-[26.25px]">
-            {nft.relacionados.map((relacionado) => (
-              <li key={relacionado.id} data-testid="relacionado">
-                <Link to="/nfts/$nftId" params={{ nftId: relacionado.id }} className="block">
-                  <div className="flex aspect-[219/255] items-center justify-center bg-card">
-                    <ImagemNft
-                      url={relacionado.imagem.url}
-                      sizes="212px"
-                      width={212}
-                      height={212}
-                      alt={relacionado.imagem.alt}
-                      loading="lazy"
-                      className="aspect-square w-[calc(100%-7px)] rounded-[13px] object-cover"
-                    />
-                  </div>
-                  <h3 className="mt-3 truncate text-[15px] leading-5">{relacionado.nome}</h3>
-                  <p className="text-base leading-4 font-bold text-texto-destaque">
-                    {relacionado.preco} ETH
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <div aria-hidden className="mt-8 flex justify-center gap-2">
-            <span className="size-3 rounded-full border-[1.3px] border-primary" />
-            <span className="size-3 rounded-full bg-primary" />
-            <span className="size-3 rounded-full border-[1.3px] border-primary" />
-          </div>
-        </section>
+        <VitrineNfts titulo="Mais desta coleção" nfts={nft.relacionados} variante="detalhe" />
       </main>
       <Rodape />
     </div>
@@ -522,30 +487,22 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
           <div role="group" aria-label="Quantidade" className="flex items-center gap-2">
             <span className="text-[15px] leading-4 font-medium text-muted-foreground">Qtd.</span>
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                aria-label="Diminuir quantidade"
+              <BotaoQuantidade
+                acao="diminuir"
                 disabled={compra.quantidade <= 1}
                 onClick={compra.diminuir}
-                className="flex h-[30px] w-5 items-center justify-center rounded-[20px] border border-background bg-primary text-black shadow-[0_4px_12px_-2px_rgba(20,13,10,0.15)] disabled:cursor-not-allowed"
-              >
-                <IconeMenosPequeno />
-              </button>
+              />
               <output
                 aria-live="polite"
                 className="w-[11px] text-center text-lg leading-[25px] font-medium"
               >
                 {compra.quantidade}
               </output>
-              <button
-                type="button"
-                aria-label="Aumentar quantidade"
+              <BotaoQuantidade
+                acao="aumentar"
                 disabled={compra.esgotada || compra.quantidade >= compra.edicao.disponivel}
                 onClick={compra.aumentar}
-                className="flex h-[30px] w-5 items-center justify-center rounded-[20px] border border-background bg-primary text-black shadow-[0_4px_12px_-2px_rgba(20,13,10,0.15)] disabled:opacity-50"
-              >
-                <IconeMaisPequeno />
-              </button>
+              />
             </div>
           </div>
           <p

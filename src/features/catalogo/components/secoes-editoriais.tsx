@@ -118,23 +118,23 @@ export function DiarioCunhagem() {
       <p className="mt-3 text-center text-sm leading-[18px] text-muted-foreground">
         Histórias, guias e insights para colecionadores sobre o universo da propriedade digital.
       </p>
-      <ul className="mt-10 flex flex-wrap gap-6">
+      <ul className="mt-10 grid grid-cols-[repeat(auto-fill,minmax(268px,1fr))] gap-6">
         {ARTIGOS.map((artigo) => (
           <li
             key={artigo.titulo}
             data-testid="artigo"
-            className="h-[369px] w-[268px] overflow-hidden rounded-lg bg-card"
+            className="h-[369px] overflow-hidden rounded-lg bg-card"
           >
             <ImagemNft
               url={artigo.imagem}
-              sizes="268px"
-              width={268}
+              sizes="282px"
+              width={282}
               height={195}
               alt=""
               loading="lazy"
-              className="h-[195px] w-[268px] object-cover"
+              className="h-[195px] w-full object-cover"
             />
-            <div className="px-4 pt-3">
+            <div className="max-w-[268px] px-4 pt-3">
               <p className="text-xs leading-4 font-medium whitespace-pre-wrap text-muted-foreground">
                 {artigo.meta}
               </p>

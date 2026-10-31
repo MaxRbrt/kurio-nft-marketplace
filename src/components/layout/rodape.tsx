@@ -112,7 +112,7 @@ export function Rodape() {
                 placeholder="digite seu e-mail..."
                 className="min-w-0 flex-1 bg-transparent text-sm leading-4 text-foreground outline-none placeholder:text-secundaria"
               />
-              <AcaoIndisponivel className="h-10 w-[85px] shrink-0 cursor-not-allowed bg-primary pr-1 pl-4 text-left text-lg leading-4 font-bold text-primary-foreground">
+              <AcaoIndisponivel className="h-10 w-[85px] shrink-0 cursor-not-allowed bg-primary text-center text-lg leading-4 font-bold text-primary-foreground">
                 Enviar
               </AcaoIndisponivel>
             </div>
@@ -175,7 +175,7 @@ export function Rodape() {
           <h2 className="mt-8 text-lg leading-4 font-bold text-foreground">
             Carteiras compatíveis
           </h2>
-          <p className="mt-3 flex h-[26px] items-center justify-center rounded-md border border-borda-suave bg-secondary pl-2 text-[9px] font-bold tracking-[0.1px] whitespace-pre text-texto-destaque">
+          <p className="mt-3 flex h-[26px] items-center justify-center rounded-md border border-borda-suave bg-secondary text-[9px] font-bold tracking-[0.1px] whitespace-pre text-texto-destaque">
             {'METAMASK  •  WALLETCONNECT  •  COINBASE'}
           </p>
         </div>

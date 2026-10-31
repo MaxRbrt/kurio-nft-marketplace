@@ -12,7 +12,9 @@ const CLASSE_AREA = 'absolute top-[57%] size-11 -translate-x-1/2 -translate-y-1/
 export function BarraNavegacao() {
   const { pathname } = useLocation();
 
-  if (pathname === '/login' || pathname === '/cadastro' || pathname.startsWith('/nfts/')) {
+  const telaSemBarra = ['/login', '/cadastro', '/carrinho'].includes(pathname);
+
+  if (telaSemBarra || pathname.startsWith('/nfts/')) {
     return null;
   }
 

@@ -12,3 +12,15 @@ export async function adicionarItem(entrada: EntradaItemCarrinho) {
 
   return carrinhoSchema.parse(data);
 }
+
+export async function alterarQuantidade(itemId: string, quantidade: number) {
+  const { data } = await clienteApi.patch(`/carrinho/itens/${itemId}`, { quantidade });
+
+  return carrinhoSchema.parse(data);
+}
+
+export async function removerItem(itemId: string) {
+  const { data } = await clienteApi.delete(`/carrinho/itens/${itemId}`);
+
+  return carrinhoSchema.parse(data);
+}

@@ -58,7 +58,7 @@ test.describe('desktop 1440', () => {
     conferir(cartao.width, 258);
     conferir(promocao.width, 586);
     conferir(promocao.height, 250);
-    conferir(artigo.width, 268);
+    conferir(artigo.width, 282);
     conferir(artigo.height, 369);
   });
 

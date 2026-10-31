@@ -2,7 +2,6 @@ import { IconeSetaDireitaPequena } from '@/components/icones/icones';
 import { ImagemNft } from './imagem-nft';
 
 const ARTE_PRINCIPAL = '/nfts/arte-1-960.webp';
-const ARTE_SECUNDARIA = '/nfts/arte-2-320.webp';
 
 function PontosCarrossel({ className }: { className: string }) {
   return (
@@ -41,7 +40,7 @@ export function Hero() {
           </p>
           <a
             href="#catalogo"
-            className="mt-8 flex h-10 w-[140px] items-center justify-center rounded-md pr-9 pl-7 bg-primary text-base leading-5 font-bold text-primary-foreground hover:bg-primaria-clara"
+            className="mt-8 flex h-10 w-[140px] items-center justify-center rounded-md bg-primary text-base leading-5 font-bold text-primary-foreground hover:bg-primaria-clara"
           >
             EXPLORAR
           </a>
@@ -94,14 +93,6 @@ export function Hero() {
           height={138}
           alt=""
           className="absolute top-[10.5px] right-4 size-[138px] rounded-2xl object-cover"
-        />
-        <ImagemNft
-          url={ARTE_SECUNDARIA}
-          sizes="58px"
-          width={58}
-          height={58}
-          alt=""
-          className="absolute top-[98.5px] right-[82px] size-[58px] rounded-2xl object-cover"
         />
         <PontosCarrossel className="absolute bottom-[5.5px] left-1/2 -translate-x-1/2 gap-1.5 [&>span]:size-[7px]" />
       </section>

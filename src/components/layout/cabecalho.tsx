@@ -1,7 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation } from '@tanstack/react-router';
-import { obterCarrinho } from '@/features/compra/api/carrinho';
 import { BuscaDesktop } from '@/features/catalogo/components/busca-desktop';
+import { useCarrinho } from '@/features/compra/usar-carrinho';
 import { useSessao } from '@/features/conta/usar-sessao';
 import { IconeCarrinho, IconeEntrar } from '../icones/icones';
 import { AcaoIndisponivel } from './acao-indisponivel';
@@ -22,11 +21,8 @@ export function Cabecalho() {
   const sessao = useSessao();
   const { pathname } = useLocation();
   const inicioAtivo = ['/', '/login', '/cadastro'].includes(pathname);
-  const mercadoAtivo = pathname.startsWith('/nfts/');
-  const { data: carrinho } = useQuery({
-    queryKey: ['carrinho', sessao?.usuario.id ?? 'visitante'],
-    queryFn: ({ signal }) => obterCarrinho(signal),
-  });
+  const mercadoAtivo = pathname.startsWith('/nfts/') || pathname === '/carrinho';
+  const { data: carrinho } = useCarrinho();
   const totalItens = carrinho?.itens.reduce((total, item) => total + item.quantidade, 0) ?? 0;
   const rotuloCarrinho = totalItens > 0 ? `Carrinho, ${totalItens} itens` : 'Carrinho, nenhum item';
 

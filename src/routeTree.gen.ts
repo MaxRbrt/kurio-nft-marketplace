@@ -14,6 +14,7 @@ import { Route as AutenticadoRouteImport } from './routes/_autenticado'
 import { Route as CadastroRouteImport } from './routes/cadastro'
 import { Route as CarrinhoRouteImport } from './routes/carrinho'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AutenticadoPagamentoRouteImport } from './routes/_autenticado/pagamento'
 import { Route as AutenticadoPerfilRouteImport } from './routes/_autenticado/perfil'
 import { Route as NftsNftIdRouteImport } from './routes/nfts.$nftId'
 
@@ -41,6 +42,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AutenticadoPagamentoRoute = AutenticadoPagamentoRouteImport.update({
+  id: '/pagamento',
+  path: '/pagamento',
+  getParentRoute: () => AutenticadoRoute,
+} as any)
 const AutenticadoPerfilRoute = AutenticadoPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/pagamento': typeof AutenticadoPagamentoRoute
   '/perfil': typeof AutenticadoPerfilRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
 }
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/pagamento': typeof AutenticadoPagamentoRoute
   '/perfil': typeof AutenticadoPerfilRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
 }
@@ -75,15 +83,29 @@ export interface FileRoutesById {
   '/cadastro': typeof CadastroRoute
   '/carrinho': typeof CarrinhoRoute
   '/login': typeof LoginRoute
+  '/_autenticado/pagamento': typeof AutenticadoPagamentoRoute
   '/_autenticado/perfil': typeof AutenticadoPerfilRoute
   '/nfts/$nftId': typeof NftsNftIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/cadastro' | '/carrinho' | '/login' | '/perfil' | '/nfts/$nftId'
+    | '/'
+    | '/cadastro'
+    | '/carrinho'
+    | '/login'
+    | '/pagamento'
+    | '/perfil'
+    | '/nfts/$nftId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/cadastro' | '/carrinho' | '/login' | '/perfil' | '/nfts/$nftId'
+  to:
+    | '/'
+    | '/cadastro'
+    | '/carrinho'
+    | '/login'
+    | '/pagamento'
+    | '/perfil'
+    | '/nfts/$nftId'
   id:
     | '__root__'
     | '/'
@@ -91,6 +113,7 @@ export interface FileRouteTypes {
     | '/cadastro'
     | '/carrinho'
     | '/login'
+    | '/_autenticado/pagamento'
     | '/_autenticado/perfil'
     | '/nfts/$nftId'
   fileRoutesById: FileRoutesById
@@ -141,6 +164,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_autenticado/pagamento': {
+      id: '/_autenticado/pagamento'
+      path: '/pagamento'
+      fullPath: '/pagamento'
+      preLoaderRoute: typeof AutenticadoPagamentoRouteImport
+      parentRoute: typeof AutenticadoRoute
+    }
     '/_autenticado/perfil': {
       id: '/_autenticado/perfil'
       path: '/perfil'
@@ -159,10 +189,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AutenticadoRouteChildren {
+  AutenticadoPagamentoRoute: typeof AutenticadoPagamentoRoute
   AutenticadoPerfilRoute: typeof AutenticadoPerfilRoute
 }
 
 const AutenticadoRouteChildren: AutenticadoRouteChildren = {
+  AutenticadoPagamentoRoute: AutenticadoPagamentoRoute,
   AutenticadoPerfilRoute: AutenticadoPerfilRoute,
 }
 

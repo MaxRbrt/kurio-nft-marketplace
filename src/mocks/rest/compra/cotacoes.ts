@@ -6,10 +6,10 @@ import {
   type EntradaCotacao,
 } from '@/contracts/compra/cotacao';
 import type { Rede } from '@/contracts/comum/valores';
-import { donoUsuario, montarCarrinho } from '../../banco/carrinhos';
+import { montarCarrinho } from '../../banco/carrinhos';
 import { lerBanco, salvarBanco, type CotacaoBanco } from '../../banco/estado';
-import { autenticar } from '../conta/autenticacao';
 import { lerCorpo, responderErro } from '../respostas';
+import { lerDono } from './dono';
 
 const VALIDADE_COTACAO_MS = 15 * 60 * 1000;
 const TAXA_POR_REDE: Record<Rede, string> = {
@@ -90,12 +90,17 @@ export function calcularCotacao(
   };
 }
 
+// ====================================================================
+// 2. HANDLER
+// Visitante também cota, pois o resumo do carrinho aparece para ele e a
+// interface não recalcula valores. Criar o pedido continua exigindo login.
+// ====================================================================
 export const handlersCotacoes = [
   http.post('/api/cotacoes', async ({ request }) => {
-    const sessao = autenticar(request);
+    const leitura = lerDono(request);
 
-    if ('erro' in sessao) {
-      return sessao.erro;
+    if ('erro' in leitura) {
+      return leitura.erro;
     }
 
     const entrada = await lerCorpo(request, entradaCotacaoSchema);
@@ -104,7 +109,7 @@ export const handlersCotacoes = [
       return entrada.erro;
     }
 
-    const resultado = calcularCotacao(donoUsuario(sessao.usuario.id), entrada.dados);
+    const resultado = calcularCotacao(leitura.dono, entrada.dados);
 
     if ('erro' in resultado) {
       return resultado.erro;

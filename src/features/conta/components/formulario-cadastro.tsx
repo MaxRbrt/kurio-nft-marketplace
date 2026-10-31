@@ -50,7 +50,6 @@ export function FormularioCadastro({ aoCriar }: { aoCriar: () => void }) {
           rotulo="Nome de usuário"
           placeholder="Nome de usuário"
           autoComplete="username"
-          className="max-lg:placeholder:text-center"
           erro={errors.nomeUsuario?.message}
           {...register('nomeUsuario')}
         />

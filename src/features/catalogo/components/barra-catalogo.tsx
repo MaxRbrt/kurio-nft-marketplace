@@ -15,8 +15,8 @@ type Ordem = NonNullable<ParametrosNfts['ordem']>;
 
 const LARGURA_ABA: Record<Aba, string> = {
   todos: 'w-[110px] lg:w-[118px]',
-  novos: 'ml-1 w-[143px] lg:ml-0 lg:w-[154px]',
-  'em-alta': 'ml-4 w-[59px] lg:ml-0 lg:w-[64px]',
+  novos: 'w-[143px] lg:w-[154px]',
+  'em-alta': 'w-[59px] lg:w-[64px]',
 };
 
 // ====================================================================
@@ -32,7 +32,9 @@ export function AbasCatalogo({ className = '' }: { className?: string }) {
   const abas = Object.keys(ROTULOS_ABA) as Aba[];
 
   return (
-    <ul className={`flex text-sm leading-4 lg:gap-5 lg:text-[15px] lg:font-medium ${className}`}>
+    <ul
+      className={`flex gap-4 text-sm leading-4 lg:gap-5 lg:text-[15px] lg:font-medium ${className}`}
+    >
       {abas.map((aba) => (
         <li key={aba}>
           <button
