@@ -202,7 +202,7 @@ test.describe('favoritos', () => {
 
     await expect(page).toHaveURL(/\/login\?redirect=%2Fnfts%2Fnft-01/);
 
-    await page.getByRole('textbox', { name: 'E-mail' }).fill(ANA.email);
+    await page.getByRole('textbox', { name: 'E-mail', exact: true }).fill(ANA.email);
     await page.getByLabel('Senha', { exact: true }).fill(ANA.senha);
     await page.getByRole('button', { name: 'Entrar', exact: true }).click();
 
