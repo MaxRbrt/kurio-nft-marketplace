@@ -39,6 +39,9 @@ test.describe('desktop 1440', () => {
 
   test('modal de login nas medidas do Figma', async ({ page }) => {
     await page.goto('/login');
+    await page
+      .getByTestId('modal-autenticacao')
+      .evaluate((modal) => Promise.all(modal.getAnimations().map(({ finished }) => finished)));
 
     const modal = await caixa(page, '[data-testid=modal-autenticacao]');
     const email = await caixa(page, '#login-email');
