@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import { derrubarConexoes, publicarEvento } from './socket';
+import { derrubarConexoes, publicarEvento } from '../socket/conexoes';
 
 // ====================================================================
 // 1. CONTROLE DOS CENÁRIOS

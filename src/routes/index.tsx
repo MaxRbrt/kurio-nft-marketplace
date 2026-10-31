@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { criarSocket } from '@/lib/socket';
+import { criarSocket } from '@/lib/tempo-real/socket';
 
 export const Route = createFileRoute('/')({
   component: PaginaInicial,
