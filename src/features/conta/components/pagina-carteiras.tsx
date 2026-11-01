@@ -281,6 +281,7 @@ function FormularioDeCarteira({ papel, carteira, valoresIniciais }: PropsFormula
               control={control}
               nome="sufixoEns"
               texto=".eth"
+              rotulo="Sufixo do nome ENS"
               opcoes={OPCOES_SUFIXO_ENS}
               classeCaixa="w-auto min-w-[78px] shrink-0 pr-7 pl-2.5 text-[15px]"
               classeSeta="right-[4px] size-5 text-foreground"

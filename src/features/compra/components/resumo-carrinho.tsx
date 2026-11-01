@@ -227,7 +227,10 @@ export function ResumoDesktop({ resumo }: PropsResumo) {
             />
           </dd>
         </div>
-        <p className="mt-3 text-right text-xs leading-4 text-texto-destaque">Taxa estimada</p>
+        <div className="mt-3 text-right text-xs leading-4 text-texto-destaque">
+          <dt className="sr-only">Observação</dt>
+          <dd>Taxa estimada</dd>
+        </div>
         <div className="mt-6 flex h-4 items-start justify-between">
           <dt className="text-base leading-4 font-bold">Total</dt>
           <dd data-testid="resumo-total">
@@ -322,7 +325,10 @@ export function ResumoMobile({ resumo }: PropsResumo) {
               />
             </dd>
           </div>
-          <p className="text-right text-xs leading-4 text-texto-destaque">Taxa estimada</p>
+          <div className="text-right text-xs leading-4 text-texto-destaque">
+            <dt className="sr-only">Observação</dt>
+            <dd>Taxa estimada</dd>
+          </div>
           <div className="mt-3 flex h-4 items-start justify-between">
             <dt className="text-base leading-4 font-bold">Total</dt>
             <dd data-testid="resumo-total-mobile">

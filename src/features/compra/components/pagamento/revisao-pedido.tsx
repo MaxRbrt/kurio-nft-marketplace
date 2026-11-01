@@ -8,6 +8,7 @@ type PropsRevisao = {
   aberta: boolean;
   cotacao: Cotacao | undefined;
   valoresMudaram: boolean;
+  avisoCupom: string | null;
   atualizando: boolean;
   dados: FormularioPagamento;
   enviando: boolean;
@@ -44,6 +45,7 @@ export function RevisaoPedido({
   aberta,
   cotacao,
   valoresMudaram,
+  avisoCupom,
   atualizando,
   dados,
   enviando,
@@ -119,6 +121,7 @@ export function RevisaoPedido({
             data-testid="revisao-mudou"
             className="mt-4 text-sm leading-5 text-texto-coral"
           >
+            {avisoCupom && <p>{avisoCupom}. O desconto saiu do total.</p>}
             <p>Os valores mudaram desde a sua revisão. Confira o novo total para continuar.</p>
             <button
               type="button"

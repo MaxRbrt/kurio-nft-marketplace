@@ -22,10 +22,25 @@
       html {
         background: #140d0a;
       }
+
+      .abertura {
+        display: flex;
+        min-height: 100dvh;
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        color: #f5f1eb;
+        font:
+          700 18px/1 'Roboto Mono Variable',
+          monospace;
+        letter-spacing: 0.1em;
+      }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="abertura">KURIO</div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

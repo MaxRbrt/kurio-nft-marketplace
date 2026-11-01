@@ -188,7 +188,7 @@ function Galeria({ nft }: { nft: NftDetalhe }) {
       <div className="relative mt-0.5 size-[444px] shrink-0 rounded-md bg-card p-5">
         <ImagemNft
           url={imagem.url}
-          sizes="404px"
+          sizes="(min-width: 1024px) 404px, 1px"
           width={404}
           height={404}
           alt={imagem.alt}
@@ -479,7 +479,7 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
         </div>
         <ImagemNft
           url={nft.imagem.url}
-          sizes="361px"
+          sizes="(min-width: 1024px) 1px, 361px"
           width={361}
           height={356}
           alt={nft.imagem.alt}
@@ -596,9 +596,12 @@ export function PaginaDetalhe({ nftId }: { nftId: string }) {
       <main
         aria-busy="true"
         data-testid="detalhe-esqueleto"
-        className="mx-auto mt-8 flex w-full max-w-[1200px] gap-[33px] px-4 xl:px-0"
+        className="mx-auto w-full max-w-[414px] lg:mt-8 lg:flex lg:max-w-[1200px] lg:gap-[33px] lg:px-4 xl:px-0"
       >
-        <div className="esqueleto h-[356px] w-full rounded-3xl lg:size-[444px]" />
+        <div className="h-[506px] bg-linear-to-b from-card to-muted px-7 pt-[66px] lg:h-auto lg:bg-none lg:p-0">
+          <div className="esqueleto h-[356px] w-full rounded-3xl lg:size-[444px]" />
+        </div>
+        <div className="relative z-10 -mt-[114px] min-h-[504px] rounded-t-[31px] bg-card lg:hidden" />
         <div className="hidden flex-1 flex-col gap-4 lg:flex">
           <div className="esqueleto h-[37px] w-2/3" />
           <div className="esqueleto h-5 w-1/4" />

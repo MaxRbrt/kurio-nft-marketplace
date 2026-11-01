@@ -61,6 +61,19 @@ export const handlersControle = [
     return new HttpResponse(null, { status: 204 });
   }),
 
+  http.post('/api/__mock/cupons/:codigo/expirar', ({ params }) => {
+    const cupom = lerBanco().cupons.find(({ codigo }) => codigo === params.codigo);
+
+    if (!cupom) {
+      return responderErro(404, 'CUPOM_INVALIDO', 'Cupom inexistente');
+    }
+
+    cupom.expiraEm = new Date(Date.now() - 1000).toISOString();
+    salvarBanco();
+
+    return new HttpResponse(null, { status: 204 });
+  }),
+
   http.post('/api/__mock/pagamento', async ({ request }) => {
     const { resolucao } = (await request.json()) as { resolucao: ResolucaoPagamento };
 

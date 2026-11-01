@@ -149,8 +149,8 @@ function ConteudoPedido({ pedido }: { pedido: Pedido }) {
                   className="size-[70px] shrink-0 rounded-lg object-cover"
                 />
                 <div className="min-w-0">
-                  <p className="truncate text-base leading-4 font-bold">{item.nome}</p>
-                  <p className="mt-1.5 truncate text-sm leading-4 text-secundaria">
+                  <p className="text-base leading-4 font-bold break-words">{item.nome}</p>
+                  <p className="mt-1.5 text-sm leading-4 break-words text-secundaria">
                     {pedido.itens.filter(({ nftId }) => nftId === item.nftId).length > 1
                       ? `Edição: ${item.rotuloEdicao}`
                       : `ID do token: ${item.tokenId}`}

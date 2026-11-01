@@ -50,7 +50,7 @@ export function Hero() {
         <PontosCarrossel className="absolute top-[415px] left-[600px] gap-2" />
         <ImagemNft
           url={ARTE_PRINCIPAL}
-          sizes="450px"
+          sizes="(min-width: 1024px) 450px, 1px"
           width={450}
           height={450}
           alt="Emerald Ape #042"
@@ -90,7 +90,7 @@ export function Hero() {
         </div>
         <ImagemNft
           url={ARTE_PRINCIPAL}
-          sizes="138px"
+          sizes="(min-width: 1024px) 1px, 138px"
           width={138}
           height={138}
           alt=""

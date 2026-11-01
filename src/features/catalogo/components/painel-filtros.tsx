@@ -109,6 +109,7 @@ export function PainelFiltros() {
         </h2>
         <div className="mt-3 pl-3">
           <Slider
+            role="group"
             aria-label="Faixa de preço em ETH"
             rotulosPuxadores={['Preço mínimo em ETH', 'Preço máximo em ETH']}
             className="h-[21px]"

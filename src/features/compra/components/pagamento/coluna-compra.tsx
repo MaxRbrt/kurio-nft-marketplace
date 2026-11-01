@@ -197,7 +197,10 @@ export function ColunaCompra({ resumo, estado, confirmar, aviso, ocupado }: Prop
             className="block text-lg leading-4"
           />
         </LinhaValor>
-        <p className="text-right text-xs leading-4 text-texto-destaque">Taxa estimada</p>
+        <div className="text-right text-xs leading-4 text-texto-destaque">
+          <dt className="sr-only">Observação</dt>
+          <dd>Taxa estimada</dd>
+        </div>
         <div className="flex h-7 items-start justify-between border-t border-primary/25 pt-3">
           <dt className="text-base leading-4 font-bold">Total</dt>
           <dd data-testid="pagamento-total">
