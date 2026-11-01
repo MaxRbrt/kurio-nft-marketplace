@@ -40,8 +40,12 @@ function mensagensDoCarrinho(carrinho: Carrinho | undefined, evento: EventoNftAt
 // 2. PROCESSADOR DE EVENTOS
 // Ordem fixa: valida, descarta duplicata pela identidade, descarta antigo
 // pela versão, cancela consulta em andamento (a resposta seria anterior
-// à mudança), atualiza o cache e só então invalida e anuncia. Um por
-// sessão: trocar de usuário começa do zero.
+// à mudança), atualiza o cache e só então invalida e anuncia. Listas são
+// buscadas de novo, pois o preço novo muda ordem, filtros e contagens; o
+// cache já mostra o valor novo enquanto isso. Consulta cancelada antes de
+// ter dados (primeira carga) também, senão a tela ficaria carregando para
+// sempre. Catálogo e carrinho são revalidados em paralelo. Um por sessão:
+// trocar de usuário começa do zero.
 // ====================================================================
 export function criarProcessadorEventos(
   clienteConsultas: QueryClient,
@@ -102,7 +106,15 @@ export function criarProcessadorEventos(
           ),
         },
     );
-    await clienteConsultas.invalidateQueries({ queryKey: ['carrinho'] });
+    const listaOuSemDados = (consulta: {
+      queryKey: readonly unknown[];
+      state: { data: unknown };
+    }) => consulta.queryKey[1] === 'lista' || consulta.state.data === undefined;
+
+    await Promise.all([
+      clienteConsultas.invalidateQueries({ queryKey: ['nfts'], predicate: listaOuSemDados }),
+      clienteConsultas.invalidateQueries({ queryKey: ['carrinho'] }),
+    ]);
     mensagens.forEach(anunciar);
   }
 
