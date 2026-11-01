@@ -31,7 +31,7 @@ npm run dev
 | `npm run test:visual`  | Só a regressão visual                                         |
 | `npm run lighthouse`   | Auditoria completa, com relatórios em `lighthouse/relatorios` |
 
-A porta 4173 precisa estar livre para os testes e a auditoria. Relatório HTML dos testes: `npx playwright show-report`. Traces das falhas ficam em `test-results`.
+A porta 4173 precisa estar livre para os testes e a auditoria. Cada teste tem uma nova tentativa local e duas no CI; o que só passa na nova tentativa aparece como `flaky` no relatório. Relatório HTML dos testes: `npx playwright show-report`. Traces das falhas ficam em `test-results`.
 
 **Regressão visual:** as baselines em `tests/visual/regressao.spec.ts-snapshots` existem para Windows e Linux, pois a renderização de fonte muda entre sistemas. Em outro sistema os testes visuais são pulados, com aviso. Para gerar as baselines locais:
 
@@ -83,6 +83,7 @@ fetch('/api/__mock/cenario', { method: 'POST', body: JSON.stringify({ nome: 'err
 | `pedidos/:id/resolver`       | `{ estado }`: `confirmado`, `recusado`            | Resolve um pedido pendente              |
 | `pedidos/timeout-no-proximo` |                                                   | Cria o próximo pedido e não responde    |
 | `carteiras/recusar-conexao`  | `{ recusar }`                                     | Faz a carteira recusar a conexão        |
+| `cupons/:codigo/expirar`     |                                                   | Faz o cupom vencer agora                |
 
 ## Como reproduzir as falhas
 
@@ -95,21 +96,26 @@ Entre como Ana, adicione um NFT ao carrinho e vá ao pagamento. Use o painel (`?
 - **Queda com pedido pendente:** "Pagamento: manter pendente", confirme, "Derrubar o socket" e recarregue a página. O estado volta, sem outra compra. Resolva com `POST /api/__mock/pedidos/pedido-1/resolver`.
 - **Sessão expirada no checkout:** "Expirar a sessão", e confirme. Depois do login, a compra continua com o que foi digitado.
 - **Conexão recusada:** "Carteira recusa conexão", e escolha outra carteira.
+- **Cupom vencido durante a compra:** vá ao pagamento com `?cupom=KURIO10`, abra a revisão, rode `fetch('/api/__mock/cupons/KURIO10/expirar', { method: 'POST' })` no console e confirme. O pedido não é criado: a revisão explica que o cupom venceu, tira o desconto do total e pede novo aceite.
 - **Lentidão e falhas de rede:** selecione `lento`, `offline` ou `erro-500` no painel.
 
 ## Testes
 
-Cobrem os 12 itens do enunciado, em Chromium, nos viewports desktop e mobile. A responsividade roda em 28 perfis de aparelho do Playwright (os mesmos do modo responsivo do DevTools: celulares, tablets e dobráveis de 320 a 984 px) e em desktop de 1024 x 768, 1280 x 800 e 1440 x 900. iPhone e iPad rodam no WebKit, que reproduz o Safari. A lista fica em `tests/responsivo/aparelhos.ts`:
+Cobrem os 12 itens do enunciado, em Chromium, nos viewports desktop e mobile. A responsividade roda em 31 perfis de aparelho do Playwright (os mesmos do modo responsivo do DevTools: celulares, tablets e dobráveis de 320 a 984 px, três deles deitados) e em desktop de 1024 x 768, 1280 x 800 e 1440 x 900, além de 720 x 450, que é a tela de 1440 x 900 com zoom de 200%. iPhone e iPad rodam no WebKit, que reproduz o Safari. A lista fica em `tests/responsivo/aparelhos.ts`:
 
-| Pasta              | Conteúdo                                                                                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/interface`  | Fluxos pela interface: catálogo, detalhe, conta, carrinho, compra, acessibilidade                                                                 |
-| `tests/visual`     | Regressão visual de início, detalhe, carrinho e pagamento                                                                                         |
-| `tests/responsivo` | Dez telas e estados por aparelho: sem texto cortado, sobreposto, colado na borda ou fora da tela, sem controle espremido nem diálogo que não cabe |
-| `tests/mocks`      | Contratos da API simulada, idempotência e cenários                                                                                                |
-| `tests/tempo-real` | Socket.IO: eventos, reconexão e heartbeat                                                                                                         |
-| `tests/contratos`  | Schemas zod                                                                                                                                       |
+| Pasta              | Conteúdo                                                                                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/interface`  | Fluxos pela interface: catálogo, detalhe, conta, carrinho, compra e acessibilidade, com regras WCAG A e AA pelo axe em 10 telas, nas duas larguras dos frames |
+| `tests/visual`     | Regressão visual de início, detalhe, carrinho e pagamento                                                                                                     |
+| `tests/responsivo` | Doze telas e estados por aparelho: sem texto cortado, sobreposto, colado na borda ou fora da tela, sem controle espremido nem diálogo que não cabe            |
+| `tests/mocks`      | Contratos da API simulada, idempotência e cenários                                                                                                            |
+| `tests/tempo-real` | Socket.IO: eventos, reconexão e heartbeat                                                                                                                     |
+| `tests/contratos`  | Schemas zod                                                                                                                                                   |
+
+Relógio, latência e eventos: `page.clock` controla o heartbeat do socket, a resposta fora de ordem, o favorito lento e a data do recibo. Latência e falhas vêm dos cenários do MSW, e os eventos, das rotas de controle. Os demais testes esperam a interface em tempo real, como a resolução do pedido pendente. O timeout do pedido também roda em tempo real, porque o limite de 10 s do Axios usa o temporizador nativo do `XMLHttpRequest`, que o relógio do Playwright não controla.
+
+O workflow `.github/workflows/testes.yml` roda verificação de tipos, lint, formatação e toda a suíte em Linux, a cada PR e a cada push na `main`. Para gerar as baselines visuais do Linux, execute-o manualmente com a opção `gerar_baselines`.
 
 ## Lighthouse
 
-Resultados, versões e condições em [`lighthouse/relatorios/resumo.md`](lighthouse/relatorios/resumo.md). Análise em `ARCHITECTURE.md`.
+As quatro metas são atingidas nas duas páginas e nos dois perfis no modo padrão do Lighthouse, que simula rede e CPU (mobile: 92 em Performance). A análise traz também a medição com limitação real e os limites do resultado. Resultados, versões e condições em [`lighthouse/relatorios/resumo.md`](lighthouse/relatorios/resumo.md). Análise em `ARCHITECTURE.md`.
