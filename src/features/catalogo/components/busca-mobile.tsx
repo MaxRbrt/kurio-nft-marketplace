@@ -14,7 +14,7 @@ export function BuscaMobile() {
 
   return (
     <div className="mx-6 mt-10 flex h-[45px] gap-2 lg:hidden">
-      <label className="flex flex-1 items-center gap-2 rounded-[10px] bg-card px-3 has-focus-visible:outline-2 has-focus-visible:outline-ring">
+      <label className="flex min-w-0 flex-1 items-center gap-2 rounded-[10px] bg-card px-3 has-focus-visible:outline-2 has-focus-visible:outline-ring">
         <IconeBuscaMobile className="shrink-0 text-secundaria" />
         <span className="sr-only">Buscar NFTs</span>
         <input

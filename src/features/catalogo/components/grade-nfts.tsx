@@ -187,8 +187,9 @@ function Paginacao({ pagina, totalPaginas }: { pagina: number; totalPaginas: num
 
 // ====================================================================
 // 4. GRADE
-// Desktop em 3 colunas. No mobile, 2 colunas com a direita 32 px abaixo,
-// como no frame. Só a primeira linha é prioritária, para o LCP.
+// Desktop em 3 colunas. No mobile, 2 colunas niveladas: o frame desce a
+// da direita 32 px (ver ARCHITECTURE.md). Só a primeira linha é
+// prioritária, para o LCP.
 // ====================================================================
 export function GradeNfts() {
   const consulta = useListaNfts();
@@ -243,7 +244,7 @@ export function GradeNfts() {
 
   return (
     <>
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-6 lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px] max-lg:[&>li:nth-child(even)]:translate-y-8">
+      <ul className="grid grid-cols-2 gap-x-4 gap-y-6 lg:grid-cols-3 lg:gap-x-[34px] lg:gap-y-[72px]">
         {itens.map((nft, indice) => (
           <CartaoNft key={nft.id} nft={nft} prioridade={indice < 3} />
         ))}

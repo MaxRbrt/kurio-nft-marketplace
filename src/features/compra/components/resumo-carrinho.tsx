@@ -188,7 +188,7 @@ export function ResumoDesktop({ resumo }: PropsResumo) {
               caixa:
                 'flex h-10 items-center rounded-[3px] border border-primary pl-2 focus-within:outline-2 focus-within:outline-ring',
               campo:
-                'h-full min-w-0 flex-1 bg-transparent text-xs leading-4 outline-none placeholder:text-secundaria',
+                'h-full min-w-0 flex-1 bg-transparent text-xs leading-4 outline-none placeholder:text-xs placeholder:text-secundaria',
               botao:
                 '-mr-px h-10 w-[102px] shrink-0 rounded-r-[3px] bg-primary text-[15px] leading-4 font-bold text-primary-foreground hover:bg-primaria-clara disabled:opacity-50',
             }}
@@ -285,7 +285,7 @@ export function ResumoMobile({ resumo }: PropsResumo) {
             caixa:
               'flex h-[50px] items-center rounded-[40px] border border-border bg-card pl-4 shadow-[0_6px_20px_rgba(10,6,4,0.45)] focus-within:outline-2 focus-within:outline-ring',
             campo:
-              'h-full min-w-0 flex-1 bg-transparent text-[13px] leading-[22px] outline-none placeholder:text-secundaria',
+              'h-full min-w-0 flex-1 bg-transparent text-[13px] leading-[22px] outline-none placeholder:text-[13px] placeholder:text-secundaria',
             botao:
               '-my-px -mr-px h-[50px] w-[97px] shrink-0 rounded-[40px] bg-[linear-gradient(90deg,rgb(210_138_76/0.54),rgb(210_138_76))] text-[15px] leading-4 font-bold text-foreground disabled:opacity-50',
           }}

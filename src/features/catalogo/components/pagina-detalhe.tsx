@@ -84,7 +84,7 @@ function SeletorEdicao({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
   return (
     <fieldset>
       <legend className="text-[15px] leading-4 font-bold">Edição:</legend>
-      <div className="mt-2 flex gap-3 lg:mt-3 lg:gap-1.5">
+      <div className="mt-[9px] flex gap-3 lg:mt-3 lg:gap-1.5">
         {nft.edicoes.map((edicao) => {
           const ativa = edicao.id === compra.edicao.id;
 
@@ -264,7 +264,14 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
               <p className="flex items-center gap-1 text-[15px] leading-5">
                 <span className="flex gap-1 text-primary" aria-hidden>
                   {Array.from({ length: 5 }, (_, indice) => (
-                    <IconeEstrela key={indice} />
+                    <IconeEstrela
+                      key={indice}
+                      className={
+                        indice < Math.floor(nft.avaliacoes.nota)
+                          ? 'text-primary'
+                          : 'text-muted-foreground'
+                      }
+                    />
                   ))}
                 </span>
                 <span className="w-[280px]">
@@ -496,11 +503,11 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
         <p className="mt-3 min-h-[71px] text-sm leading-6 text-muted-foreground">
           {nft.descricaoCurta}
         </p>
-        <div className="mt-3">
+        <div className="mt-[11px]">
           <SeletorEdicao nft={nft} compra={compra} />
         </div>
         <AvisoEstoque compra={compra} className="mt-2" />
-        <div className="mt-3">
+        <div className="mt-[11px]">
           <DadosToken nft={nft} />
         </div>
       </section>

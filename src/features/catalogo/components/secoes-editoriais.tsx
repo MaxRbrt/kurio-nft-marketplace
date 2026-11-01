@@ -55,14 +55,6 @@ export function Promocoes() {
             style={{ left: promocao.esquerda, width: larguraDaArte(promocao) }}
             className="absolute top-0 h-[250px] rounded-[18px] object-cover"
           />
-          <div
-            aria-hidden
-            className="absolute top-[142px] left-[-191px] size-64 rounded-full border-2 border-primary"
-          />
-          <div
-            aria-hidden
-            className="absolute top-[134px] left-[-199px] size-64 rounded-full border border-primary"
-          />
           <h2 className="absolute top-[37px] right-[30px] text-right text-lg leading-6 font-bold whitespace-pre-line">
             {promocao.titulo}
           </h2>
