@@ -10,8 +10,10 @@ type PropsCabecalhoMobile = {
 
 // ====================================================================
 // 1. CABEÇALHO DA COMPRA
-// Voltar e título dos frames mobile, com o recuo de cada um. No desktop,
-// a trilha termina na tela atual.
+// Voltar e título dos frames mobile, com o recuo de cada um. Em tela
+// mais estreita que o frame, o título quebra em duas linhas dentro dos
+// 44 px do cabeçalho em vez de sair da tela. No desktop, a trilha
+// termina na tela atual.
 // ====================================================================
 export function CabecalhoMobile({ titulo, recuo, voltarPara = '/' }: PropsCabecalhoMobile) {
   const navigate = useNavigate();
@@ -26,7 +28,9 @@ export function CabecalhoMobile({ titulo, recuo, voltarPara = '/' }: PropsCabeca
       >
         <IconeVoltarDetalhe />
       </button>
-      <h1 className={cn('absolute top-[9px] text-xl leading-4 font-bold whitespace-nowrap', recuo)}>
+      <h1
+        className={cn('absolute top-[9px] right-0 text-xl leading-4 font-bold text-balance', recuo)}
+      >
         {titulo}
       </h1>
     </div>

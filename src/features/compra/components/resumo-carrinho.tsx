@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import { ErroApi } from '@/lib/api/erros';
 import { formatarEth, textoDesconto } from '@/lib/eth';
+import { useConsultaTela } from '@/lib/usar-tela-desktop';
 import { cn } from '@/lib/utils';
 import type { ResumoCompra } from '../usar-cotacao';
 
@@ -24,7 +25,11 @@ type PropsCampoCupom = {
   sufixo: string;
   classes: { caixa: string; campo: string; botao: string };
   focarAoAbrir?: boolean;
+  dica?: string;
 };
+
+const DICA_CUPOM = 'Digite o código promocional...';
+const DICA_CUPOM_CURTA = 'Código promocional';
 
 // ====================================================================
 // 1. CÓDIGO PROMOCIONAL
@@ -32,7 +37,13 @@ type PropsCampoCupom = {
 // fica somente leitura e o botão passa a remover. O erro é ligado ao
 // campo e anunciado, e não depende só de cor.
 // ====================================================================
-export function CampoCupom({ resumo, sufixo, classes, focarAoAbrir }: PropsCampoCupom) {
+export function CampoCupom({
+  resumo,
+  sufixo,
+  classes,
+  focarAoAbrir,
+  dica = DICA_CUPOM,
+}: PropsCampoCupom) {
   const [digitado, setDigitado] = useState('');
   const aplicado = resumo.cupomAplicado;
   const erroId = `cupom-erro-${sufixo}`;
@@ -63,7 +74,7 @@ export function CampoCupom({ resumo, sufixo, classes, focarAoAbrir }: PropsCampo
           readOnly={Boolean(aplicado)}
           autoComplete="off"
           autoFocus={focarAoAbrir}
-          placeholder="Digite o código promocional..."
+          placeholder={dica}
           value={aplicado ?? digitado}
           onChange={(evento) => setDigitado(evento.target.value)}
           className={classes.campo}
@@ -251,9 +262,12 @@ export function ResumoDesktop({ resumo }: PropsResumo) {
 // 4. PAINEL DO MOBILE
 // Painel de 342 fixo no fim da tela enquanto a lista rola, e que volta ao
 // fluxo no fim da página: nenhum item fica escondido, mesmo com zoom.
+// Em tela mais estreita que o frame (414), rótulo longo quebra linha sem
+// invadir a linha de baixo, e o cupom usa uma dica curta que cabe.
 // ====================================================================
 export function ResumoMobile({ resumo }: PropsResumo) {
   const dados = resumo.cotacao.isError ? undefined : resumo.cotacao.data;
+  const larguraDoFrame = useConsultaTela('(min-width: 414px)');
 
   return (
     <section
@@ -266,6 +280,7 @@ export function ResumoMobile({ resumo }: PropsResumo) {
         <CampoCupom
           resumo={resumo}
           sufixo="mobile"
+          dica={larguraDoFrame ? DICA_CUPOM : DICA_CUPOM_CURTA}
           classes={{
             caixa:
               'flex h-[50px] items-center rounded-[40px] border border-border bg-card pl-4 shadow-[0_6px_20px_rgba(10,6,4,0.45)] focus-within:outline-2 focus-within:outline-ring',
@@ -277,9 +292,9 @@ export function ResumoMobile({ resumo }: PropsResumo) {
         />
 
         <dl className="mt-3">
-          <div className="flex h-5 items-start justify-between">
+          <div className="flex min-h-5 items-start justify-between gap-3">
             <dt className="text-[15px] leading-5">Subtotal</dt>
-            <dd>
+            <dd className="shrink-0">
               <ValorOuEsqueleto
                 valor={dados && formatarEth(dados.subtotal)}
                 largura="w-[77px]"
@@ -287,9 +302,9 @@ export function ResumoMobile({ resumo }: PropsResumo) {
               />
             </dd>
           </div>
-          <div className="mt-3 flex h-5 items-start justify-between">
+          <div className="mt-3 flex min-h-5 items-start justify-between gap-3">
             <dt className="text-[15px] leading-5">Desconto do lançamento</dt>
-            <dd>
+            <dd className="shrink-0">
               <ValorOuEsqueleto
                 valor={dados && textoDesconto(dados.desconto)}
                 largura="w-[82px]"
@@ -297,9 +312,9 @@ export function ResumoMobile({ resumo }: PropsResumo) {
               />
             </dd>
           </div>
-          <div className="mt-3 flex h-5 items-center justify-between">
+          <div className="mt-3 flex min-h-5 items-center justify-between gap-3">
             <dt className="text-[15px] leading-5">Taxa de rede</dt>
-            <dd>
+            <dd className="shrink-0">
               <ValorOuEsqueleto
                 valor={dados && formatarEth(dados.taxaRede)}
                 largura="w-[87px]"

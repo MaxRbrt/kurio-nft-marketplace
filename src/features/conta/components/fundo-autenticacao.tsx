@@ -77,38 +77,42 @@ function estiloDe(elemento: ElementoFundo): CSSProperties {
 // 2. FUNDO DO LOGIN E DO CADASTRO NO DESKTOP
 // Nos frames, o modal fica sobre uma composição própria da página, que
 // difere da Início. É decorativa: fora da árvore acessível e inerte, sem
-// foco nem clique. Mede 1200 x 1900, abaixo do cabeçalho.
+// foco nem clique. Mede 1200 x 1900, abaixo do cabeçalho, centrada; em
+// tela mais estreita as laterais são recortadas, sem rolagem lateral.
 // ====================================================================
 export function FundoAutenticacao() {
   return (
-    <div
-      aria-hidden
-      inert
-      data-testid="fundo-autenticacao"
-      className="relative mx-auto mt-3 h-[1900px] w-[1200px] overflow-hidden whitespace-pre"
-    >
-      {ELEMENTOS_FUNDO.map((elemento, indice) =>
-        elemento.tipo === 'imagem' ? (
-          <img
-            key={indice}
-            src={elemento.url}
-            alt=""
-            loading={indice === 0 ? 'eager' : 'lazy'}
-            style={estiloDe(elemento)}
-            className="absolute object-cover"
-          />
-        ) : elemento.tipo === 'texto' ? (
-          <p key={indice} style={estiloDe(elemento)} className="absolute">
-            {elemento.texto}
-          </p>
-        ) : (
-          <div key={indice} style={estiloDe(elemento)} className="absolute" />
-        ),
-      )}
-      <IconeSetaBaixo className="absolute top-[498px] left-[1183px] text-foreground" />
-      <IconeCarrinhoAcao className="absolute top-[816px] left-[729px] text-foreground" />
-      <IconeFavorito ativo={false} className="absolute top-[816px] left-[775px] text-foreground" />
-      <IconeBusca className="absolute top-[815px] left-[822px] text-foreground" />
+    <div aria-hidden inert className="overflow-x-clip">
+      <div
+        data-testid="fundo-autenticacao"
+        className="relative left-1/2 mt-3 h-[1900px] w-[1200px] -translate-x-1/2 overflow-hidden whitespace-pre"
+      >
+        {ELEMENTOS_FUNDO.map((elemento, indice) =>
+          elemento.tipo === 'imagem' ? (
+            <img
+              key={indice}
+              src={elemento.url}
+              alt=""
+              loading={indice === 0 ? 'eager' : 'lazy'}
+              style={estiloDe(elemento)}
+              className="absolute object-cover"
+            />
+          ) : elemento.tipo === 'texto' ? (
+            <p key={indice} style={estiloDe(elemento)} className="absolute">
+              {elemento.texto}
+            </p>
+          ) : (
+            <div key={indice} style={estiloDe(elemento)} className="absolute" />
+          ),
+        )}
+        <IconeSetaBaixo className="absolute top-[498px] left-[1183px] text-foreground" />
+        <IconeCarrinhoAcao className="absolute top-[816px] left-[729px] text-foreground" />
+        <IconeFavorito
+          ativo={false}
+          className="absolute top-[816px] left-[775px] text-foreground"
+        />
+        <IconeBusca className="absolute top-[815px] left-[822px] text-foreground" />
+      </div>
     </div>
   );
 }

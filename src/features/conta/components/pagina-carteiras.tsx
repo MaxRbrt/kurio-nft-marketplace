@@ -12,6 +12,7 @@ import {
   type EntradaCarteira,
 } from '@/contracts/conta/carteiras';
 import { ErroApi } from '@/lib/api/erros';
+import { useTelaDesktop } from '@/lib/usar-tela-desktop';
 import { cn } from '@/lib/utils';
 import { atualizarCarteira, criarCarteira, listarCarteiras } from '../api/carteiras';
 import { OPCOES_SUFIXO_ENS, separarEns, SUFIXOS_ENS } from '../ens';
@@ -31,6 +32,8 @@ const TIPOS = [
 const obrigatorio = (mensagem: string) => z.string().trim().min(1, mensagem);
 const SETA_CHEIA = 'right-2 size-[18px] text-secundaria';
 const ESPACO_ROTULO = 'mb-[-4px]';
+const DICA_SECUNDARIA = 'ENS ou carteira secundária (opcional)';
+const DICA_SECUNDARIA_CURTA = 'ENS ou carteira (opcional)';
 
 // ====================================================================
 // 1. VALIDAÇÃO
@@ -82,6 +85,7 @@ function FormularioDeCarteira({ papel, carteira, valoresIniciais }: PropsFormula
   const clienteConsultas = useQueryClient();
   const usuarioId = useSessao()?.usuario.id;
   const prefixo = `carteira-${papel}`;
+  const telaDesktop = useTelaDesktop();
   const {
     register,
     handleSubmit,
@@ -206,13 +210,13 @@ function FormularioDeCarteira({ papel, carteira, valoresIniciais }: PropsFormula
         </CampoRotulado>
         <CampoRotulado
           id={`${prefixo}-secundaria`}
-          rotulo="ENS ou carteira secundária (opcional)"
+          rotulo={DICA_SECUNDARIA}
           rotuloOculto
           classeRotulo={ESPACO_ROTULO}
         >
           <Entrada
             id={`${prefixo}-secundaria`}
-            placeholder="ENS ou carteira secundária (opcional)"
+            placeholder={telaDesktop ? DICA_SECUNDARIA : DICA_SECUNDARIA_CURTA}
             {...register('carteiraSecundaria')}
           />
         </CampoRotulado>
@@ -274,7 +278,7 @@ function FormularioDeCarteira({ papel, carteira, valoresIniciais }: PropsFormula
               nome="sufixoEns"
               texto=".eth"
               opcoes={OPCOES_SUFIXO_ENS}
-              classeCaixa="w-[78px] shrink-0 pr-0 pl-2.5 text-[15px]"
+              classeCaixa="w-auto min-w-[78px] shrink-0 pr-7 pl-2.5 text-[15px]"
               classeSeta="right-[4px] size-5 text-foreground"
             />
             <Entrada

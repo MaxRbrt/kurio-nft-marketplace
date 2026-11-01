@@ -1,20 +1,32 @@
-import { useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 const CONSULTA_DESKTOP = '(min-width: 1024px)';
 
-function assinar(ouvinte: () => void) {
-  const consulta = window.matchMedia(CONSULTA_DESKTOP);
+// ====================================================================
+// 1. CONSULTA DE TELA
+// Acompanha uma media query e redesenha quando ela muda, por exemplo ao
+// girar o celular ou redimensionar a janela.
+// ====================================================================
+export function useConsultaTela(consulta: string) {
+  const assinar = useCallback(
+    (ouvinte: () => void) => {
+      const lista = window.matchMedia(consulta);
 
-  consulta.addEventListener('change', ouvinte);
+      lista.addEventListener('change', ouvinte);
 
-  return () => consulta.removeEventListener('change', ouvinte);
+      return () => lista.removeEventListener('change', ouvinte);
+    },
+    [consulta],
+  );
+
+  return useSyncExternalStore(assinar, () => window.matchMedia(consulta).matches);
 }
 
 // ====================================================================
-// 1. TELA DESKTOP
+// 2. TELA DESKTOP
 // Para telas cujos frames têm estruturas diferentes: montar um só evita
 // campos duplicados no mesmo formulário. Mesmo limite do Tailwind (lg).
 // ====================================================================
 export function useTelaDesktop() {
-  return useSyncExternalStore(assinar, () => window.matchMedia(CONSULTA_DESKTOP).matches);
+  return useConsultaTela(CONSULTA_DESKTOP);
 }
