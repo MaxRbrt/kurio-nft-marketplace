@@ -61,3 +61,36 @@ export async function entrar(pagina: Page, credenciais: { email: string; senha: 
 
   return corpo.token as string;
 }
+
+// ====================================================================
+// PEDIDO PRONTO
+// Cria, pela API simulada, o pedido da sessão aberta na página, com o que
+// estiver no carrinho. Devolve a rota do recibo.
+// ====================================================================
+export async function criarPedidoConfirmado(pagina: Page) {
+  const token = await pagina.evaluate(() => localStorage.getItem('kurio:token'));
+  const sessao = token ?? undefined;
+  const cotacao = await chamarApi(pagina, 'POST', '/api/cotacoes', { rede: 'ethereum' }, sessao);
+  const pedido = await chamarApi(
+    pagina,
+    'POST',
+    '/api/pedidos',
+    {
+      cotacaoId: cotacao.corpo.id,
+      carteiraId: 'carteira-ana-principal',
+      rede: 'ethereum',
+      nomeExibicao: 'Ana',
+      email: ANA.email,
+      nomeUsuario: 'ana',
+      nomePerfil: null,
+      carteiraSecundaria: null,
+      codigoIndicacao: null,
+      nomeEns: null,
+      observacao: null,
+    },
+    sessao,
+    { cabecalhos: { 'Idempotency-Key': 'pedido-pronto' } },
+  );
+
+  return `/pedidos/${pedido.corpo.id}`;
+}

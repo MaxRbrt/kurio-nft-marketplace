@@ -188,3 +188,47 @@ for (const largura of [390, 768, 1440]) {
     expect(excesso).toBeLessThanOrEqual(0);
   });
 }
+
+test.describe('abertura antes do JavaScript', () => {
+  test.use({ serviceWorkers: 'block' });
+
+  test('marca aparece sem depender do JavaScript', async ({ page }) => {
+    await page.route('**/assets/*.js', (rota) => rota.abort());
+    await page.goto('/');
+
+    await expect(page.getByText('KURIO')).toBeVisible();
+  });
+});
+
+test.describe('falha ao iniciar', () => {
+  const PACOTE_DOS_MOCKS = '**/assets/browser-*.js';
+
+  test('pacote que não baixa mostra aviso, e tentar de novo recupera', async ({ page }) => {
+    await page.route(PACOTE_DOS_MOCKS, (rota) => rota.abort());
+    await page.goto('/');
+    await expect(page.getByRole('alert')).toContainText('Não foi possível iniciar');
+
+    await page.unroute(PACOTE_DOS_MOCKS);
+    await page.getByRole('button', { name: 'Tentar de novo' }).click();
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+  });
+
+  test('inicialização presa além do limite também avisa', async ({ page }) => {
+    await page.clock.install();
+    await page.route(PACOTE_DOS_MOCKS, () => undefined);
+    await page.goto('/', { waitUntil: 'commit' });
+
+    await expect(async () => {
+      await page.clock.runFor(15_000);
+      await expect(page.getByRole('alert')).toContainText('Não foi possível iniciar', {
+        timeout: 500,
+      });
+    }).toPass();
+  });
+});
+
+test('abertura some quando a aplicação monta', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+  await expect(page.locator('.abertura')).toHaveCount(0);
+});

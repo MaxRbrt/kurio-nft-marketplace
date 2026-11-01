@@ -1,4 +1,6 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { ANA, chamarApi, criarPedidoConfirmado, entrar } from '../apoio/api';
 
 // ====================================================================
 // 1. TECLADO E DIÁLOGOS (ENUNCIADO 11)
@@ -156,4 +158,57 @@ test.describe('painel de cenários', () => {
     await expect(page.getByTestId('painel-mensagem')).toContainText('Feito');
     await expect(page.getByTestId('detalhe-preco')).toHaveText('2.00 ETH');
   });
+});
+
+// ====================================================================
+// 3. WCAG COM AXE (ENUNCIADO 8)
+// Regras A e AA, inclusive contraste, em todas as telas, nas duas larguras
+// dos frames. As telas privadas entram com sessão e item no carrinho.
+// ====================================================================
+const TELAS_PUBLICAS = ['/', '/nfts/nft-01', '/login', '/cadastro', '/rota-inexistente'];
+const TELAS_PRIVADAS = ['/carrinho', '/pagamento', '/perfil', '/carteiras', '/pedidos'];
+
+test.describe('wcag com axe', () => {
+  for (const largura of [414, 1440]) {
+    for (const caminho of [...TELAS_PUBLICAS, ...TELAS_PRIVADAS]) {
+      test(`${caminho} em ${largura} px`, async ({ page }) => {
+        await page.setViewportSize({ width: largura, height: 900 });
+        await page.goto('/');
+        await page.getByTestId('socket-estado').waitFor({ state: 'attached' });
+
+        if (TELAS_PRIVADAS.includes(caminho)) {
+          const token = await entrar(page, ANA);
+
+          await chamarApi(
+            page,
+            'POST',
+            '/api/carrinho/itens',
+            { nftId: 'nft-01', edicaoId: 'nft-01-1-50', quantidade: 1 },
+            token,
+          );
+          await page.evaluate((valor) => localStorage.setItem('kurio:token', valor), token);
+        }
+
+        const recibo = caminho === '/pedidos';
+
+        await page.goto(recibo ? await criarPedidoConfirmado(page) : caminho);
+        await page.waitForLoadState('networkidle');
+        if (recibo) {
+          await expect(page.getByTestId('pedido-titulo')).toHaveText(/Seus NFTs/, {
+            timeout: 10_000,
+          });
+        }
+        await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
+
+        const { violations: violacoes } = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa'])
+          .analyze();
+        const resumo = violacoes.flatMap((violacao) =>
+          violacao.nodes.map((no) => `${violacao.id}: ${no.target.join(' ')}`),
+        );
+
+        expect(resumo).toEqual([]);
+      });
+    }
+  }
 });

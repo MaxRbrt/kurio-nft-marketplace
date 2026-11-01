@@ -400,3 +400,34 @@ test.describe('edição selecionada', () => {
     expect((comprar?.x ?? 0) - faixa.direita).toBeGreaterThanOrEqual(8);
   });
 });
+
+test.describe('carregamento no celular', () => {
+  test.use({ viewport: { width: 412, height: 823 }, deviceScaleFactor: 1.75 });
+
+  test('detalhe não desloca o layout nem baixa a imagem grande escondida', async ({ page }) => {
+    const enderecos: string[] = [];
+
+    page.on('request', (pedido) => enderecos.push(pedido.url()));
+    await page.addInitScript(() => {
+      const janela = window as unknown as { deslocamento: number };
+
+      janela.deslocamento = 0;
+      new PerformanceObserver((lista) => {
+        for (const item of lista.getEntries()) {
+          janela.deslocamento += (item as unknown as { value: number }).value;
+        }
+      }).observe({ type: 'layout-shift', buffered: true });
+    });
+
+    await page.goto('/nfts/nft-01');
+    await expect(titulo(page)).toBeVisible();
+    await page.waitForLoadState('networkidle');
+
+    const deslocamento = await page.evaluate(
+      () => (window as unknown as { deslocamento: number }).deslocamento,
+    );
+
+    expect(deslocamento).toBeLessThan(0.01);
+    expect(enderecos.filter((endereco) => endereco.includes('-960.webp'))).toEqual([]);
+  });
+});
