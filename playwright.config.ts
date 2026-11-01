@@ -38,6 +38,11 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'iphone-15-webkit',
+      testMatch: /responsivo\/.*\.spec\.ts/,
+      use: { ...devices['iPhone 15'] },
+    },
 
     // {
     //   name: 'firefox',

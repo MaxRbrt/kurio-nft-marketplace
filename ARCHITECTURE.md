@@ -213,6 +213,26 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 | Cabeçalho                | Só mostra "Entrar", inclusive nas telas de conta                                                | Com sessão, avatar no lugar do botão; o menu central não muda de posição                                  | Mostrar "Entrar" a quem já entrou seria informação errada         |
 | Carrinho, mobile         | Quantidade 6 px abaixo do centro dos botões                                                     | Quantidade centrada na linha dos botões                                                                   | Item visivelmente fora do centro                                  |
 
+### Larguras sem frame
+
+Os frames têm 1440 px no desktop e 414 px no mobile, com medidas fixas. Nas larguras intermediárias, as medidas do frame viram teto: o layout é igual ao frame na largura dele e se adapta abaixo, sem cortar texto nem sobrepor elementos. O teste `tests/responsivo/telas.spec.ts` confere oito telas de 320 a 1440 px no Chromium e em 375, 393 e 430 px no WebKit, com o perfil do iPhone 15, e falha com texto cortado, sobreposto, fora da tela ou atrás da barra inferior.
+
+| Tela                          | Largura           | Adaptação                                                                                                                |
+| ----------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Perfil, Carteiras e Pagamento | todas             | O seletor do sufixo ENS tem 78 px no mínimo, como no frame, e cresce para caber ".kurio.eth" sem a seta encobrir o texto |
+| Carteiras                     | abaixo de 1024 px | Texto de exemplo "ENS ou carteira (opcional)"; o rótulo completo continua para leitores de tela                          |
+| Carrinho, mobile              | abaixo de 414 px  | Texto de exemplo do cupom "Código promocional"; rótulo longo do resumo quebra linha sem invadir a de baixo               |
+| Carrinho, mobile              | abaixo de 375 px  | A quantidade desce para uma linha própria no cartão; nome longo quebra linha em vez de ser cortado                       |
+| Compra, mobile                | abaixo de 414 px  | Título do cabeçalho quebra em duas linhas dentro dos 44 px, em vez de sair da tela                                       |
+| Pagamento, mobile             | todas             | Marcador da opção de carteira preso a 16 px da borda direita, a mesma posição do frame em 414 px                         |
+| Início, mobile                | abaixo de 338 px  | Título do destaque diminui com a tela para não encostar na arte                                                          |
+| Início, mobile                | abaixo de 360 px  | As abas rolam, com a borda direita esmaecida para indicar que há mais                                                    |
+| Início                        | todas             | Nome do NFT quebra linha em vez de ser cortado                                                                           |
+| Início, mobile                | todas             | Paginação centrada; o frame mobile termina antes dela                                                                    |
+| Início, desktop               | 1024 px           | Arte das promoções encolhe para não entrar na coluna do texto                                                            |
+| Detalhe, mobile               | abaixo de 375 px  | A descrição curta pode ocupar mais de três linhas sem invadir "Edição"                                                   |
+| Login e Cadastro              | abaixo de 1200 px | O fundo decorativo fica centrado e recortado nas laterais, sem rolagem lateral                                           |
+
 ### Pontos do arquivo verificados e mantidos
 
 Os comentários deixados no arquivo do Figma foram usados como lista do que conferir. Cada um foi medido no frame: os que se confirmaram estão na tabela acima. Estes foram verificados e mantidos, por serem preferência de desenho ou por o frame estar coerente:
