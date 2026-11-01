@@ -117,6 +117,14 @@ test('ação fora do escopo avisa, sem navegar', async ({ page }) => {
   expect(new URL(page.url()).pathname).toBe('/');
 });
 
+test('rota inexistente mostra a página 404 com volta ao início', async ({ page }) => {
+  await page.goto('/rota-que-nao-existe');
+
+  await expect(page.getByRole('heading', { name: 'Página não encontrada' })).toBeVisible();
+  await page.getByRole('link', { name: 'Voltar para o início' }).click();
+  await expect(page).toHaveURL(/\/$/);
+});
+
 test('links reais levam às rotas', async ({ page }) => {
   await page.goto('/');
   await page.getByTestId('cabecalho-entrar').click();

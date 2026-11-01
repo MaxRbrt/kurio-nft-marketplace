@@ -102,7 +102,7 @@ export function Rodape() {
             <h2 className="text-lg leading-4 font-bold text-foreground xl:h-8">
               Antecipe-se ao próximo lançamento
             </h2>
-            <div className="mt-4 flex h-10 items-center justify-between overflow-hidden rounded-md bg-secondary pl-3 shadow-[0_0_20px_rgba(10,6,4,0.45)]">
+            <div className="mt-4 flex h-10 items-center justify-between overflow-hidden rounded-md bg-secondary pl-3 shadow-[0_0_20px_rgba(10,6,4,0.45)] has-focus-visible:outline-2 has-focus-visible:outline-ring">
               <label htmlFor="rodape-email" className="sr-only">
                 Seu e-mail
               </label>
