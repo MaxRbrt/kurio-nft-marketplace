@@ -212,6 +212,22 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 | Carteiras                | Título "Carteira principal" cortado na parte de baixo das letras                                | Título inteiro, na mesma posição                                                                          | Texto cortado parece erro                                         |
 | Cabeçalho                | Só mostra "Entrar", inclusive nas telas de conta                                                | Com sessão, avatar no lugar do botão; o menu central não muda de posição                                  | Mostrar "Entrar" a quem já entrou seria informação errada         |
 | Carrinho, mobile         | Quantidade 6 px abaixo do centro dos botões                                                     | Quantidade centrada na linha dos botões                                                                   | Item visivelmente fora do centro                                  |
+| Carrinho, mobile         | Subtotal 8.92 ETH e total 8.936 ETH, com itens que somam 8.14 ETH                               | Subtotal 8.14 ETH e total 8.156 ETH, calculados dos itens                                                 | Total diferente da soma seria dado errado                         |
+| Início, desktop          | Contagens das coleções (33, 12, 65...) e das raridades (119, 78, 86)                            | Contagem real do catálogo simulado: 4 por coleção e 12 por raridade                                       | Prometer 33 itens e listar 4 ao filtrar seria dado errado         |
+| Início, desktop          | "Arte digital" em laranja, como se estivesse selecionada, com a grade mostrando todos os NFTs   | Laranja só com o filtro ativo; sem filtro, a cor normal                                                   | Destaque sem filtro aplicado informa um estado falso              |
+| Início, desktop          | Segundo cartão de promoção corta a última palavra: "...que definem a"                           | Frase inteira: "...que definem a cultura."                                                                | Texto cortado parece erro                                         |
+| Carteiras                | "Adicionar" da carteira secundária termina 6 px antes da margem usada pelo "Adicionar" de cima  | Os dois terminam na mesma margem direita                                                                  | Ações iguais desalinhadas entre si                                |
+| Formulários              | Asterisco colado ao rótulo na maioria dos campos e a 4 px em "Rede" e "Nome ENS"                | Asterisco colado ao rótulo em todos os campos                                                             | Campos iguais com espaçamentos diferentes                         |
+| Cabeçalho                | Menu central 7 px acima do logo e dos botões                                                    | Menu 7 px abaixo, centrado com logo e botões; o traço da aba ativa não muda                               | Itens da mesma barra desalinhados na vertical                     |
+| Início, desktop          | Arcos laranja cortados sobre a arte dos dois cartões de promoção                                | Sem os arcos                                                                                              | Parecem colocados por engano e cobrem a arte                      |
+| Início, desktop          | Seletor do destaque em y = 500                                                                  | 16 px mais abaixo, em y = 516                                                                             | Comentário: muito perto, as animações podem cobri-lo              |
+
+### Mudanças depois de testar em celular real
+
+| Tela                     | O que o frame mostra                               | O que a aplicação faz                                                  | Motivo                                                                             |
+| ------------------------ | -------------------------------------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Início, mobile           | Coluna direita de cartões 32 px abaixo da esquerda | Colunas niveladas                                                      | Cartões da mesma linha desalinhados parecem defeito                                |
+| Campos, em tela de toque | Texto digitado com 12 a 14 px                      | Texto digitado com 16 px; o texto de exemplo mantém o tamanho do frame | Abaixo de 16 px o iOS amplia a página ao focar. O zoom da página continua liberado |
 
 ### Larguras sem frame
 
@@ -243,8 +259,6 @@ Os frames têm 1440 px no desktop e 414 px no mobile, com medidas fixas. Nas lar
 
 Os comentários deixados no arquivo do Figma foram usados como lista do que conferir. Cada um foi medido no frame: os que se confirmaram estão na tabela acima. Estes foram verificados e mantidos, por serem preferência de desenho ou por o frame estar coerente:
 
-- Início, mobile: as duas colunas de cartões têm deslocamento constante de 32 px. É um desenho escalonado, não um desnível.
-- Início, desktop: os arcos laranja aparecem nos dois cartões de promoção, na mesma posição. É um detalhe decorativo.
 - Carrinho, desktop: a lixeira está centrada na própria caixa de 24 px, e os botões de quantidade são pílulas de 20 x 30 com raio cheio.
 - Carrinho, mobile: botões de quantidade redondos, diferentes dos do desktop. Cada frame segue o seu desenho.
 - Pagamento: a seta dos seletores fica a 28,5 px da borda nos dois seletores, de forma coerente.
@@ -252,7 +266,76 @@ Os comentários deixados no arquivo do Figma foram usados como lista do que conf
 - Perfil: botão "Salvar" de 131 px e recuo da linha "Sair": o frame está coerente, e a mudança seria preferência.
 - Perfil e Carteiras não têm frame mobile: usam abas no padrão da Início e os mesmos campos em uma coluna.
 - "Lista de interesse" e os demais itens fora do escopo avisam que estão indisponíveis.
+- Início, desktop: paginação com números e seta de próxima, como no frame; não há seta de voltar, e os números levam às páginas anteriores.
+- Início, mobile: sublinhado da aba como no frame; o botão central da barra, "Escanear", está fora do escopo e avisa que está indisponível.
+- Detalhe, desktop: posição do botão "Entrar" e miniaturas como no frame. Elas mostram a mesma arte e trocam a imagem principal.
+- Detalhe, mobile: rótulos das edições em pílula, como no frame.
+- Carrinho, desktop: distância da trilha até "NFTs" e fundo atrás das artes como no frame.
+- Pagamento e Login: espaçamentos de "Seus NFTs" e tipografia do fundo decorativo seguem o frame, salvo os desvios da tabela acima.
+- Cadastro: título "Criar conta" e subtítulo seguem o frame; o fundo escuro atrás do modal é o do frame, sem camada extra.
+- Tema só escuro e sem frame mobile de Confirmação, Perfil e Carteiras nem frame de tablet: o arquivo não traz essas referências.
 - Sem mudança por gosto: ordem das coleções, letras W, C e D nos serviços, controle deslizante de preço e fundo escuro atrás do modal, que reproduz o frame.
+
+### Comentários do arquivo, um a um
+
+O arquivo tem 62 comentários de outros candidatos, 2 deles vazios, agrupados aqui por assunto. Cada um foi conferido no frame. "Corrigido" tem linha na tabela de desvios ou em "Larguras sem frame"; "Mantido" foi medido e está coerente, ou é preferência de desenho; "Respondido" é uma pergunta resolvida pelo comportamento da aplicação.
+
+| Tela               | Comentário                                       | Situação                                                                |
+| ------------------ | ------------------------------------------------ | ----------------------------------------------------------------------- |
+| Início, desktop    | Círculos colocados por engano                    | Corrigido: arcos removidos                                              |
+| Início, desktop    | Frase termina em "cultura" e não aparece         | Corrigido: frase inteira                                                |
+| Início, desktop    | Diário empurrado para a esquerda                 | Corrigido: ocupa toda a largura                                         |
+| Início, desktop    | Fundo sai da imagem; fundo descentrado           | Corrigido: arte centrada nos cartões                                    |
+| Início, desktop    | Falta de uniformidade na 2ª linha                | Corrigido: arte e distância do preço iguais                             |
+| Início, desktop    | Falta de padding em "METAMASK"; centrar botão    | Corrigido: textos centrados no rodapé                                   |
+| Início, desktop    | Falta margem em "Explorar"                       | Corrigido: recuos iguais nas promoções                                  |
+| Início, desktop    | Texto sem alinhamento em "NFT EM DESTAQUE"       | Corrigido: títulos centrados                                            |
+| Início, desktop    | "EXPLORAR" fora do centro                        | Corrigido: texto centrado                                               |
+| Início, desktop    | Seletor do destaque muito perto                  | Corrigido: 16 px abaixo                                                 |
+| Início, desktop    | Divisória só em algumas telas                    | Corrigido: divisória em todas                                           |
+| Início, desktop    | Cartão com fundo de outra cor                    | Mantido: é o fundo do cartão no frame                                   |
+| Início, desktop    | Coleções fora de ordem alfabética                | Mantido: ordem do frame                                                 |
+| Início, desktop    | Filtros poderiam usar checkboxes                 | Mantido: filtros já são combináveis; seleção por cor e estado anunciado |
+| Início, desktop    | Faixa de preço imprecisa                         | Mantido: controle do frame                                              |
+| Início, desktop    | Letras em vez de ícones nos serviços             | Mantido: desenho do frame                                               |
+| Início, desktop    | Botão de voltar na página 2                      | Respondido: números levam às páginas anteriores                         |
+| Início, desktop    | Opções de ordenação                              | Respondido: recentes, menor e maior preço                               |
+| Início, mobile     | Imagem sobre o destaque                          | Corrigido: imagem removida                                              |
+| Início, mobile     | Falta de margem nas abas                         | Corrigido: 16 px entre as abas                                          |
+| Início, mobile     | Itens não nivelados                              | Corrigido: colunas niveladas                                            |
+| Início, mobile     | O que faz o botão central                        | Respondido: "Escanear", fora do escopo, avisa que está indisponível     |
+| Detalhe, desktop   | Margem não uniforme em "Entrar"                  | Mantido: 9 px de recuo dos dois lados                                   |
+| Detalhe, desktop   | Container descentrado; falta de uniformidade     | Corrigido: cartões iguais em "Mais desta coleção"                       |
+| Detalhe, desktop   | Miniaturas são variações?                        | Respondido: trocam a imagem principal, sem mudar dados                  |
+| Detalhe, desktop   | "-" deveria desabilitar em 1                     | Respondido: desabilitado na quantidade 1                                |
+| Detalhe, mobile    | Pílula das edições desnecessária                 | Mantido: desenho do frame                                               |
+| Carrinho, desktop  | Textos desalinhados no rodapé                    | Mantido: mesmo rodapé das outras telas                                  |
+| Carrinho, desktop  | Ícone da lixeira descentrado                     | Mantido: centrado na caixa de 24 px                                     |
+| Carrinho, desktop  | Trilha muito perto de "NFTs"                     | Mantido: 12 px, como no frame                                           |
+| Carrinho, desktop  | Botão de quantidade sem raio                     | Mantido: pílula de 20 x 30 com raio cheio                               |
+| Carrinho, desktop  | Fundo atrás da arte diferente                    | Mantido: desenho do frame                                               |
+| Carrinho, desktop  | Token diferente de Pagamento                     | Corrigido: um token por NFT                                             |
+| Carrinho, mobile   | Falta de centralização; sem espaço para excluir  | Corrigido: quantidade centrada e lixeira acima do "+"                   |
+| Carrinho, mobile   | Botões deveriam ser iguais aos do desktop        | Mantido: cada frame segue o seu desenho                                 |
+| Pagamento, desktop | Falta centralizar a seta do seletor              | Mantido: seta centrada na altura e na mesma posição nos dois seletores  |
+| Pagamento, desktop | Falta uniformizar a lista                        | Corrigido: linhas iguais                                                |
+| Pagamento, desktop | Falta margem e padding nas carteiras             | Corrigido: recuos iguais nas opções                                     |
+| Pagamento, mobile  | Formulário não aparece                           | Corrigido: campos abrem em folha                                        |
+| Confirmação        | Textos mais à direita                            | Mantido: "Taxa de rede" e "Total" alinhados entre si                    |
+| Confirmação        | Só o estado confirmado                           | Corrigido: pendente e recusado no mesmo modal                           |
+| Login              | Melhorar a tipografia de "Listados recentemente" | Corrigido: texto não fica sob a seta                                    |
+| Cadastro           | Menu desalinhado do logo                         | Corrigido: menu centrado com logo e botões                              |
+| Cadastro           | Sem camada escura atrás do modal                 | Mantido: fundo reproduzido do frame                                     |
+| Cadastro           | Centralizar abas; aproximar subtítulo            | Mantido: abas e subtítulo como no frame                                 |
+| Cadastro, mobile   | Texto de exemplo centrado                        | Corrigido: à esquerda, como nos outros campos                           |
+| Perfil             | Aumentar o recuo de "Sair"                       | Mantido: 12 px, coerente no frame                                       |
+| Perfil             | Botão de largura total                           | Mantido: "Salvar" de 131 px                                             |
+| Perfil             | Centrar "Alterar"                                | Corrigido: texto centrado                                               |
+| Perfil             | ENS só existe em Ethereum                        | Mantido: seletor do frame                                               |
+| Perfil             | "Entrar" continua após o login?                  | Corrigido: avatar com sessão                                            |
+| Carteiras          | Ícone desproporcional ao botão                   | Mantido: ícone de 20 px em botão de 35 px, centrado                     |
+| Arquivo            | Cores em hexadecimal e tema claro                | Mantido: o arquivo só traz tema escuro                                  |
+| Arquivo            | Sem frames de tablet e de mobile em três telas   | Corrigido: adaptação em "Larguras sem frame"                            |
 
 ### Reproduzidos como estão no frame
 

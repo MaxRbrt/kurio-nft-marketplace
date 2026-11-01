@@ -47,7 +47,7 @@ export function Hero() {
             EXPLORAR
           </a>
         </div>
-        <PontosCarrossel className="absolute top-[399px] left-[600px] gap-2" />
+        <PontosCarrossel className="absolute top-[415px] left-[600px] gap-2" />
         <ImagemNft
           url={ARTE_PRINCIPAL}
           sizes="450px"

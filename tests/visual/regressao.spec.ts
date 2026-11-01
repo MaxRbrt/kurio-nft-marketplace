@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { ANA, chamarApi, entrar } from '../apoio/api';
 
@@ -14,12 +15,15 @@ const ITENS = [
 // ====================================================================
 // 1. DADOS ESTÁVEIS
 // Banco restaurado, carrinho conhecido e animações desligadas. Baselines
-// dependem do sistema: foram geradas no Windows, e em outro sistema o
-// teste é pulado até gerar as próprias com --update-snapshots.
+// dependem do sistema: há versões para Windows e Linux, e em outro sistema
+// o teste é pulado até gerar as próprias com --update-snapshots.
 // ====================================================================
+const pastaBaselines = 'tests/visual/regressao.spec.ts-snapshots';
+const baselineDoSistema = `${pastaBaselines}/inicio-desktop-chromium-${process.platform}.png`;
+
 test.skip(
-  process.platform !== 'win32' && !process.env.PLAYWRIGHT_VISUAL_QUALQUER_SISTEMA,
-  'Baselines geradas no Windows; veja o README para regenerar.',
+  !existsSync(baselineDoSistema) && !process.env.PLAYWRIGHT_VISUAL_QUALQUER_SISTEMA,
+  'Sem baselines para este sistema; veja o README para gerar.',
 );
 
 async function prepararCarrinho(pagina: Page) {

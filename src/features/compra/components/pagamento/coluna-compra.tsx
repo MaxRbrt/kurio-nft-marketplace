@@ -159,7 +159,7 @@ export function ColunaCompra({ resumo, estado, confirmar, aviso, ocupado }: Prop
               caixa:
                 'flex h-10 items-center rounded-[3px] border border-primary pl-2 focus-within:outline-2 focus-within:outline-ring',
               campo:
-                'h-full min-w-0 flex-1 bg-transparent text-xs leading-4 outline-none placeholder:text-secundaria',
+                'h-full min-w-0 flex-1 bg-transparent text-xs leading-4 outline-none placeholder:text-xs placeholder:text-secundaria',
               botao:
                 '-mr-px h-10 w-[102px] shrink-0 rounded-r-[3px] bg-primary text-[15px] leading-4 font-bold text-primary-foreground disabled:opacity-50',
             }}

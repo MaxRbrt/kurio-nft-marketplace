@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-const ESPERA_ALEM_DO_PRAZO_MS = 40_000;
+const TEMPO_ALEM_DO_PRAZO_MS = 40_000;
 
 function postarControle(pagina: Page, caminho: string, corpo?: unknown) {
   return pagina.evaluate(
@@ -42,9 +42,11 @@ test('reconecta sozinho após queda e volta a receber eventos', async ({ page })
 });
 
 test('heartbeat mantém a conexão além do prazo de 30 s', async ({ page }) => {
-  test.setTimeout(90_000);
+  await page.clock.install();
+  await page.reload();
+  await expect(page.getByTestId('socket-estado')).toHaveText('Conectado');
 
-  await page.waitForTimeout(ESPERA_ALEM_DO_PRAZO_MS);
+  await page.clock.runFor(TEMPO_ALEM_DO_PRAZO_MS);
 
   await expect(page.getByTestId('socket-estado')).toHaveText('Conectado');
   await expect(page.getByTestId('socket-conexoes')).toHaveText('1');

@@ -143,6 +143,36 @@ test.describe('estado na URL', () => {
     await expect(nomes(page).first()).toHaveText('Emerald Ape #042');
   });
 
+  test('busca e ordem sobrevivem a refresh e histórico', async ({ page }) => {
+    const campo = page.getByRole('searchbox', { name: 'Buscar NFTs' });
+
+    if (!(await campo.isVisible())) {
+      await page.getByRole('button', { name: 'Buscar', exact: true }).click();
+    }
+
+    await campo.fill('nomad');
+    await expect(page).toHaveURL(/busca=nomad/);
+
+    await page.getByRole('combobox', { name: 'Ordenar por' }).click();
+    await page.getByRole('option', { name: 'Maior preço' }).click();
+    await expect(page).toHaveURL(/ordem=maior-preco/);
+
+    const nomeEsperado = await page.getByTestId('cartao-nome').first().textContent();
+
+    await page.reload();
+    await expect(page).toHaveURL(/busca=nomad/);
+    await expect(page).toHaveURL(/ordem=maior-preco/);
+    await expect(page.getByTestId('cartao-nome').first()).toHaveText(nomeEsperado ?? '');
+
+    await page.goBack();
+    await expect(page).not.toHaveURL(/ordem=/);
+    await expect(page).toHaveURL(/busca=nomad/);
+
+    await page.goForward();
+    await expect(page).toHaveURL(/ordem=maior-preco/);
+    await expect(page.getByTestId('cartao-nome').first()).toHaveText(nomeEsperado ?? '');
+  });
+
   test('ordenação e aba mudam a consulta', async ({ page }) => {
     await page.getByRole('combobox', { name: 'Ordenar por' }).click();
     await page.getByRole('option', { name: 'Maior preço' }).click();
@@ -278,7 +308,7 @@ test.describe('mobile 414', () => {
     conferir(primeiro.y, 343);
     conferir(primeiro.width, 175);
     conferir(segundo?.x ?? 0, 215);
-    conferir(segundo?.y ?? 0, 375);
+    conferir(segundo?.y ?? 0, 343);
     await expect(page.getByTestId('hero')).toBeHidden();
     await expect(page.getByTestId('coluna-lateral')).toBeHidden();
     await expect(page.getByTestId('cartao-nft').nth(2).getByText('RARO')).toBeVisible();
@@ -345,5 +375,33 @@ test.describe('faixa de preço', () => {
     await page.keyboard.press('ArrowRight');
     await expect(painel).toContainText('0,02 - 12,30 ETH');
     await expect(maximo).toHaveAttribute('aria-valuemax', '16.01');
+  });
+});
+
+test.describe('celular com toque', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('colunas de cartões niveladas', async ({ page }) => {
+    await page.goto('/');
+
+    const cartoes = page.getByTestId('cartao-nft');
+
+    await expect(cartoes.nth(1)).toBeVisible();
+
+    const esquerda = await cartoes.nth(0).boundingBox();
+    const direita = await cartoes.nth(1).boundingBox();
+
+    expect(direita?.y).toBe(esquerda?.y);
+  });
+
+  test('campos com 16 px, para o iOS não ampliar a página ao focar', async ({ page }) => {
+    await page.goto('/login');
+
+    const email = page.locator('#login-email');
+
+    await expect(email).toBeVisible();
+    await expect(email).toHaveCSS('font-size', '16px');
+    await page.goto('/');
+    await expect(page.locator('input[type=search]').first()).toHaveCSS('font-size', '16px');
   });
 });

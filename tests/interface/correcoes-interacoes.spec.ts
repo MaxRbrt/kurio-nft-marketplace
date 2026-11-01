@@ -39,7 +39,8 @@ test.describe('catálogo no desktop', () => {
     expect(await page.evaluate(() => window.scrollY)).toBe(500);
 
     await page.getByRole('button', { name: 'Novos lançamentos' }).first().click();
-    await page.waitForTimeout(300);
+    await expect(page).toHaveURL(/aba=/);
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
     expect(await page.evaluate(() => window.scrollY)).toBe(500);
   });
 

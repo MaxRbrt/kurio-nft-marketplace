@@ -36,14 +36,16 @@ test('busca envia parâmetro e mostra resultado vazio', async ({ page }) => {
 });
 
 test('resposta atrasada não sobrescreve a busca mais recente', async ({ page }) => {
+  await page.clock.install();
   await definirCenario(page, 'fora-de-ordem');
 
   await buscar(page, 'emerald');
-  await page.waitForTimeout(400);
+  await page.clock.runFor(400);
   await buscar(page, 'ivory');
+  await page.clock.runFor(400);
   await expect(primeiroNome(page)).toHaveText('Ivory Baron #088');
 
-  await page.waitForTimeout(2_500);
+  await page.clock.runFor(2_500);
 
   await expect(primeiroNome(page)).toHaveText('Ivory Baron #088');
 });

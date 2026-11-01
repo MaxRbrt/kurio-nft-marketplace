@@ -111,7 +111,7 @@ function ConteudoPedido({ pedido }: { pedido: Pedido }) {
         </DialogPrimitive.Title>
       </div>
 
-      <dl className="grid grid-cols-2 gap-3 border-y border-primary px-4 py-3 text-muted-foreground sm:flex sm:h-[66px] sm:items-center sm:justify-between sm:gap-0 sm:px-9 sm:py-0">
+      <dl className="grid grid-cols-2 gap-3 border-y border-primary px-4 py-3 text-muted-foreground sm:flex sm:h-[67px] sm:items-center sm:justify-between sm:gap-0 sm:px-9 sm:py-0">
         {confirmado && (
           <Metadado rotulo="ID da transação" valor={transacaoCurta(pedido.idTransacao)} forte />
         )}
@@ -124,11 +124,11 @@ function ConteudoPedido({ pedido }: { pedido: Pedido }) {
         <Metadado rotulo="Carteira" valor={nomeDaCarteira(pedido)} forte />
       </dl>
 
-      <div className="px-4 pt-[21px] sm:px-11">
+      <div className="px-4 pt-[21px] sm:px-11 sm:pt-5">
         <h2 className="text-[15px] leading-4 font-bold">Detalhes da transação</h2>
         <div className="mt-3 grid h-7 grid-cols-[1fr_auto] items-start border-b border-primary/25 text-base leading-4 font-medium sm:grid-cols-[297px_64px_1fr]">
-          <span>NFTs</span>
-          <span className="hidden whitespace-nowrap sm:block">Edições</span>
+          <span className="font-bold">NFTs</span>
+          <span className="hidden font-bold whitespace-nowrap sm:block">Edições</span>
           <span className="text-right">Subtotal</span>
         </div>
 

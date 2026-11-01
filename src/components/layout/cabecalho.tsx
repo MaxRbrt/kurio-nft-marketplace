@@ -15,7 +15,9 @@ const LINKS_INDISPONIVEIS = [
 // 1. CABEÇALHO
 // Frame Desktop / Início: 1200 x 45. A divisória de 0,3 px rende na
 // última linha, a 25%, sem ocupar altura; a aba ativa cobre as três
-// últimas linhas. A contagem do carrinho soma as quantidades da API.
+// últimas linhas. O menu fica 7 px abaixo do frame, centrado com o logo
+// e os botões (ver ARCHITECTURE.md). A contagem do carrinho soma as
+// quantidades da API.
 // ====================================================================
 export function Cabecalho() {
   const sessao = useSessao();
@@ -47,7 +49,7 @@ export function Cabecalho() {
           <Link
             to="/"
             aria-current={inicioAtivo ? 'page' : undefined}
-            className={`relative h-[45px] w-[58px] text-base leading-[21px] ${
+            className={`relative h-[45px] w-[58px] pt-[7px] text-base leading-[21px] ${
               inicioAtivo
                 ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:bg-primary after:content-['']"
                 : 'text-foreground'
@@ -59,7 +61,7 @@ export function Cabecalho() {
             <AcaoIndisponivel
               key={rotulo}
               aria-current={rotulo === 'Mercado' && mercadoAtivo ? 'page' : undefined}
-              className={`${largura} relative flex h-[45px] cursor-not-allowed items-start self-start text-left text-base leading-[21px] ${
+              className={`${largura} relative flex h-[45px] cursor-not-allowed items-start self-start pt-[7px] text-left text-base leading-[21px] ${
                 rotulo === 'Mercado' && mercadoAtivo
                   ? "font-bold text-texto-destaque after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:bg-primary after:content-['']"
                   : 'text-foreground'

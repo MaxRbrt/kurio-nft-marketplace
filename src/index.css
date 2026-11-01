@@ -146,3 +146,26 @@ input:-webkit-autofill:focus {
   caret-color: var(--foreground);
   transition: background-color 9999s ease-out 0s;
 }
+
+/* ====================================================================
+   CAMPOS EM TELA DE TOQUE
+   O iOS amplia a página ao focar campo com fonte menor que 16 px. O texto
+   digitado usa 16 px só em tela de toque; o texto de exemplo mantém o
+   tamanho do frame, e o zoom da página continua liberado.
+   ==================================================================== */
+@media (pointer: coarse) {
+  input,
+  textarea {
+    font-size: 16px;
+    line-height: normal;
+  }
+}
+
+@layer base {
+  @media (pointer: coarse) {
+    input::placeholder,
+    textarea::placeholder {
+      font-size: 14px;
+    }
+  }
+}

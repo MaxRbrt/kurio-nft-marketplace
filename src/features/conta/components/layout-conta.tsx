@@ -81,7 +81,7 @@ function MenuConta() {
         <button
           type="button"
           onClick={() => sair.mutate()}
-          className="relative block h-5 w-full pl-[46px] text-left text-[15px] leading-5 font-bold text-texto-destaque"
+          className="relative block h-5 w-full pb-0.5 pl-[46px] text-left text-[15px] leading-[15px] font-bold text-texto-destaque"
         >
           <IconeMenuSair className="absolute top-0 left-4 text-primary" />
           Sair

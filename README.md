@@ -33,7 +33,7 @@ npm run dev
 
 A porta 4173 precisa estar livre para os testes e a auditoria. Relatório HTML dos testes: `npx playwright show-report`. Traces das falhas ficam em `test-results`.
 
-**Regressão visual:** as baselines em `tests/visual/regressao.spec.ts-snapshots` foram geradas no Windows, pois a renderização de fonte muda entre sistemas. Em outro sistema os testes visuais são pulados. Para gerar as próprias:
+**Regressão visual:** as baselines em `tests/visual/regressao.spec.ts-snapshots` existem para Windows e Linux, pois a renderização de fonte muda entre sistemas. Em outro sistema os testes visuais são pulados, com aviso. Para gerar as baselines locais:
 
 ```bash
 PLAYWRIGHT_VISUAL_QUALQUER_SISTEMA=1 npx playwright test tests/visual --update-snapshots
