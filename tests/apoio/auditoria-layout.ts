@@ -4,8 +4,9 @@
 // da própria função. Mede o texto desenhado, não a caixa do elemento:
 // um parágrafo largo com texto curto não conta como sobreposição. Até
 // 4 px na vertical é a sobra da caixa da fonte, não glifo sobre glifo.
-// Acusa texto cortado, texto sobre texto, imagem ou ícone, texto fora
-// da tela, placeholder que não cabe e rolagem lateral. Com um diálogo
+// Acusa texto cortado (por ele mesmo ou por um contêiner acima), texto sobre texto, imagem ou ícone, texto fora
+// da tela ou colado na borda, placeholder que não cabe, controle
+// espremido e rolagem lateral. Com um diálogo
 // aberto, audita só o diálogo, que é o que a pessoa vê.
 // ====================================================================
 export function auditarLayout() {
@@ -43,6 +44,23 @@ export function auditarLayout() {
       }
     }
     return false;
+  };
+
+  const caixaQueRecorta = (elemento: Element) => {
+    for (
+      let atual = elemento.parentElement;
+      atual && atual !== document.body;
+      atual = atual.parentElement
+    ) {
+      const estilo = getComputedStyle(atual);
+      const recorta = [estilo.overflowX, estilo.overflowY].some((valor) =>
+        ['hidden', 'clip'].includes(valor),
+      );
+      if (recorta) {
+        return atual;
+      }
+    }
+    return null;
   };
 
   const nome = (elemento: Element) => {
@@ -121,6 +139,21 @@ export function auditarLayout() {
     if (foraDaTela && !dentroDeRolagemHorizontal(elemento)) {
       problemas.push(`TEXTO FORA DA TELA ${nome(elemento)}`);
     }
+
+    const recorte = caixaQueRecorta(elemento);
+    if (recorte) {
+      const limite = recorte.getBoundingClientRect();
+      const cortado = caixas.some(
+        (caixa) =>
+          caixa.right > limite.right + 1 ||
+          caixa.left < limite.left - 1 ||
+          caixa.bottom > limite.bottom + 1 ||
+          caixa.top < limite.top - 1,
+      );
+      if (cortado) {
+        problemas.push(`TEXTO CORTADO PELO CONTÊINER ${nome(elemento)}`);
+      }
+    }
   }
 
   // ====================================================================
@@ -194,6 +227,91 @@ export function auditarLayout() {
     }
   }
 
+  // ====================================================================
+  // 5. TEXTO COLADO NA BORDA
+  // Dentro de uma caixa com borda visível (pílula, campo, botão), o texto
+  // precisa ficar dentro da borda, com pelo menos 1 px de folga.
+  // ====================================================================
+  const caixaComBorda = (elemento: Element) => {
+    for (let atual: Element | null = elemento; atual; atual = atual.parentElement) {
+      const estilo = getComputedStyle(atual);
+      const larguraBorda = parseFloat(estilo.borderRightWidth);
+      const bordaVisivel = larguraBorda > 0 && !estilo.borderRightColor.endsWith(', 0)');
+      if (bordaVisivel) {
+        return { caixa: atual.getBoundingClientRect(), larguraBorda };
+      }
+      if (atual === raiz) {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  for (const { elemento, caixas } of textos) {
+    const contorno = caixaComBorda(elemento);
+    if (!contorno) {
+      continue;
+    }
+    const limiteDireito = contorno.caixa.right - contorno.larguraBorda - 1;
+    const limiteEsquerdo = contorno.caixa.left + contorno.larguraBorda + 1;
+    const colado = caixas.some(
+      (caixa) => caixa.right > limiteDireito + 0.5 || caixa.left < limiteEsquerdo - 0.5,
+    );
+    if (colado) {
+      problemas.push(`TEXTO NA BORDA ${nome(elemento)}`);
+    }
+  }
+
+  // ====================================================================
+  // 6. CONTROLE ESPREMIDO
+  // Em contêiner flexível, um botão ou campo pode encolher abaixo da
+  // própria altura para caber. A medida é refeita com flex-shrink: 0;
+  // se ele crescer na altura, estava espremido. Na largura não conta:
+  // campo com flex-1 encolhe de propósito. A medida mexe no layout por um
+  // instante, e o Chrome ajusta a rolagem: ela é restaurada no fim.
+  // ====================================================================
+  const controles = todos.filter((elemento) => {
+    const pai = elemento.parentElement;
+    const controle = ['BUTTON', 'INPUT', 'TEXTAREA', 'A', 'IMG'].includes(elemento.tagName);
+    const itemFlexivel = pai !== null && getComputedStyle(pai).display.includes('flex');
+    return controle && itemFlexivel && visivel(elemento);
+  });
+  const rolaveis = [document.scrollingElement, ...document.querySelectorAll('[role="dialog"]')];
+  const rolagensOriginais = rolaveis.map((rolavel) => rolavel?.scrollTop ?? 0);
+  for (const controle of controles as HTMLElement[]) {
+    const antes = controle.getBoundingClientRect();
+    const encolhimentoOriginal = controle.style.flexShrink;
+    controle.style.flexShrink = '0';
+    const depois = controle.getBoundingClientRect();
+    controle.style.flexShrink = encolhimentoOriginal;
+    const cresceu = depois.height - antes.height > 2;
+    if (cresceu) {
+      problemas.push(
+        `CONTROLE ESPREMIDO ${nome(controle)} ${Math.round(antes.height)}px de ${Math.round(depois.height)}px`,
+      );
+    }
+  }
+
+  // ====================================================================
+  // 7. DIÁLOGO QUE NÃO CABE
+  // Com diálogo aberto a página não rola: a caixa do diálogo precisa
+  // caber na tela, rolando por dentro se o conteúdo for maior. Caixa que
+  // passa da tela deixa o fim inalcançável, mesmo com rolagem interna.
+  // ====================================================================
+  if (dialogo) {
+    const caixaDialogo = dialogo.getBoundingClientRect();
+    const passaDaTela = caixaDialogo.bottom > window.innerHeight + 1 || caixaDialogo.top < -1;
+    if (passaDaTela) {
+      problemas.push(
+        `DIÁLOGO FORA DA TELA ${Math.round(caixaDialogo.bottom)}px de ${window.innerHeight}px`,
+      );
+    }
+  }
+
+  rolaveis.forEach((rolavel, indice) => {
+    rolavel?.scrollTo({ top: rolagensOriginais[indice], behavior: 'instant' });
+  });
+
   if (document.documentElement.scrollWidth > larguraTela) {
     problemas.push(`ROLAGEM LATERAL ${document.documentElement.scrollWidth}px`);
   }
@@ -202,12 +320,14 @@ export function auditarLayout() {
 }
 
 // ====================================================================
-// 5. CONTEÚDO ESCONDIDO SOB A BARRA INFERIOR
+// 8. CONTEÚDO ESCONDIDO SOB A BARRA INFERIOR
 // Chamada com a página rolada até o fim: nada pode ficar atrás da barra.
+// Com folha aberta não se aplica: a página fica parada atrás dela.
 // ====================================================================
 export function auditarFimDaPagina() {
   const barra = document.querySelector('nav[aria-label="Navegação inferior"]');
-  if (!barra || !barra.checkVisibility()) {
+  const folhaAberta = document.querySelector('[role="dialog"]');
+  if (!barra || !barra.checkVisibility() || folhaAberta) {
     return [];
   }
 
@@ -220,7 +340,8 @@ export function auditarFimDaPagina() {
     const atras = caixa.bottom > topoDaBarra + 1 && caixa.top < window.innerHeight;
     if (atras && caixa.height > 1 && alvo.checkVisibility()) {
       const texto = (alvo as HTMLElement).innerText.trim().slice(0, 30);
-      problemas.push(`ESCONDIDO SOB A BARRA ${alvo.tagName.toLowerCase()} "${texto}"`);
+      const posicao = `${Math.round(caixa.top)}-${Math.round(caixa.bottom)} barra ${Math.round(topoDaBarra)} rolagem ${Math.round(scrollY)}/${document.documentElement.scrollHeight - innerHeight}`;
+      problemas.push(`ESCONDIDO SOB A BARRA ${alvo.tagName.toLowerCase()} "${texto}" ${posicao}`);
     }
   }
 

@@ -3,16 +3,26 @@ import { ANA, chamarApi, entrar } from '../apoio/api';
 import { auditarFimDaPagina, auditarLayout } from '../apoio/auditoria-layout';
 
 // ====================================================================
-// 1. LARGURAS E TELAS
-// O enunciado pede no mínimo 390, 768 e 1440. A lista cobre também os
-// celulares mais comuns (320 a 430) e o tablet deitado. No WebKit, que
-// reproduz o Safari do iPhone, ficam as larguras dos iPhones atuais.
+// 1. TELAS
+// Cada tela roda em todos os aparelhos de PROJETOS_RESPONSIVOS
+// (aparelhos.ts), um projeto do Playwright por aparelho.
 // ====================================================================
-const LARGURAS_CHROMIUM = [320, 360, 375, 390, 393, 414, 430, 768, 1024, 1440];
-const LARGURAS_IPHONE = [375, 393, 430];
+type Estado = 'inicial' | 'filtros' | 'folha-pagamento' | 'revisao';
+type Tela = { rota: string; sessao: boolean; estado: Estado };
 
-const TELAS_VISITANTE = ['/', '/nfts/nft-01', '/login', '/cadastro'];
-const TELAS_COM_SESSAO = ['/carrinho', '/pagamento', '/perfil', '/carteiras'];
+const TELAS: Tela[] = [
+  { rota: '/', sessao: false, estado: 'inicial' },
+  { rota: '/', sessao: false, estado: 'filtros' },
+  { rota: '/nfts/nft-01', sessao: false, estado: 'inicial' },
+  { rota: '/login', sessao: false, estado: 'inicial' },
+  { rota: '/cadastro', sessao: false, estado: 'inicial' },
+  { rota: '/carrinho', sessao: true, estado: 'inicial' },
+  { rota: '/pagamento', sessao: true, estado: 'inicial' },
+  { rota: '/pagamento', sessao: true, estado: 'folha-pagamento' },
+  { rota: '/pagamento', sessao: true, estado: 'revisao' },
+  { rota: '/perfil', sessao: true, estado: 'inicial' },
+  { rota: '/carteiras', sessao: true, estado: 'inicial' },
+];
 
 const ITENS_CARRINHO = [
   ['nft-01', 'nft-01-1-50', 2],
@@ -49,13 +59,6 @@ async function prepararSessao(pagina: Page) {
   await pagina.evaluate((valor) => localStorage.setItem('kurio:token', valor), token);
 }
 
-async function abrirTela(pagina: Page, rota: string) {
-  await pagina.goto(rota);
-  await aguardarSimulacao(pagina);
-  await expect(pagina.locator('[aria-busy="true"]')).toHaveCount(0);
-  await pagina.evaluate(esperarFontesEAnimacoes);
-}
-
 async function esperarFontesEAnimacoes() {
   await document.fonts.ready;
   const animacoesFinitas = document
@@ -65,52 +68,102 @@ async function esperarFontesEAnimacoes() {
   await new Promise((pronto) => requestAnimationFrame(() => requestAnimationFrame(pronto)));
 }
 
-// ====================================================================
-// 3. AUDITORIA POR LARGURA
-// Cada tela é medida no topo e no fim da rolagem. Os problemas de todas
-// as larguras saem juntos na falha, para a correção ser feita de uma vez.
-// ====================================================================
-async function auditarTela(pagina: Page, rota: string, larguras: number[]) {
-  const achados: string[] = [];
+async function rolarAteOFim() {
+  const folha = document.querySelector('[role="dialog"]');
+  const rolavel = folha ?? document.scrollingElement;
+  if (!rolavel) {
+    return true;
+  }
+  rolavel.scrollTo({ top: rolavel.scrollHeight, behavior: 'instant' });
+  await new Promise((pronto) => requestAnimationFrame(() => requestAnimationFrame(pronto)));
+  const noFim = rolavel.scrollTop + rolavel.clientHeight >= rolavel.scrollHeight - 1;
+  return noFim;
+}
 
-  for (const largura of larguras) {
-    await pagina.setViewportSize({ width: largura, height: largura < 768 ? 852 : 900 });
-    await abrirTela(pagina, rota);
-    const noTopo = await pagina.evaluate(auditarLayout);
+// ====================================================================
+// 3. ESTADOS QUE SÓ APARECEM COM CLIQUE
+// Filtros e a folha de dados do pagamento existem só abaixo de 1024 px;
+// a revisão do pedido, em todas as larguras. Retorna falso quando o
+// estado não se aplica à largura.
+// ====================================================================
+async function abrirRevisao(pagina: Page, desktop: boolean) {
+  await pagina.getByRole('button', { name: 'Confirmar compra' }).click();
+  if (!desktop) {
+    await expect(pagina.getByRole('dialog')).toBeVisible();
+  }
+  await pagina.getByLabel('Código de indicação').fill('AMIGO10');
+  const continuar = desktop ? 'Confirmar compra' : 'Continuar';
+  await pagina.getByRole('button', { name: continuar, exact: true }).click();
+  await expect(pagina.getByTestId('revisao-pedido')).toBeVisible();
+}
 
-    await pagina.evaluate(() => window.scrollTo({ top: 1e6, behavior: 'instant' }));
+async function abrirEstado(pagina: Page, estado: Estado) {
+  const desktop = (pagina.viewportSize()?.width ?? 0) >= 1024;
+
+  if (estado === 'inicial') {
+    return true;
+  }
+  if (estado === 'revisao') {
+    await abrirRevisao(pagina, desktop);
     await pagina.evaluate(esperarFontesEAnimacoes);
-    const noFim = await pagina.evaluate(auditarFimDaPagina);
-
-    for (const problema of new Set([...noTopo, ...noFim])) {
-      achados.push(`${largura}px ${problema}`);
-    }
+    return true;
   }
-
-  return achados;
+  if (desktop) {
+    return false;
+  }
+  if (estado === 'filtros') {
+    await pagina.getByRole('button', { name: 'Abrir filtros' }).click();
+  }
+  if (estado === 'folha-pagamento') {
+    await pagina.getByRole('button', { name: 'Confirmar compra' }).click();
+  }
+  await expect(pagina.getByRole('dialog')).toBeVisible();
+  await pagina.evaluate(esperarFontesEAnimacoes);
+  return true;
 }
 
-function largurasDoProjeto(nomeProjeto: string) {
-  return nomeProjeto.includes('iphone') ? LARGURAS_IPHONE : LARGURAS_CHROMIUM;
+// ====================================================================
+// 4. AUDITORIA DE UMA TELA
+// Mede no topo e no fim da rolagem. Com folha aberta, rola a própria
+// folha até o fim, onde ficam os botões de ação. A rolagem se repete até
+// o fim de verdade, pois a página ainda cresce enquanto os dados chegam.
+// ====================================================================
+async function auditarTela(pagina: Page, tela: Tela) {
+  if (tela.sessao) {
+    await prepararSessao(pagina);
+  }
+  await pagina.goto(tela.rota);
+  await aguardarSimulacao(pagina);
+  await expect(pagina.locator('[aria-busy="true"]')).toHaveCount(0);
+  await expect(
+    pagina.locator('main, [role="dialog"]').filter({ visible: true }).first(),
+  ).toBeVisible();
+  await expect(pagina.getByText(/Algo deu errado|Página não encontrada/)).toHaveCount(0);
+  await pagina.evaluate(esperarFontesEAnimacoes);
+
+  const aplicavel = await abrirEstado(pagina, tela.estado);
+  if (!aplicavel) {
+    return [];
+  }
+
+  const noTopo = await pagina.evaluate(auditarLayout);
+  await expect.poll(() => pagina.evaluate(rolarAteOFim)).toBe(true);
+  await pagina.evaluate(esperarFontesEAnimacoes);
+  const noFimDaFolha = await pagina.evaluate(auditarLayout);
+  const noFim = await pagina.evaluate(auditarFimDaPagina);
+
+  return [...new Set([...noTopo, ...noFimDaFolha, ...noFim])];
 }
 
-test.describe('responsividade sem corte nem sobreposição', () => {
-  test.describe.configure({ timeout: 180_000 });
+function nomeDoTeste(tela: Tela) {
+  const sufixo = tela.estado === 'inicial' ? '' : ` (${tela.estado})`;
+  return `${tela.rota}${sufixo}`;
+}
 
-  for (const rota of TELAS_VISITANTE) {
-    test(`visitante ${rota}`, async ({ page }, info) => {
-      const achados = await auditarTela(page, rota, largurasDoProjeto(info.project.name));
+for (const tela of TELAS) {
+  test(nomeDoTeste(tela), async ({ page }) => {
+    const achados = await auditarTela(page, tela);
 
-      expect(achados, achados.join('\n')).toEqual([]);
-    });
-  }
-
-  for (const rota of TELAS_COM_SESSAO) {
-    test(`com sessão ${rota}`, async ({ page }, info) => {
-      await prepararSessao(page);
-      const achados = await auditarTela(page, rota, largurasDoProjeto(info.project.name));
-
-      expect(achados, achados.join('\n')).toEqual([]);
-    });
-  }
-});
+    expect(achados, achados.join('\n')).toEqual([]);
+  });
+}

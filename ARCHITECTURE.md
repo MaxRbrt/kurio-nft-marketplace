@@ -215,24 +215,29 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 
 ### Larguras sem frame
 
-Os frames têm 1440 px no desktop e 414 px no mobile, com medidas fixas. Nas larguras intermediárias, as medidas do frame viram teto: o layout é igual ao frame na largura dele e se adapta abaixo, sem cortar texto nem sobrepor elementos. O teste `tests/responsivo/telas.spec.ts` confere oito telas de 320 a 1440 px no Chromium e em 375, 393 e 430 px no WebKit, com o perfil do iPhone 15, e falha com texto cortado, sobreposto, fora da tela ou atrás da barra inferior.
+Os frames têm 1440 px no desktop e 414 px no mobile, com medidas fixas. Nas larguras intermediárias, as medidas do frame viram teto: o layout é igual ao frame na largura dele e se adapta abaixo, sem cortar texto nem sobrepor elementos. O teste `tests/responsivo/telas.spec.ts` confere dez telas e estados (inclusive filtros e a folha do pagamento abertos) em 28 perfis de aparelho do Playwright, de 320 a 984 px, e em desktop de 1024 x 768, 1280 x 800 e 1440 x 900; iPhone e iPad rodam no WebKit. Ele falha com texto cortado, sobreposto, colado na borda ou fora da tela, controle espremido, diálogo que não cabe na tela ou conteúdo atrás da barra inferior.
 
-| Tela                          | Largura           | Adaptação                                                                                                                |
-| ----------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Perfil, Carteiras e Pagamento | todas             | O seletor do sufixo ENS tem 78 px no mínimo, como no frame, e cresce para caber ".kurio.eth" sem a seta encobrir o texto |
-| Carteiras                     | abaixo de 1024 px | Texto de exemplo "ENS ou carteira (opcional)"; o rótulo completo continua para leitores de tela                          |
-| Carrinho, mobile              | abaixo de 414 px  | Texto de exemplo do cupom "Código promocional"; rótulo longo do resumo quebra linha sem invadir a de baixo               |
-| Carrinho, mobile              | abaixo de 375 px  | A quantidade desce para uma linha própria no cartão; nome longo quebra linha em vez de ser cortado                       |
-| Compra, mobile                | abaixo de 414 px  | Título do cabeçalho quebra em duas linhas dentro dos 44 px, em vez de sair da tela                                       |
-| Pagamento, mobile             | todas             | Marcador da opção de carteira preso a 16 px da borda direita, a mesma posição do frame em 414 px                         |
-| Início, mobile                | abaixo de 338 px  | Título do destaque diminui com a tela para não encostar na arte                                                          |
-| Início, mobile                | abaixo de 360 px  | As abas rolam, com a borda direita esmaecida para indicar que há mais                                                    |
-| Início                        | todas             | Nome do NFT quebra linha em vez de ser cortado                                                                           |
-| Início, mobile                | todas             | Paginação centrada; o frame mobile termina antes dela                                                                    |
-| Início, desktop               | 1024 px           | Arte das promoções encolhe para não entrar na coluna do texto                                                            |
-| Detalhe, mobile               | abaixo de 375 px  | A descrição curta pode ocupar mais de três linhas sem invadir "Edição"                                                   |
-| Detalhe, mobile               | abaixo de 414 px  | Nome do NFT que quebra linha usa entrelinha de 24 px, para as linhas não se tocarem                                      |
-| Login e Cadastro              | abaixo de 1200 px | O fundo decorativo fica centrado e recortado nas laterais, sem rolagem lateral                                           |
+| Tela                          | Largura                    | Adaptação                                                                                                                        |
+| ----------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Perfil, Carteiras e Pagamento | todas                      | O seletor do sufixo ENS tem 78 px no mínimo, como no frame, e cresce para caber ".kurio.eth" sem a seta encobrir o texto         |
+| Carteiras                     | abaixo de 1024 px          | Texto de exemplo "ENS ou carteira (opcional)"; o rótulo completo continua para leitores de tela                                  |
+| Carrinho, mobile              | abaixo de 414 px           | Texto de exemplo do cupom "Código promocional"; rótulo longo do resumo quebra linha sem invadir a de baixo                       |
+| Carrinho, mobile              | abaixo de 375 px           | A quantidade desce para uma linha própria no cartão; nome longo quebra linha em vez de ser cortado                               |
+| Compra, mobile                | abaixo de 414 px           | Título do cabeçalho quebra em duas linhas dentro dos 44 px, em vez de sair da tela                                               |
+| Pagamento, mobile             | todas                      | Marcador da opção de carteira preso a 16 px da borda direita, a mesma posição do frame em 414 px                                 |
+| Início, mobile                | abaixo de 338 px           | Título do destaque diminui com a tela para não encostar na arte                                                                  |
+| Início, mobile                | abaixo de 360 px           | As abas rolam, com a borda direita esmaecida para indicar que há mais                                                            |
+| Início                        | todas                      | Nome do NFT quebra linha em vez de ser cortado                                                                                   |
+| Início, mobile                | todas                      | Paginação centrada; o frame mobile termina antes dela                                                                            |
+| Início, desktop               | 1024 px                    | Arte das promoções encolhe para não entrar na coluna do texto                                                                    |
+| Detalhe, mobile               | abaixo de 375 px           | A descrição curta pode ocupar mais de três linhas sem invadir "Edição"                                                           |
+| Detalhe, mobile               | abaixo de 414 px           | Nome do NFT que quebra linha usa entrelinha de 24 px, para as linhas não se tocarem                                              |
+| Login e Cadastro              | abaixo de 1200 px          | O fundo decorativo fica centrado e recortado nas laterais, sem rolagem lateral                                                   |
+| Login e Cadastro              | abaixo de 900 px de altura | O modal limita a altura à tela e rola por dentro; em 900 px fica igual ao frame                                                  |
+| Detalhe                       | todas                      | A pílula da nota parte dos 80 px do frame e cresce com o texto, sem encostar na borda                                            |
+| Pagamento, mobile             | todas                      | Os campos da folha não encolhem para caber: a folha rola e o botão "Continuar" mantém 60 px                                      |
+| Pagamento, mobile             | abaixo de 1024 px          | Texto de exemplo "ENS ou carteira (opcional)" na folha, como em Carteiras; "Trocar carteira" não encolhe e o título quebra linha |
+| Início, mobile                | todas                      | Folha de filtros com 320 px, limitada à largura da tela                                                                          |
 
 ### Pontos do arquivo verificados e mantidos
 
