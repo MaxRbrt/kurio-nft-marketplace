@@ -7,6 +7,8 @@ import { ImagemNft } from './imagem-nft';
 // Dois cartões de 586 x 250 do frame, com os recuos do primeiro: no frame
 // o segundo difere de 4 a 9 px, desvio documentado no ARCHITECTURE.md.
 // A arte mantém o corte de cada cartão. O botão leva à grade do catálogo.
+// Em cartão mais estreito que o frame (1024 px), a arte encolhe para não
+// entrar na coluna do texto: 263 px de texto, 30 de recuo e 4 de folga.
 // ====================================================================
 const PROMOCOES = [
   {
@@ -24,6 +26,12 @@ const PROMOCOES = [
     esquerda: 2,
   },
 ];
+
+const COLUNA_DO_TEXTO = 297;
+
+function larguraDaArte({ largura, esquerda }: { largura: number; esquerda: number }) {
+  return `min(${largura}px, calc(100% - ${COLUNA_DO_TEXTO + esquerda}px))`;
+}
 
 export function Promocoes() {
   return (
@@ -44,7 +52,7 @@ export function Promocoes() {
             height={250}
             alt=""
             loading="lazy"
-            style={{ left: promocao.esquerda, width: promocao.largura }}
+            style={{ left: promocao.esquerda, width: larguraDaArte(promocao) }}
             className="absolute top-0 h-[250px] rounded-[18px] object-cover"
           />
           <div

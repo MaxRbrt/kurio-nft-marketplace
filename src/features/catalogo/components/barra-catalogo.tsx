@@ -25,7 +25,8 @@ const LARGURA_ABA: Record<Aba, string> = {
 // Barra acima da grade. A aba ativa usa a cor e o traço do frame e é
 // anunciada por aria-current, sem depender só da cor. Larguras e vãos são
 // os do frame: 110, 143, 59 no mobile, com ativa em negrito; 118, 154, 64
-// no desktop, todas em peso médio.
+// no desktop, todas em peso médio. Abaixo de 360 px as abas não cabem:
+// a faixa rola, com a borda direita esmaecida para indicar que há mais.
 // ====================================================================
 export function AbasCatalogo({ className = '' }: { className?: string }) {
   const { busca, alterarFiltros } = useFiltrosCatalogo();
@@ -34,7 +35,7 @@ export function AbasCatalogo({ className = '' }: { className?: string }) {
 
   return (
     <ul
-      className={`flex w-full gap-[clamp(4px,calc((100%-312px)/2),16px)] text-sm leading-4 [scrollbar-width:none] max-lg:-mb-1 max-lg:overflow-x-auto max-lg:pb-1 lg:w-auto lg:gap-5 lg:text-[15px] lg:font-medium ${className}`}
+      className={`flex w-full gap-[clamp(4px,calc((100%-312px)/2),16px)] text-sm leading-4 [scrollbar-width:none] max-lg:-mb-1 max-lg:overflow-x-auto max-lg:pb-1 max-[359px]:pr-8 max-[359px]:[mask-image:linear-gradient(to_right,black_80%,transparent)] lg:w-auto lg:gap-5 lg:text-[15px] lg:font-medium ${className}`}
     >
       {abas.map((aba) => (
         <li key={aba}>

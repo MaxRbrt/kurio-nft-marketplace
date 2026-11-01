@@ -494,7 +494,7 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
             </span>
           </p>
         </div>
-        <p className="mt-3 h-[71px] text-sm leading-6 text-muted-foreground">
+        <p className="mt-3 min-h-[71px] text-sm leading-6 text-muted-foreground">
           {nft.descricaoCurta}
         </p>
         <div className="mt-3">
