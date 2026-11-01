@@ -59,7 +59,7 @@ export function CampoRotulado({
 }
 
 const CLASSE_ENTRADA =
-  'h-10 w-full rounded-[3px] border border-border bg-transparent px-3 text-sm leading-[15px] text-foreground outline-none placeholder:text-secundaria focus-visible:border-primary aria-invalid:border-texto-coral';
+  'h-10 w-full rounded-[3px] border border-border bg-transparent px-3 text-sm leading-[15px] text-foreground outline-none placeholder:text-secundaria focus-visible:border-primary aria-invalid:border-texto-coral max-lg:placeholder:text-[13px]';
 
 type PropsEntrada = ComponentProps<'input'> & { erro?: string };
 
@@ -156,7 +156,7 @@ export function Seletor<Campos extends FieldValues>({
             aria-invalid={Boolean(erro)}
             aria-describedby={erro ? `${id}-erro` : undefined}
             className={cn(
-              'relative !h-10 rounded-[3px] border-border bg-transparent pl-3 text-sm leading-[15px] text-foreground shadow-none data-placeholder:text-secundaria dark:bg-transparent [&>svg:last-child]:hidden',
+              'relative !h-10 rounded-[3px] border-border bg-transparent pl-3 aria-invalid:border-texto-coral aria-invalid:ring-0 dark:aria-invalid:border-texto-coral dark:aria-invalid:ring-0 text-sm leading-[15px] text-foreground shadow-none data-placeholder:text-secundaria dark:bg-transparent [&>svg:last-child]:hidden',
               classeCaixa,
             )}
           >

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { useSyncExternalStore } from 'react';
 import {
   Dialog,
@@ -53,6 +53,7 @@ function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo)
     <Link
       to={destino === 'login' ? '/login' : '/cadastro'}
       search={busca}
+      replace
       aria-current={modo === destino ? 'page' : undefined}
       className={cn(
         'text-xl leading-4 font-medium',
@@ -138,11 +139,11 @@ function TelaMobile({ modo, busca, aoConcluir }: PropsConteudo) {
       </div>
       <p className="mt-10 text-center text-[15px] leading-5 text-muted-foreground">
         {modo === 'login' ? (
-          <Link to="/cadastro" search={busca}>
+          <Link to="/cadastro" search={busca} replace>
             Novo na Kurio? Crie uma conta
           </Link>
         ) : (
-          <Link to="/login" search={busca}>
+          <Link to="/login" search={busca} replace>
             Já tem uma conta? Entre
           </Link>
         )}
@@ -160,9 +161,18 @@ type PropsConteudo = {
 
 export function PaginaAutenticacao({ modo, busca }: { modo: Modo; busca: BuscaAutenticacao }) {
   const navigate = useNavigate();
+  const router = useRouter();
   const desktop = useTelaDesktop();
   const aoConcluir = () => void navigate({ to: busca.redirect ?? '/' });
-  const aoFechar = () => void navigate({ to: '/' });
+  const aoFechar = () => {
+    if (router.history.canGoBack()) {
+      router.history.back();
+
+      return;
+    }
+
+    void navigate({ to: '/' });
+  };
   const propriedades = { modo, busca, aoConcluir, aoFechar };
 
   if (!desktop) {

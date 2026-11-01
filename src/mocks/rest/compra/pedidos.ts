@@ -141,6 +141,7 @@ export const handlersPedidos = [
       desconto: cotacao.desconto,
       taxaRede: cotacao.taxaRede,
       total: cotacao.total,
+      cupom: cotacao.cupom,
       rede: entrada.dados.rede,
       carteira: { endereco: carteira.endereco, tipo: carteira.tipo },
       criadoEm: new Date().toISOString(),

@@ -137,3 +137,12 @@ html {
     scroll-behavior: auto;
   }
 }
+
+/* Preenchimento automático do navegador: sem o fundo azul, fora da paleta. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--foreground);
+  caret-color: var(--foreground);
+  transition: background-color 9999s ease-out 0s;
+}

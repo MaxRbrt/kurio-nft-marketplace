@@ -56,6 +56,7 @@ const pedidoBaseSchema = z.object({
   desconto: valorEthSchema,
   taxaRede: valorEthSchema,
   total: valorEthSchema,
+  cupom: z.string().nullable().default(null),
   rede: redeSchema,
   carteira: z.object({ endereco: z.string(), tipo: tipoCarteiraSchema }),
   criadoEm: dataIsoSchema,

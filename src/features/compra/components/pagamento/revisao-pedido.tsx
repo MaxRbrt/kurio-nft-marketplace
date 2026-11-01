@@ -53,6 +53,7 @@ export function RevisaoPedido({
   aoConfirmar,
 }: PropsRevisao) {
   const mensagemErro = mensagemDoErro(erroEnvio);
+  const enderecoCurto = `${dados.endereco.slice(0, 6)}…${dados.endereco.slice(-4)}`;
   const rede = REDES.find(({ valor }) => valor === dados.rede)?.rotulo;
   const carteira = TIPOS_CARTEIRA.find(({ valor }) => valor === dados.tipo)?.rotulo;
   const podeConfirmar = Boolean(cotacao) && !valoresMudaram && !atualizando && !enviando;
@@ -61,6 +62,7 @@ export function RevisaoPedido({
     <Dialog open={aberta} onOpenChange={(abrir) => !abrir && !enviando && aoFechar()}>
       <DialogContent
         data-testid="revisao-pedido"
+        classeFundo="bg-black/60"
         onCloseAutoFocus={(evento) => {
           evento.preventDefault();
           document.getElementById('confirmar-compra')?.focus();
@@ -71,14 +73,15 @@ export function RevisaoPedido({
           Revise sua compra
         </DialogTitle>
         <DialogDescription className="mt-2 text-sm leading-5 text-muted-foreground">
-          Carteira {carteira}, rede {rede}. Confira os valores antes de confirmar.
+          Carteira {carteira}, rede {rede}, endereço {enderecoCurto}. Confira os valores antes de
+          confirmar.
         </DialogDescription>
 
         <ul className="mt-4 flex flex-col gap-2 border-t border-primary pt-4">
           {cotacao?.itens.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-3 text-sm leading-5">
               <span className="min-w-0 truncate">
-                {item.nome} (x {item.quantidade})
+                {item.nome}, edição {item.rotuloEdicao} (x {item.quantidade})
               </span>
               <span className="font-bold whitespace-nowrap text-texto-destaque">
                 {formatarEth(item.subtotal)}

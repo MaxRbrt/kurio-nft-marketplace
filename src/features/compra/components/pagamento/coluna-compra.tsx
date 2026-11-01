@@ -131,9 +131,11 @@ export function ColunaCompra({ resumo, estado, confirmar, aviso, ocupado }: Prop
               className="size-[70px] rounded-lg object-cover"
             />
             <div className="ml-2 min-w-0">
-              <p className="truncate text-base leading-4 font-bold">{item.nome}</p>
+              <p className="line-clamp-2 text-base leading-4 font-bold">{item.nome}</p>
               <p className="mt-1.5 truncate text-sm leading-4 text-secundaria">
-                ID do token: {item.tokenId}
+                {dados.itens.filter(({ nftId }) => nftId === item.nftId).length > 1
+                  ? `Edição: ${item.rotuloEdicao}`
+                  : `ID do token: ${item.tokenId}`}
               </p>
             </div>
             <span className="text-sm leading-4 whitespace-nowrap text-muted-foreground">
@@ -152,6 +154,7 @@ export function ColunaCompra({ resumo, estado, confirmar, aviso, ocupado }: Prop
           <CampoCupom
             resumo={resumo}
             sufixo="pagamento"
+            focarAoAbrir={cupomAberto}
             classes={{
               caixa:
                 'flex h-10 items-center rounded-[3px] border border-primary pl-2 focus-within:outline-2 focus-within:outline-ring',

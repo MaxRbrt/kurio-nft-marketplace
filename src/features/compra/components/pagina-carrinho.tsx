@@ -74,7 +74,7 @@ export function PaginaCarrinho({ cupom }: { cupom?: string }) {
     [navigate],
   );
   const resumo = useResumoCompra({ cupom, habilitada: temItens, trocarCupom });
-  const focarConteudo = () => conteudo.current?.focus();
+  const focarConteudo = () => conteudo.current?.focus({ preventScroll: true });
 
   if (carrinho.isError) {
     return (
