@@ -30,15 +30,15 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
   return (
     <li data-testid="cartao-nft" className="group relative">
       <Link to="/nfts/$nftId" params={{ nftId: nft.id }} className="block">
-        <div className="relative flex h-[200px] items-center justify-center rounded-[20px] bg-linear-to-b from-card to-muted group-focus-within:lg:border-t group-hover:lg:border-t lg:h-[300px] lg:rounded-none lg:border-primary lg:bg-card lg:bg-none">
+        <div className="relative flex h-[200px] min-[480px]:max-lg:h-auto min-[480px]:max-lg:py-4 items-center justify-center rounded-[20px] bg-linear-to-b from-card to-muted group-focus-within:lg:border-t group-hover:lg:border-t lg:h-[300px] lg:rounded-none lg:border-primary lg:bg-card lg:bg-none">
           <ImagemNft
             url={nft.imagem.url}
-            sizes="(min-width: 1024px) 250px, 168px"
+            sizes="(min-width: 1024px) 250px, (min-width: 480px) 45vw, 168px"
             width={250}
             height={250}
             alt={nft.imagem.alt}
             loading={prioridade ? 'eager' : 'lazy'}
-            className="size-[168px] rounded-2xl object-cover lg:size-[250px] lg:rounded-[15px]"
+            className="size-[168px] rounded-2xl object-cover min-[480px]:max-lg:aspect-square min-[480px]:max-lg:size-auto min-[480px]:max-lg:w-[calc(100%-7px)] lg:size-[250px] lg:rounded-[15px]"
           />
           {nft.raro && (
             <span className="absolute top-4 left-0 flex h-8 w-[68px] items-center bg-primary pl-2 lg:hidden text-[13px] leading-4 font-medium text-primary-foreground lg:top-3.5 lg:h-[29px] lg:w-20 lg:text-base">
@@ -48,7 +48,7 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
         </div>
         <h3
           data-testid="cartao-nome"
-          className="mt-2 truncate pl-2 text-[15px] leading-5 lg:mt-3 lg:pl-0 lg:text-base lg:leading-4"
+          className="mt-2 line-clamp-2 pl-2 text-[15px] leading-5 lg:mt-3 lg:line-clamp-none lg:truncate lg:pl-0 lg:text-base lg:leading-4"
         >
           {nft.nome}
         </h3>
@@ -128,7 +128,7 @@ function GradeEsqueleto() {
     >
       {Array.from({ length: TAMANHO_PAGINA_LAYOUT }, (_, indice) => (
         <li key={indice}>
-          <div className="esqueleto h-[200px] rounded-[20px] lg:h-[300px] lg:rounded-none" />
+          <div className="esqueleto h-[200px] rounded-[20px] min-[480px]:max-lg:aspect-[175/200] min-[480px]:max-lg:h-auto lg:h-[300px] lg:rounded-none" />
           <div className="esqueleto mt-2 h-5 w-3/4 lg:mt-3 lg:h-4" />
           <div className="esqueleto mt-1.5 h-4 w-1/3" />
         </li>
@@ -146,7 +146,7 @@ function Paginacao({ pagina, totalPaginas }: { pagina: number; totalPaginas: num
   }
 
   return (
-    <nav aria-label="Paginação" className="mt-[94px] flex justify-end gap-2">
+    <nav aria-label="Paginação" className="mt-16 flex justify-end gap-2 lg:mt-[94px]">
       {paginas.map((numero) => (
         <button
           key={numero}

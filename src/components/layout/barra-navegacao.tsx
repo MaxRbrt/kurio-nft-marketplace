@@ -7,7 +7,8 @@ const CLASSE_AREA = 'absolute top-[57%] size-11 -translate-x-1/2 -translate-y-1/
 // 1. BARRA INFERIOR DO MOBILE
 // Desenho exportado do frame Mobile / Início, sem alteração. As áreas
 // clicáveis ficam sobre cada ícone, em porcentagem da largura, para
-// acompanhar a escala do desenho em telas menores que 414 px.
+// acompanhar a escala do desenho em telas menores que 414 px. Em telas
+// maiores, faixas laterais completam a barra até as bordas.
 // ====================================================================
 export function BarraNavegacao() {
   const { pathname } = useLocation();
@@ -25,6 +26,14 @@ export function BarraNavegacao() {
       data-testid="barra-navegacao"
       className="fixed inset-x-0 bottom-0 z-40 lg:hidden"
     >
+      <div
+        aria-hidden
+        className="absolute bottom-0 left-0 hidden h-[95px] w-[calc(50%-207px)] bg-card min-[415px]:block"
+      />
+      <div
+        aria-hidden
+        className="absolute right-0 bottom-0 hidden h-[95px] w-[calc(50%-207px)] bg-card min-[415px]:block"
+      />
       <div className="relative mx-auto w-full max-w-[414px]">
         <svg viewBox="0 0 414 135" className="block h-auto w-full" fill="none" aria-hidden>
           <path

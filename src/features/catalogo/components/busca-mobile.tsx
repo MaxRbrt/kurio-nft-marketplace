@@ -36,7 +36,7 @@ export function BuscaMobile() {
         <SheetContent className="w-[320px] overflow-y-auto bg-card p-0">
           <SheetTitle className="px-5 pt-5 text-lg font-bold">Filtros</SheetTitle>
           <div className="px-5 pt-4">
-            <OrdemCatalogo />
+            <OrdemCatalogo empilhado />
           </div>
           <PainelFiltros />
         </SheetContent>

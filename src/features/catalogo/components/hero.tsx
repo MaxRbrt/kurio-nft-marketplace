@@ -75,7 +75,7 @@ export function Hero() {
           <p className="mt-1.5 text-lg leading-[29px] font-bold whitespace-pre-line">
             {'SEJA DONO DA\nCULTURA DIGITAL'}
           </p>
-          <p className="mt-1.5 w-[188px] text-xs leading-[18px] text-muted-foreground">
+          <p className="mt-1.5 w-[min(188px,calc(100%-98px))] text-xs leading-[18px] text-muted-foreground">
             Descubra NFTs selecionados de criadores do mundo todo.
           </p>
           <a
@@ -92,7 +92,7 @@ export function Hero() {
           width={138}
           height={138}
           alt=""
-          className="absolute top-[10.5px] right-4 size-[138px] rounded-2xl object-cover"
+          className="absolute top-[10.5px] right-4 aspect-square w-[clamp(90px,calc(100%-228px),138px)] rounded-2xl object-cover"
         />
         <PontosCarrossel className="absolute bottom-[5.5px] left-1/2 -translate-x-1/2 gap-1.5 [&>span]:size-[7px]" />
       </section>
