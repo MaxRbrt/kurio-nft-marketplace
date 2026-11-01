@@ -437,7 +437,9 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
 // ====================================================================
 // 6. TELA DO MOBILE
 // Medidas do frame Mobile / Detalhes: imagem, painel sobreposto e barra
-// de compra fixa no rodapé da tela, sem a barra de navegação.
+// de compra fixa no rodapé da tela, sem a barra de navegação. Abaixo
+// dos 414 px do frame o nome pode quebrar linha: a entrelinha sobe de
+// 16 para 24 px para as linhas não se tocarem.
 // ====================================================================
 function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
   const { favorito, alternar } = useFavorito(nft.id);
@@ -482,8 +484,8 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
         data-testid="detalhe-painel"
         className="relative z-10 -mt-[114px] min-h-[504px] rounded-t-[31px] bg-card px-6 pt-8 pb-[176px]"
       >
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl leading-4 font-bold">{nft.nome}</h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-xl leading-4 font-bold max-[413px]:leading-6">{nft.nome}</h1>
           <p className="relative mr-[2.42px] h-[27px] w-[80.16px] shrink-0 rounded-[32px] border border-primary text-sm leading-4">
             <IconeEstrelaPequena className="absolute top-[5px] left-[4.58px] text-ambar" />
             <span className="absolute top-[5px] left-[22.58px] font-medium">
