@@ -315,3 +315,62 @@ for (const largura of [390, 768, 1024, 1440]) {
     expect(excesso).toBeLessThanOrEqual(0);
   });
 }
+
+// ====================================================================
+// RÓTULOS DE EDIÇÃO E AVISO DE LIMITE
+// Nenhum rótulo estoura a pílula selecionada, e o aviso não encosta
+// nos botões vizinhos.
+// ====================================================================
+test.describe('edição selecionada', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  for (const rotulo of ['1/1', '1/10', '1/50', 'ABERTA']) {
+    test(`rótulo ${rotulo} cabe na pílula selecionada`, async ({ page }) => {
+      await page.goto('/nfts/nft-01');
+      const pilula = page.getByRole('button', { name: rotulo, exact: true }).first();
+
+      await pilula.click();
+      await expect(pilula).toHaveAttribute('aria-pressed', 'true');
+
+      const cabe = await pilula.evaluate((elemento) => {
+        const faixa = document.createRange();
+
+        faixa.selectNodeContents(elemento);
+
+        return faixa.getBoundingClientRect().width <= elemento.clientWidth;
+      });
+
+      expect(cabe).toBe(true);
+    });
+  }
+
+  test('aviso de limite fica no vão, afastado da quantidade e dos botões', async ({ page }) => {
+    await page.goto('/nfts/nft-01');
+    await page.getByRole('button', { name: '1/1', exact: true }).first().click();
+    const aviso = page.getByTestId('aviso-estoque').first();
+
+    await expect(aviso).toHaveText('Limite disponível atingido');
+
+    const faixa = await aviso.evaluate((elemento) => {
+      const intervalo = document.createRange();
+
+      intervalo.selectNodeContents(elemento);
+      const texto = intervalo.getBoundingClientRect();
+
+      return {
+        esquerda: texto.left,
+        direita: texto.right,
+        linhas: intervalo.getClientRects().length,
+      };
+    });
+    const mais = await page
+      .getByRole('button', { name: 'Aumentar quantidade' })
+      .first()
+      .boundingBox();
+    const comprar = await page.getByRole('button', { name: 'COMPRAR', exact: true }).boundingBox();
+
+    expect(faixa.linhas).toBe(1);
+    expect(faixa.esquerda - ((mais?.x ?? 0) + (mais?.width ?? 0))).toBeGreaterThanOrEqual(8);
+    expect((comprar?.x ?? 0) - faixa.direita).toBeGreaterThanOrEqual(8);
+  });
+});
