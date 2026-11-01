@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { chamarApi } from '../apoio/api';
+import { ANA, chamarApi, entrar } from '../apoio/api';
 
 // ====================================================================
 // 1. MEDIDAS DO FIGMA
@@ -231,4 +231,94 @@ test('abertura some quando a aplicação monta', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
   await expect(page.locator('.abertura')).toHaveCount(0);
+});
+
+// ====================================================================
+// FRAMES: DIVISÓRIA DO CABEÇALHO E FUNDO DO LOGIN
+// A divisória só aparece nas telas cujo frame a desenha. O fundo do login
+// segue o frame também com barra de rolagem real, que o navegador de
+// teste esconde por padrão: arte 405 px e título 305 px antes do modal.
+// ====================================================================
+test.describe('frames do desktop', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  for (const caminho of ['/nfts/nft-01', '/carrinho']) {
+    test(`${caminho} sem divisória no cabeçalho, como no frame`, async ({ page }) => {
+      await page.goto(caminho);
+      await expect(page.getByTestId('cabecalho-logo')).toBeVisible();
+      await expect(page.getByTestId('cabecalho-divisoria')).toHaveCount(0);
+    });
+  }
+
+  test('/pagamento sem divisória no cabeçalho, como no frame', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('socket-estado').waitFor({ state: 'attached' });
+
+    const token = await entrar(page, ANA);
+
+    await chamarApi(
+      page,
+      'POST',
+      '/api/carrinho/itens',
+      { nftId: 'nft-01', edicaoId: 'nft-01-1-50', quantidade: 1 },
+      token,
+    );
+    await page.evaluate((valor) => localStorage.setItem('kurio:token', valor), token);
+    await page.goto('/pagamento');
+
+    await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeVisible();
+    await expect(page.getByTestId('cabecalho-logo')).toBeVisible();
+    await expect(page.getByTestId('cabecalho-divisoria')).toHaveCount(0);
+  });
+
+  test('início com divisória no cabeçalho, como no frame', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('cabecalho-divisoria')).toBeVisible();
+  });
+
+  test('fundo do login alinhado ao modal com barra de rolagem real', async ({
+    playwright,
+    baseURL,
+  }) => {
+    const navegador = await playwright.chromium.launch({
+      ignoreDefaultArgs: ['--hide-scrollbars'],
+    });
+    const pagina = await navegador.newPage({ viewport: { width: 1440, height: 900 } });
+
+    await pagina.goto(`${baseURL}/login`);
+
+    const modal = pagina.getByTestId('modal-autenticacao');
+
+    await expect(modal).toBeVisible();
+    await modal.evaluate((elemento) =>
+      Promise.all(elemento.getAnimations().map(({ finished }) => finished)),
+    );
+
+    const medidas = await pagina.evaluate(() => {
+      const caixaModal = document
+        .querySelector('[data-testid=modal-autenticacao]')
+        ?.getBoundingClientRect();
+      const arte = [...document.querySelectorAll('img')]
+        .map((imagem) => imagem.getBoundingClientRect())
+        .find((caixa) => Math.round(caixa.width) === 450);
+      const titulo = [...document.querySelectorAll('*')]
+        .find(
+          (elemento) =>
+            elemento.children.length === 0 && elemento.textContent?.includes('SEJA DONO DO FUTURO'),
+        )
+        ?.getBoundingClientRect();
+
+      return {
+        barra: getComputedStyle(document.body).getPropertyValue('--removed-body-scroll-bar-size'),
+        arte: (arte?.x ?? 0) - (caixaModal?.x ?? 0),
+        titulo: (titulo?.x ?? 0) - (caixaModal?.x ?? 0),
+      };
+    });
+
+    await navegador.close();
+
+    expect(parseFloat(medidas.barra)).toBeGreaterThan(0);
+    expect(Math.abs(medidas.arte - 405)).toBeLessThanOrEqual(0.5);
+    expect(Math.abs(medidas.titulo + 305)).toBeLessThanOrEqual(0.5);
+  });
 });

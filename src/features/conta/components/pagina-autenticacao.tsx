@@ -75,7 +75,7 @@ function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo)
         }}
         data-testid="modal-autenticacao"
         className={cn(
-          'block w-[500px] max-w-[500px] translate-y-0 gap-0 rounded-none bg-card p-0 ring-0 sm:max-w-[500px]',
+          'left-[calc(50%-var(--removed-body-scroll-bar-size,0px)/2)] block w-[500px] max-w-[500px] translate-y-0 gap-0 rounded-none bg-card p-0 ring-0 sm:max-w-[500px]',
           'overflow-y-auto',
           modo === 'login'
             ? 'top-[160px] max-h-[calc(100dvh-176px)] min-h-[min(600px,calc(100dvh-176px))]'

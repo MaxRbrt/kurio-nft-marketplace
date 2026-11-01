@@ -14,7 +14,8 @@ const LINKS_INDISPONIVEIS = [
 // ====================================================================
 // 1. CABEÇALHO
 // Frame Desktop / Início: 1200 x 45. A divisória de 0,3 px rende na
-// última linha, a 25%, sem ocupar altura; a aba ativa cobre as três
+// última linha, a 25%, sem ocupar altura, e só aparece nas telas cujo frame
+// a desenha: Detalhe, Carrinho e Pagamento não têm. A aba ativa cobre as três
 // últimas linhas. O menu fica 7 px abaixo do frame, centrado com o logo
 // e os botões (ver ARCHITECTURE.md). A contagem do carrinho soma as
 // quantidades da API.
@@ -36,7 +37,13 @@ export function Cabecalho() {
   return (
     <header className="mx-auto mt-6 hidden w-full max-w-[1200px] px-4 lg:block xl:px-0">
       <div className="relative flex h-[45px] items-start justify-between">
-        <div aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-primary/25" />
+        {!mercadoAtivo && (
+          <div
+            aria-hidden
+            data-testid="cabecalho-divisoria"
+            className="absolute inset-x-0 bottom-0 h-px bg-primary/25"
+          />
+        )}
         <Link
           to="/"
           data-testid="cabecalho-logo"
