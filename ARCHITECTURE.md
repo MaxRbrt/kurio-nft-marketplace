@@ -231,6 +231,7 @@ Os frames têm 1440 px no desktop e 414 px no mobile, com medidas fixas. Nas lar
 | Início, mobile                | todas             | Paginação centrada; o frame mobile termina antes dela                                                                    |
 | Início, desktop               | 1024 px           | Arte das promoções encolhe para não entrar na coluna do texto                                                            |
 | Detalhe, mobile               | abaixo de 375 px  | A descrição curta pode ocupar mais de três linhas sem invadir "Edição"                                                   |
+| Detalhe, mobile               | abaixo de 414 px  | Nome do NFT que quebra linha usa entrelinha de 24 px, para as linhas não se tocarem                                      |
 | Login e Cadastro              | abaixo de 1200 px | O fundo decorativo fica centrado e recortado nas laterais, sem rolagem lateral                                           |
 
 ### Pontos do arquivo verificados e mantidos
