@@ -139,13 +139,15 @@ Processamento de cada evento (`lib/tempo-real/processador.ts`), sempre nesta ord
 
 Banco em memória salvo em `localStorage` (`kurio:banco:v3`), validado ao carregar. Ao mudar a forma dos dados, a versão da chave sobe. `resetar` restaura tudo. Toda alteração de NFT passa por uma função central, que muda o dado, sobe a versão, salva e publica o evento. Cenários são determinísticos, sem `Math.random`. O painel (`?painel=1`) usa as mesmas rotas de controle e não toca em estado da interface.
 
+O navegador desliga o service worker quando a aba fica parada, e o worker do MSW guarda só em memória as páginas ativas. Ao religar, ele não reconhece a página, e as chamadas iriam para a rede. Por isso, em `src/mocks/manter-ativos.ts`, cada chamada do Axios espera o worker confirmar o registro da página. Voltar à aba e interagir também registram, o que cobre o painel de cenários, que usa `fetch` direto. Uma resposta com corpo que não é JSON vira falha transitória, e a consulta tenta de novo.
+
 O cookie store do MSW usa o `tough-cookie`, que pede o domínio registrável ao `tldts`, com a lista mundial de sufixos. Como a API simulada autentica por Bearer e não grava cookies, `vite.config.ts` troca esse pacote por `src/mocks/dominio-registravel.ts`, que usa os dois últimos rótulos do domínio.
 
 ## Lighthouse
 
 Mediana de 3 medições por página e perfil em [`lighthouse/relatorios/resumo.md`](lighthouse/relatorios/resumo.md).
 
-**As quatro metas são atingidas nas duas páginas e nos dois perfis, no modo padrão do Lighthouse, que simula rede e CPU.** Performance fica em 92 nas duas páginas no mobile, variando de 91 a 93 entre execuções, e em 99 no desktop. Accessibility, Best Practices e SEO ficam em 100. No mobile, LCP de cerca de 3,3 s, CLS 0,000 e TBT abaixo de 70 ms.
+**As quatro metas são atingidas nas duas páginas e nos dois perfis, no modo padrão do Lighthouse, que simula rede e CPU.** Performance fica em 92 nas duas páginas no mobile, variando de 91 a 93 entre execuções, e em 99 no desktop. Accessibility, Best Practices e SEO ficam em 100. No mobile, LCP de cerca de 3,2 s, CLS 0,000 e TBT de até 103 ms.
 
 A nota mobile começou em 84. Causas encontradas nos relatórios e corrigidas, medindo a cada passo:
 
@@ -165,7 +167,7 @@ Limites que continuam:
 - O LCP mobile segue acima dos 2,5 s recomendados. O pacote do MSW precisa subir antes da aplicação, para a primeira requisição já ser interceptada e o `socket.io-client` capturar o WebSocket certo. É um custo da demonstração: com um backend real, esse pacote não existe.
 - O relatório ainda aponta cerca de 290 ms de CSS bloqueando a renderização e 32 KiB de JavaScript sem uso no pacote dos mocks.
 - Testado e descartado: pré-carregar os pacotes com `modulepreload` piorou a nota de 84 para 81.
-- A nota depende da máquina e do modo de medir. Tudo abaixo vale para `localhost`, em um PC de 16 núcleos. No modo padrão, mobile 92. Com rede e CPU limitadas de verdade (`throttlingMethod: 'devtools'`), mobile 75 (início) e 82 (detalhe), com LCP de cerca de 4,1 s e TBT de 394 e 206 ms. Com todos os núcleos ocupados por outra carga, o modo padrão cai para 60 e 58. O resultado em uma máquina mais lenta pode ficar abaixo da meta.
+- A nota depende da máquina e do modo de medir. Tudo abaixo vale para `localhost`, em um PC de 16 núcleos. No modo padrão, mobile 92. Com rede e CPU limitadas de verdade (`throttlingMethod: 'devtools'`), mobile 72 (início) e 82 (detalhe), com LCP de 4,4 e 4,1 s e TBT de 444 e 187 ms. Com a máquina ocupada por outra carga, o modo padrão cai para 60 e 58, e a limitação real, para cerca de 50 a 60. O resultado em uma máquina mais lenta pode ficar abaixo da meta.
 - Depois que o service worker do MSW assume, os arquivos da aplicação aparecem com 0 KB nos relatórios, então a simulação não conta o peso deles.
 
 Já feito antes: divisão por rota, imagens WebP com `srcset`, pré-carregamento da imagem principal, fonte local e dimensões reservadas para evitar deslocamento.
@@ -199,7 +201,7 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 | Tela                     | O que o frame mostra                                                                            | O que a aplicação faz                                                                                     | Motivo                                                            |
 | ------------------------ | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | Início, desktop          | Cartão da 3ª linha, ao centro, sem nome e sem preço                                             | Todo cartão mostra nome e preço                                                                           | Sem nome e preço o cartão não informa o que é vendido             |
-| Início, mobile           | Só o primeiro cartão tem o botão de favorito; nos outros ele fica escondido atrás do cartão     | Todo cartão tem favorito                                                                                  | O favorito é uma função do catálogo, não um enfeite de um cartão  |
+| Início, mobile           | Só o primeiro cartão tem o botão de favorito; nos outros ele fica escondido atrás do cartão     | Todo cartão tem favorito, alinhado ao topo da arte, como no 1º cartão                                     | O favorito é uma função do catálogo, não um enfeite de um cartão  |
 | Início, mobile           | A 2ª linha repete "Emerald Ape #042" e "Sage Nomad #009" com outras artes                       | Cada cartão mostra o próprio NFT                                                                          | Repetir o nome com outra arte seria dado falso                    |
 | Detalhe, mobile          | Edições "1/10, 1/10, 1/50, ABERTA"                                                              | Edições "1/1, 1/10, 1/50, ABERTA", como no desktop                                                        | Rótulo repetido faria comprar uma edição achando que é outra      |
 | Início, desktop          | Seta de "Ordenar por" desenhada sobre as últimas letras de "recentemente"                       | Seta logo depois do valor, com o grupo alinhado à direita da grade                                        | Texto encoberto parece defeito                                    |
@@ -364,7 +366,7 @@ As quatro artes dos NFTs vêm do arquivo do Figma, convertidas para WebP em 320,
 
 ### Reproduzidos como estão no frame
 
-- O fundo atrás do modal de Login e Cadastro no desktop é uma composição própria do frame, diferente da Início. Ele é reproduzido a partir dos nós do frame, como elemento decorativo, inerte e fora da árvore acessível. A única mudança é o "Ordenar por", recuado 30 px para o texto não ser cortado nem ficar sob a seta.
+- O fundo atrás do modal de Login e Cadastro no desktop é uma composição própria do frame, diferente da Início. Ele é reproduzido a partir dos nós do frame, como elemento decorativo, inerte e fora da árvore acessível. Diferenças: o "Ordenar por" fica recuado 30 px, para o texto não ser cortado nem ficar sob a seta; a descrição fica em uma linha; e a coluna da direita é recortada 5 px na borda dos 1200 px.
 - A Início desktop não mostra o selo RARO; os frames de Login e o mobile mostram, e cada tela segue o seu frame.
 - Textos e rótulos ficam como desenhados, inclusive "Contrato" e "Direitos autorais" trocados no Detalhe.
 - Violet Nomad aparece com o token #0009 no Carrinho e #0314 no Pagamento. Um NFT tem um token só, e a aplicação usa #0314 nas duas telas.
@@ -379,7 +381,7 @@ As quatro artes dos NFTs vêm do arquivo do Figma, convertidas para WebP em 320,
 
 ### Fundo do login com barra de rolagem
 
-Ao abrir o modal, a barra de rolagem some e a página reserva o espaço dela, o que afastava o fundo 7,5 px do modal no Windows. O modal desconta metade dessa reserva, para manter a posição do frame: arte 405 px e título 305 px em relação à borda esquerda do modal.
+Ao abrir o modal, a barra de rolagem some e a página reserva o espaço dela, o que afastava o fundo 7,5 px do modal no Windows. O modal desconta metade dessa reserva, para manter a posição do frame: arte 405 px depois da borda esquerda do modal e título 305 px antes dela. Modal e fundo arredondam o centro para o pixel inteiro, pois em meio pixel o texto borra.
 
 ### Ajustes de acessibilidade
 
