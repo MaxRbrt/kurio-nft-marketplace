@@ -439,7 +439,8 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
 // Medidas do frame Mobile / Detalhes: imagem, painel sobreposto e barra
 // de compra fixa no rodapé da tela, sem a barra de navegação. Abaixo
 // dos 414 px do frame o nome pode quebrar linha: a entrelinha sobe de
-// 16 para 24 px para as linhas não se tocarem.
+// 16 para 24 px para as linhas não se tocarem. A pílula da nota parte
+// dos 80 px do frame e cresce com o texto, sem encostar na borda.
 // ====================================================================
 function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
   const { favorito, alternar } = useFavorito(nft.id);
@@ -486,14 +487,10 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
       >
         <div className="flex items-center justify-between gap-3">
           <h1 className="text-xl leading-4 font-bold max-[413px]:leading-6">{nft.nome}</h1>
-          <p className="relative mr-[2.42px] h-[27px] w-[80.16px] shrink-0 rounded-[32px] border border-primary text-sm leading-4">
-            <IconeEstrelaPequena className="absolute top-[5px] left-[4.58px] text-ambar" />
-            <span className="absolute top-[5px] left-[22.58px] font-medium">
-              {nft.avaliacoes.nota}
-            </span>
-            <span className="absolute top-[5px] left-[47.58px] text-muted-foreground">
-              ({nft.avaliacoes.total})
-            </span>
+          <p className="mr-[2.42px] flex h-[27px] min-w-[80.16px] shrink-0 items-start rounded-[32px] border border-primary pt-1 pr-1.5 pl-[3.58px] text-sm leading-4">
+            <IconeEstrelaPequena className="mr-1 shrink-0 text-ambar" />
+            <span className="font-medium">{nft.avaliacoes.nota}</span>
+            <span className="text-muted-foreground">({nft.avaliacoes.total})</span>
           </p>
         </div>
         <p className="mt-3 min-h-[71px] text-sm leading-6 text-muted-foreground">

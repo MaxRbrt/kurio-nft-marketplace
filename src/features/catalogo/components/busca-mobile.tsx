@@ -14,7 +14,7 @@ export function BuscaMobile() {
 
   return (
     <div className="mx-6 mt-10 flex h-[45px] gap-2 lg:hidden">
-      <label className="flex flex-1 items-center gap-2 rounded-[10px] bg-card px-3">
+      <label className="flex flex-1 items-center gap-2 rounded-[10px] bg-card px-3 has-focus-visible:outline-2 has-focus-visible:outline-ring">
         <IconeBuscaMobile className="shrink-0 text-secundaria" />
         <span className="sr-only">Buscar NFTs</span>
         <input
@@ -33,7 +33,7 @@ export function BuscaMobile() {
         >
           <IconeFiltro />
         </SheetTrigger>
-        <SheetContent className="w-[320px] overflow-y-auto bg-card p-0">
+        <SheetContent className="w-[min(320px,100vw)] overflow-y-auto bg-card p-0">
           <SheetTitle className="px-5 pt-5 text-lg font-bold">Filtros</SheetTitle>
           <div className="px-5 pt-4">
             <OrdemCatalogo empilhado />
