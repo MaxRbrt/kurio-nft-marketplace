@@ -56,8 +56,10 @@ type PropsPagamento = { cupom?: string; perfil: Perfil; carteiras: Carteira[] };
 // ====================================================================
 // 2. FLUXO DO PAGAMENTO
 // Confirmar valida o formulário, garante a carteira conectada e abre a
-// revisão com cotação recém-buscada. Só a revisão envia. Tentativa aberta
-// é retomada ao entrar, sem criar outra compra.
+// revisão com cotação recém-buscada. Só a revisão envia, e confere a
+// conexão de novo: a carteira pode ter sido trocada ou desconectada com a
+// revisão aberta. Tentativa aberta é retomada ao entrar, sem criar outra
+// compra.
 // ====================================================================
 function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
   const navigate = useNavigate({ from: '/pagamento' });
@@ -135,6 +137,13 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
 
   function enviarPedido(dados: FormularioPagamento) {
     if (!cotacaoAtual || !estado.carteira) {
+      return;
+    }
+
+    if (!estado.conexao.conectada) {
+      setRevisando(false);
+      setPediuConexao(true);
+
       return;
     }
 

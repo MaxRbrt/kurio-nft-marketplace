@@ -97,7 +97,11 @@ function CampoAvatar({ perfil }: { perfil: Perfil }) {
       return;
     }
 
-    envio.mutate(await lerArquivo(arquivo));
+    try {
+      envio.mutate(await lerArquivo(arquivo));
+    } catch {
+      toast.error('Não foi possível ler a imagem.');
+    }
   }
 
   return (

@@ -6,11 +6,13 @@ import { useCampoBusca } from '../usar-campo-busca';
 // 1. BUSCA DO CABEÇALHO
 // O frame desktop só desenha o ícone. O campo abre abaixo dele, no
 // padrão do campo mobile, e leva à tela inicial com a busca na URL.
+// Esc fecha e devolve o foco ao ícone.
 // ====================================================================
 export function BuscaDesktop() {
   const { texto, alterarTexto } = useCampoBusca();
   const [aberta, setAberta] = useState(false);
   const campo = useRef<HTMLInputElement>(null);
+  const botao = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (aberta) {
@@ -21,6 +23,7 @@ export function BuscaDesktop() {
   return (
     <div className="relative size-5">
       <button
+        ref={botao}
         type="button"
         aria-label="Buscar"
         aria-expanded={aberta}
@@ -30,7 +33,7 @@ export function BuscaDesktop() {
         <IconeBusca />
       </button>
       {aberta && (
-        <div className="absolute top-8 right-0 z-30 w-[313px] rounded-[10px] bg-card px-3 py-3">
+        <div className="absolute top-8 right-0 z-30 w-[313px] rounded-[10px] bg-card px-3 py-3 has-focus-visible:outline-2 has-focus-visible:outline-ring">
           <label htmlFor="busca-desktop" className="sr-only">
             Buscar NFTs
           </label>
@@ -44,6 +47,7 @@ export function BuscaDesktop() {
             onKeyDown={(evento) => {
               if (evento.key === 'Escape') {
                 setAberta(false);
+                botao.current?.focus();
               }
             }}
             className="w-full bg-transparent text-sm leading-4 font-bold outline-none placeholder:text-secundaria"

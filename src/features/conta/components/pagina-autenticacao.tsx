@@ -47,6 +47,7 @@ const TEXTOS: Record<Modo, { titulo: string; subtitulo: string }> = {
 // Nos frames, login e cadastro são abas de um modal sobre a tela inicial.
 // O foco entra no próprio diálogo, sem destacar campo que o frame não
 // destaca. Radix prende o foco e fecha com Esc; a rota segue própria.
+// Em tela mais baixa que o frame, o modal cabe na tela e rola por dentro.
 // ====================================================================
 function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo) {
   const aba = (destino: Modo, rotulo: string) => (
@@ -75,7 +76,10 @@ function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo)
         data-testid="modal-autenticacao"
         className={cn(
           'block w-[500px] max-w-[500px] translate-y-0 gap-0 rounded-none bg-card p-0 ring-0 sm:max-w-[500px]',
-          modo === 'login' ? 'top-[160px] min-h-[600px]' : 'top-[158px] min-h-[656px] rounded-lg',
+          'overflow-y-auto',
+          modo === 'login'
+            ? 'top-[160px] max-h-[calc(100dvh-176px)] min-h-[min(600px,calc(100dvh-176px))]'
+            : 'top-[158px] max-h-[calc(100dvh-174px)] min-h-[min(656px,calc(100dvh-174px))] rounded-lg',
         )}
       >
         <DialogClose

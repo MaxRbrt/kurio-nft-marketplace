@@ -1,5 +1,10 @@
 import { CampoRotulado, Entrada, Seletor } from '@/components/formulario/campos-formulario';
-import { OPCOES_SUFIXO_ENS } from '@/features/conta/ens';
+import {
+  DICA_CARTEIRA_SECUNDARIA,
+  DICA_CARTEIRA_SECUNDARIA_CURTA,
+  OPCOES_SUFIXO_ENS,
+} from '@/features/conta/ens';
+import { useTelaDesktop } from '@/lib/usar-tela-desktop';
 import { cn } from '@/lib/utils';
 import {
   REDES,
@@ -15,6 +20,7 @@ import {
 // leitura, pois o pedido usa a carteira da API.
 // ====================================================================
 export function FormularioColecionador({ estado }: { estado: EstadoPagamento }) {
+  const telaDesktop = useTelaDesktop();
   const {
     register,
     formState: { errors },
@@ -86,14 +92,10 @@ export function FormularioColecionador({ estado }: { estado: EstadoPagamento }) 
             {...register('endereco')}
           />
         </CampoRotulado>
-        <CampoRotulado
-          id="pagamento-secundaria"
-          rotulo="ENS ou carteira secundária (opcional)"
-          rotuloOculto
-        >
+        <CampoRotulado id="pagamento-secundaria" rotulo={DICA_CARTEIRA_SECUNDARIA} rotuloOculto>
           <Entrada
             id="pagamento-secundaria"
-            placeholder="ENS ou carteira secundária (opcional)"
+            placeholder={telaDesktop ? DICA_CARTEIRA_SECUNDARIA : DICA_CARTEIRA_SECUNDARIA_CURTA}
             {...register('carteiraSecundaria')}
           />
         </CampoRotulado>
@@ -176,7 +178,7 @@ export function FormularioColecionador({ estado }: { estado: EstadoPagamento }) 
         </label>
         <textarea
           id="pagamento-observacao"
-          className="mt-3 block h-[152px] w-full max-w-[350px] resize-none rounded-[3px] border border-border bg-transparent p-3 text-sm outline-none focus-visible:border-primary"
+          className="mt-3 block h-[152px] w-full resize-none lg:max-w-[350px] rounded-[3px] border border-border bg-transparent p-3 text-sm outline-none focus-visible:border-primary"
           {...register('observacao')}
         />
       </div>

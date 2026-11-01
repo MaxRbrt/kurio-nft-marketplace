@@ -130,13 +130,13 @@ export function PagamentoMobile({
     <main className="mx-auto flex min-h-dvh max-w-[414px] flex-col px-7 pt-8 pb-8">
       <CabecalhoMobile titulo="Pagamento com carteira" recuo="left-[59px]" voltarPara="/carrinho" />
 
-      <div className="mt-4 flex h-4 items-center justify-between">
+      <div className="mt-4 flex min-h-4 items-start justify-between gap-3">
         <h2 className="text-base leading-4 font-bold">Carteira conectada</h2>
         <button
           type="button"
           disabled={!estado.outraCarteira}
           onClick={() => estado.outraCarteira && estado.escolherTipo(estado.outraCarteira.tipo)}
-          className="text-sm leading-4 font-bold text-texto-destaque disabled:opacity-50"
+          className="shrink-0 text-sm leading-4 font-bold text-texto-destaque disabled:opacity-50"
         >
           Trocar carteira
         </button>

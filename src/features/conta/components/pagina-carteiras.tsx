@@ -15,7 +15,13 @@ import { ErroApi } from '@/lib/api/erros';
 import { useTelaDesktop } from '@/lib/usar-tela-desktop';
 import { cn } from '@/lib/utils';
 import { atualizarCarteira, criarCarteira, listarCarteiras } from '../api/carteiras';
-import { OPCOES_SUFIXO_ENS, separarEns, SUFIXOS_ENS } from '../ens';
+import {
+  DICA_CARTEIRA_SECUNDARIA,
+  DICA_CARTEIRA_SECUNDARIA_CURTA,
+  OPCOES_SUFIXO_ENS,
+  separarEns,
+  SUFIXOS_ENS,
+} from '../ens';
 import { useSessao } from '../usar-sessao';
 import { LayoutConta } from './layout-conta';
 
@@ -32,8 +38,6 @@ const TIPOS = [
 const obrigatorio = (mensagem: string) => z.string().trim().min(1, mensagem);
 const SETA_CHEIA = 'right-2 size-[18px] text-secundaria';
 const ESPACO_ROTULO = 'mb-[-4px]';
-const DICA_SECUNDARIA = 'ENS ou carteira secundária (opcional)';
-const DICA_SECUNDARIA_CURTA = 'ENS ou carteira (opcional)';
 
 // ====================================================================
 // 1. VALIDAÇÃO
@@ -210,13 +214,13 @@ function FormularioDeCarteira({ papel, carteira, valoresIniciais }: PropsFormula
         </CampoRotulado>
         <CampoRotulado
           id={`${prefixo}-secundaria`}
-          rotulo={DICA_SECUNDARIA}
+          rotulo={DICA_CARTEIRA_SECUNDARIA}
           rotuloOculto
           classeRotulo={ESPACO_ROTULO}
         >
           <Entrada
             id={`${prefixo}-secundaria`}
-            placeholder={telaDesktop ? DICA_SECUNDARIA : DICA_SECUNDARIA_CURTA}
+            placeholder={telaDesktop ? DICA_CARTEIRA_SECUNDARIA : DICA_CARTEIRA_SECUNDARIA_CURTA}
             {...register('carteiraSecundaria')}
           />
         </CampoRotulado>

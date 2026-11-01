@@ -99,16 +99,16 @@ Entre como Ana, adicione um NFT ao carrinho e vá ao pagamento. Use o painel (`?
 
 ## Testes
 
-Cobrem os 12 itens do enunciado, em Chromium, nos viewports desktop e mobile. A responsividade roda também no WebKit, com o perfil do iPhone 15, que reproduz o Safari:
+Cobrem os 12 itens do enunciado, em Chromium, nos viewports desktop e mobile. A responsividade roda em 28 perfis de aparelho do Playwright (os mesmos do modo responsivo do DevTools: celulares, tablets e dobráveis de 320 a 984 px) e em desktop de 1024 x 768, 1280 x 800 e 1440 x 900. iPhone e iPad rodam no WebKit, que reproduz o Safari. A lista fica em `tests/responsivo/aparelhos.ts`:
 
-| Pasta              | Conteúdo                                                                          |
-| ------------------ | --------------------------------------------------------------------------------- |
-| `tests/interface`  | Fluxos pela interface: catálogo, detalhe, conta, carrinho, compra, acessibilidade |
-| `tests/visual`     | Regressão visual de início, detalhe, carrinho e pagamento                         |
-| `tests/responsivo` | Oito telas de 320 a 1440 px sem texto cortado, sobreposto ou fora da tela         |
-| `tests/mocks`      | Contratos da API simulada, idempotência e cenários                                |
-| `tests/tempo-real` | Socket.IO: eventos, reconexão e heartbeat                                         |
-| `tests/contratos`  | Schemas zod                                                                       |
+| Pasta              | Conteúdo                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tests/interface`  | Fluxos pela interface: catálogo, detalhe, conta, carrinho, compra, acessibilidade                                                                 |
+| `tests/visual`     | Regressão visual de início, detalhe, carrinho e pagamento                                                                                         |
+| `tests/responsivo` | Dez telas e estados por aparelho: sem texto cortado, sobreposto, colado na borda ou fora da tela, sem controle espremido nem diálogo que não cabe |
+| `tests/mocks`      | Contratos da API simulada, idempotência e cenários                                                                                                |
+| `tests/tempo-real` | Socket.IO: eventos, reconexão e heartbeat                                                                                                         |
+| `tests/contratos`  | Schemas zod                                                                                                                                       |
 
 ## Lighthouse
 

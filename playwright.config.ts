@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import { PROJETOS_RESPONSIVOS } from './tests/responsivo/aparelhos';
 
 /**
  * Read environment variables from file.
@@ -36,13 +37,10 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: /responsivo\//,
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'iphone-15-webkit',
-      testMatch: /responsivo\/.*\.spec\.ts/,
-      use: { ...devices['iPhone 15'] },
-    },
+    ...PROJETOS_RESPONSIVOS,
 
     // {
     //   name: 'firefox',

@@ -61,45 +61,85 @@ export const ORDEM_DOS_CAMPOS: Array<keyof FormularioPagamento> = [
   'email',
 ];
 
-const rascunhoSchema = formularioPagamentoSchema.partial();
+const textoDoRascunho = z.string().optional().catch(undefined);
+const rascunhoSchema = z.object({
+  nomeExibicao: textoDoRascunho,
+  nomeUsuario: textoDoRascunho,
+  rede: formularioPagamentoSchema.shape.rede.optional().catch(undefined),
+  nomePerfil: textoDoRascunho,
+  endereco: textoDoRascunho,
+  carteiraSecundaria: textoDoRascunho,
+  tipo: formularioPagamentoSchema.shape.tipo.optional().catch(undefined),
+  codigoIndicacao: textoDoRascunho,
+  email: textoDoRascunho,
+  sufixoEns: formularioPagamentoSchema.shape.sufixoEns.optional().catch(undefined),
+  observacao: textoDoRascunho,
+});
 const chaveRascunho = (usuarioId: string) => `kurio:rascunho-pagamento:${usuarioId}`;
 
 // ====================================================================
 // 2. RASCUNHO DO FORMULÁRIO
 // Em sessionStorage, para sessão expirada ou refresh não apagarem o que
-// foi digitado. Não contém senha, e morre junto com a aba.
+// foi digitado. Não contém senha, e morre junto com a aba. Cada campo é
+// lido por si: valor ainda incompleto volta como foi digitado, e campo
+// estranho é ignorado sem perder os outros. Storage indisponível ou
+// corrompido só desliga o rascunho, sem derrubar a tela.
 // ====================================================================
-function lerRascunho(usuarioId: string) {
-  const leitura = rascunhoSchema.safeParse(
-    JSON.parse(sessionStorage.getItem(chaveRascunho(usuarioId)) ?? '{}'),
-  );
+function lerRascunho(usuarioId: string): Partial<FormularioPagamento> {
+  try {
+    const salvo = sessionStorage.getItem(chaveRascunho(usuarioId));
+    const leitura = rascunhoSchema.safeParse(JSON.parse(salvo ?? '{}'));
+    const campos = leitura.success ? Object.entries(leitura.data) : [];
 
-  return leitura.success ? leitura.data : {};
+    return Object.fromEntries(campos.filter(([, valor]) => valor !== undefined));
+  } catch {
+    return {};
+  }
 }
 
+function guardarRascunho(usuarioId: string, valores: Partial<FormularioPagamento>) {
+  try {
+    sessionStorage.setItem(chaveRascunho(usuarioId), JSON.stringify(valores));
+  } catch {
+    return;
+  }
+}
+
+// ====================================================================
+// 3. VALORES INICIAIS
+// Dados do perfil e da carteira principal, cobertos pelo rascunho. O
+// endereço de carteira já cadastrada vem sempre da API: o pedido usa a
+// carteira pelo id, e a tela não pode mostrar um endereço antigo.
+// ====================================================================
 function valoresIniciais(
   usuarioId: string,
   perfil: Perfil,
-  carteira: Carteira | undefined,
+  carteiras: Carteira[],
 ): Partial<FormularioPagamento> {
+  const principal = carteiras.find((carteira) => carteira.papel === 'principal') ?? carteiras[0];
+  const rascunho = lerRascunho(usuarioId);
+  const tipoEscolhido = rascunho.tipo ?? principal?.tipo;
+  const cadastrada = carteiras.find((carteira) => carteira.tipo === tipoEscolhido);
+
   return {
     nomeExibicao: perfil.nomeExibicao,
     nomeUsuario: perfil.nomeUsuario,
     email: perfil.email,
-    nomePerfil: carteira?.nomePerfil ?? '',
-    codigoIndicacao: carteira?.codigoIndicacao ?? '',
+    nomePerfil: principal?.nomePerfil ?? '',
+    codigoIndicacao: principal?.codigoIndicacao ?? '',
     carteiraSecundaria: '',
     observacao: '',
     sufixoEns: '.eth',
-    rede: carteira?.rede,
-    tipo: carteira?.tipo,
-    endereco: carteira?.endereco ?? '',
-    ...lerRascunho(usuarioId),
+    rede: principal?.rede,
+    tipo: principal?.tipo,
+    endereco: principal?.endereco ?? '',
+    ...rascunho,
+    ...(cadastrada && { endereco: cadastrada.endereco }),
   };
 }
 
 // ====================================================================
-// 3. DADOS DA TELA
+// 4. DADOS DA TELA
 // Perfil e carteiras chegam antes do formulário: os valores iniciais vêm
 // deles. A chave leva o usuário, e nada vaza entre contas.
 // ====================================================================
@@ -117,8 +157,10 @@ export function useDadosPagamento() {
   return { perfil, carteiras };
 }
 
+class ErroConexaoNova extends Error {}
+
 // ====================================================================
-// 4. CONEXÃO SIMULADA
+// 5. CONEXÃO SIMULADA
 // A cada carteira escolhida, tenta conectar pela API. O estado vem só da
 // resposta: recusa fica visível e pode ser repetida, e finalizar exige
 // carteira conectada.
@@ -152,7 +194,7 @@ function useConexaoCarteira(carteiraId: string | undefined) {
 }
 
 // ====================================================================
-// 5. FORMULÁRIO E CARTEIRA
+// 6. FORMULÁRIO E CARTEIRA
 // O tipo escolhido define a carteira: nas opções, no select e em "usar
 // outra" é o mesmo estado. Tipo sem carteira cadastrada: o endereço fica
 // editável, e a carteira é cadastrada na API ao prosseguir.
@@ -160,10 +202,9 @@ function useConexaoCarteira(carteiraId: string | undefined) {
 export function useFormularioPagamento(perfil: Perfil, carteiras: Carteira[]) {
   const clienteConsultas = useQueryClient();
   const usuarioId = useSessao()?.usuario.id ?? '';
-  const principal = carteiras.find((carteira) => carteira.papel === 'principal') ?? carteiras[0];
   const formulario = useForm<FormularioPagamento>({
     resolver: zodResolver(formularioPagamentoSchema),
-    defaultValues: valoresIniciais(usuarioId, perfil, principal),
+    defaultValues: valoresIniciais(usuarioId, perfil, carteiras),
     shouldFocusError: false,
   });
   const { control, setValue, getValues, subscribe } = formulario;
@@ -176,7 +217,7 @@ export function useFormularioPagamento(perfil: Perfil, carteiras: Carteira[]) {
     return subscribe({
       formState: { values: true },
       callback: ({ values }) => {
-        sessionStorage.setItem(chaveRascunho(usuarioId), JSON.stringify(values));
+        guardarRascunho(usuarioId, values);
       },
     });
   }, [subscribe, usuarioId]);
@@ -202,9 +243,11 @@ export function useFormularioPagamento(perfil: Perfil, carteiras: Carteira[]) {
   });
 
   // ==================================================================
-  // 6. CARTEIRA DO PEDIDO
+  // 7. CARTEIRA DO PEDIDO
   // Devolve a carteira a usar. Papel livre: a primeira vira principal. Com
   // os dois papéis ocupados, o conflito da API aparece para o usuário.
+  // Carteira nova é conectada antes de seguir, como as já cadastradas:
+  // recusa interrompe e avisa.
   // ==================================================================
   async function garantirCarteira(): Promise<{ carteira: Carteira } | { erro: string }> {
     if (carteira) {
@@ -229,8 +272,18 @@ export function useFormularioPagamento(perfil: Perfil, carteiras: Carteira[]) {
         nomeEns: dados.nomeUsuario,
       });
 
+      await conectarCarteira(criada.id).catch(() => {
+        throw new ErroConexaoNova();
+      });
+
       return { carteira: criada };
     } catch (erro) {
+      if (erro instanceof ErroConexaoNova) {
+        return {
+          erro: 'Carteira cadastrada, mas a conexão foi recusada. Conecte e tente de novo.',
+        };
+      }
+
       const campos = erro instanceof ErroApi ? Object.values(erro.campos) : [];
 
       return { erro: campos[0] ?? 'Não foi possível cadastrar a carteira.' };

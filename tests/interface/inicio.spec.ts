@@ -193,6 +193,25 @@ test.describe('estados', () => {
     await expect(nomes(page).first()).toHaveText('Emerald Ape #042');
   });
 
+  test('evento de preço durante a primeira carga não trava a grade', async ({ page }) => {
+    await page.goto('/?cenario=lento');
+    await page.getByTestId('socket-estado').waitFor({ state: 'attached' });
+    await chamarApi(page, 'POST', '/api/__mock/nfts/nft-01', { preco: '9.99' });
+
+    await expect(nomes(page).first()).toHaveText('Emerald Ape #042', { timeout: 10_000 });
+    await expect(page.getByTestId('cartao-preco').first()).toHaveText('9.99 ETH');
+  });
+
+  test('evento de preço reaplica o filtro: NFT acima do teto sai da grade', async ({ page }) => {
+    await page.goto('/?precoMaximo=%225%22');
+    await page.getByTestId('socket-estado').waitFor({ state: 'attached' });
+    await expect(nomes(page).first()).toHaveText('Emerald Ape #042');
+
+    await chamarApi(page, 'POST', '/api/__mock/nfts/nft-01', { preco: '9.99' });
+
+    await expect(nomes(page).filter({ hasText: 'Emerald Ape #042' })).toHaveCount(0);
+  });
+
   test('faixa de preço começa como no Figma', async ({ page }) => {
     await expect(page.getByText('Preço: 0,02 - 12,30 ETH')).toBeVisible();
   });
