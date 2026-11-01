@@ -37,6 +37,28 @@ test.beforeEach(async ({ page }) => {
 test.describe('desktop 1440', () => {
   test.use({ viewport: { width: 1440, height: 1000 } });
 
+  test('texto de Sair na altura do frame', async ({ page }) => {
+    await page.goto('/login');
+    await preencherLogin(page, ANA);
+    await expect(page.getByTestId('cabecalho-conta')).toBeVisible();
+    await page.goto('/perfil');
+
+    const sair = page.getByRole('button', { name: 'Sair' });
+
+    await expect(sair).toBeVisible();
+
+    const centroDoTexto = await sair.evaluate((botao) => {
+      const intervalo = document.createRange();
+
+      intervalo.selectNodeContents(botao.lastChild as Node);
+      const caixa = intervalo.getBoundingClientRect();
+
+      return caixa.top + caixa.height / 2;
+    });
+
+    expect(Math.abs(centroDoTexto - 480)).toBeLessThanOrEqual(0.5);
+  });
+
   test('modal de login nas medidas do Figma', async ({ page }) => {
     await page.goto('/login');
     await page
@@ -170,6 +192,13 @@ test.describe('login', () => {
 });
 
 test.describe('rotas privadas', () => {
+  for (const rota of ['/carteiras', '/pedidos/pedido-1']) {
+    test(`${rota} sem sessão leva ao login`, async ({ page }) => {
+      await page.goto(rota);
+      await expect(page).toHaveURL(/\/login/);
+    });
+  }
+
   test('sem sessão vai ao login e volta ao destino, inclusive após refresh', async ({ page }) => {
     await page.goto('/perfil');
     await expect(page).toHaveURL(/\/login\?redirect=%2Fperfil/);

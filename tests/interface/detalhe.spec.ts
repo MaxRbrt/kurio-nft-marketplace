@@ -30,6 +30,16 @@ test.beforeEach(async ({ page }) => {
 test.describe('desktop 1440', () => {
   test.use({ viewport: { width: 1440, height: 1000 } });
 
+  test('estrelas seguem a nota, com a última apagada como no frame', async ({ page }) => {
+    await page.goto('/nfts/nft-01');
+
+    const estrelas = page.getByTestId('detalhe-informacoes').locator('span[aria-hidden] svg');
+
+    await expect(estrelas).toHaveCount(5);
+    await expect(estrelas.nth(3)).toHaveCSS('color', 'rgb(210, 138, 76)');
+    await expect(estrelas.nth(4)).toHaveCSS('color', 'rgb(207, 178, 140)');
+  });
+
   test('acesso direto nas posições do Figma', async ({ page }) => {
     await page.goto('/nfts/nft-01');
     await expect(page.getByRole('heading', { name: 'Emerald Ape #042' })).toBeVisible();
@@ -220,13 +230,14 @@ test.describe('favoritos', () => {
       nome: 'lento',
       rota: '/api/favoritos/',
     });
+    await page.clock.install();
     await page.goto('/nfts/nft-01');
     await expect(botao(page).first()).toBeVisible();
 
     await botao(page).first().click();
     await expect(botao(page).first()).toHaveAttribute('aria-pressed', 'true', { timeout: 1_000 });
 
-    await page.waitForTimeout(2_800);
+    await page.clock.runFor(2_800);
     await page.reload();
     await expect(botao(page).first()).toHaveAttribute('aria-pressed', 'true');
 
@@ -290,6 +301,21 @@ test.describe('mobile 414', () => {
     conferir(comprar?.height, 60);
     await expect(page.getByTestId('barra-navegacao')).toHaveCount(0);
     await expect(page.getByTestId('detalhe-informacoes')).toBeHidden();
+  });
+
+  test('edição e dados do token na altura exata do frame', async ({ page }) => {
+    await page.goto('/nfts/nft-01');
+
+    const painel = page.getByTestId('detalhe-painel');
+    await expect(painel).toBeVisible();
+
+    const edicao = await painel.getByText('Edição:').boundingBox();
+    const token = await painel.getByText('ID do token:').boundingBox();
+    const atributos = await painel.getByText('Atributos:').boundingBox();
+
+    expect(edicao?.y).toBe(546);
+    expect(token?.y).toBe(610);
+    expect(atributos?.y).toBe(674);
   });
 
   test('adicionar pelo botão do carrinho e voltar', async ({ page }) => {

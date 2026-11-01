@@ -69,6 +69,7 @@ test.describe('compra no desktop', () => {
   // 2. COMPRA COMPLETA (ENUNCIADO 6)
   // ==================================================================
   test('do catálogo ao recibo confirmado, removendo só o comprado', async ({ page }) => {
+    await page.clock.setFixedTime(new Date('2026-07-29T12:00:00'));
     await prepararSessao(page, ANA, [], '/');
 
     await page.getByTestId('cartao-nome').first().click();
@@ -93,6 +94,13 @@ test.describe('compra no desktop', () => {
       'href',
       /etherscan\.io\/tx\/0x/,
     );
+    await expect(page.getByText('29 Jul, 2026')).toBeVisible();
+    await expect(page.getByText('Edições', { exact: true })).toHaveCSS('font-weight', '700');
+    await expect(page.getByText('Subtotal', { exact: true })).toHaveCSS('font-weight', '500');
+
+    const dadosDoRecibo = await page.locator('dl').first().boundingBox();
+
+    expect(dadosDoRecibo?.height).toBe(67);
 
     await page.getByRole('button', { name: 'Fechar' }).click();
     await expect(page).toHaveURL('/');

@@ -219,7 +219,8 @@ export function auditarLayout() {
     if (!regua) {
       break;
     }
-    regua.font = `${estilo.fontWeight} ${estilo.fontSize} ${estilo.fontFamily}`;
+    const fonteExemplo = getComputedStyle(campo, '::placeholder');
+    regua.font = `${fonteExemplo.fontWeight} ${fonteExemplo.fontSize} ${fonteExemplo.fontFamily}`;
     const espacamento = (parseFloat(estilo.letterSpacing) || 0) * campo.placeholder.length;
     const larguraTexto = regua.measureText(campo.placeholder).width + espacamento;
     if (larguraTexto > espacoLivre + 1) {

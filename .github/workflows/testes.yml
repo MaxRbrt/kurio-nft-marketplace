@@ -1,0 +1,56 @@
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      gerar_baselines:
+        description: Gerar e salvar as baselines visuais do Linux
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+
+      - name: Gerar baselines visuais do Linux
+        if: inputs.gerar_baselines
+        env:
+          PLAYWRIGHT_VISUAL_QUALQUER_SISTEMA: '1'
+        run: |
+          npx playwright test tests/visual --update-snapshots
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add tests/visual/regressao.spec.ts-snapshots
+          git commit -m "Adiciona as baselines visuais do Linux" || echo "Sem mudanças"
+          git push
+
+      - name: Rodar a suíte
+        if: ${{ !inputs.gerar_baselines }}
+        run: npx playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-playwright
+          path: |
+            playwright-report
+            test-results
+          retention-days: 7

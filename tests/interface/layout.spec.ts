@@ -22,6 +22,26 @@ function conferir(valor: number, esperado: number) {
 test.describe('desktop 1440', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
+  test('menu centrado com o logo e sem arcos nas promoções', async ({ page }) => {
+    await page.goto('/');
+
+    const logo = await caixa(page, 'cabecalho-logo');
+    const centroDoMenu = await page
+      .getByTestId('cabecalho-nav')
+      .getByText('Criadores')
+      .evaluate((elemento) => {
+        const intervalo = document.createRange();
+
+        intervalo.selectNodeContents(elemento);
+        const texto = intervalo.getBoundingClientRect();
+
+        return texto.top + texto.height / 2;
+      });
+
+    expect(Math.abs(centroDoMenu - (logo.y + logo.height / 2))).toBeLessThanOrEqual(1);
+    await expect(page.getByTestId('promocao').first().locator('div[aria-hidden]')).toHaveCount(0);
+  });
+
   test('cabeçalho nas posições do Figma', async ({ page }) => {
     await page.goto('/');
 
