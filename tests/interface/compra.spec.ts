@@ -320,7 +320,7 @@ test.describe('compra no desktop', () => {
     await expect(page.getByRole('button', { name: 'Conectar', exact: true })).toBeVisible();
   });
 
-  test('sem carteira: informa o endereço, cadastra e compra', async ({ page }) => {
+  test('sem carteira: informa o endereço, cadastra, conecta e compra', async ({ page }) => {
     await prepararSessao(page, BRUNO);
     await expect(page.getByTestId('pagamento-total')).toHaveText('10.736 ETH');
     await page.getByLabel('Coinbase Wallet').check({ force: true });
@@ -338,6 +338,32 @@ test.describe('compra no desktop', () => {
     await expect(page.getByTestId('revisao-pedido')).toBeVisible();
     await page.getByRole('button', { name: 'Confirmar pedido' }).click();
     await expect(page).toHaveURL(/\/pedidos\/pedido-1/);
+  });
+
+  test('sem carteira: conexão recusada da carteira nova interrompe e avisa', async ({ page }) => {
+    await prepararSessao(page, BRUNO);
+    await controlar(page, 'carteiras/recusar-conexao', { recusar: true });
+    await page.getByLabel('Coinbase Wallet').check({ force: true });
+    await page.getByRole('combobox', { name: 'Rede' }).click();
+    await page.getByRole('option', { name: 'Ethereum' }).click();
+    await page
+      .getByLabel('Endereço da carteira')
+      .fill('0x1234567890123456789012345678901234567890');
+    await preencherCodigo(page);
+    await page.getByRole('button', { name: 'Confirmar compra' }).click();
+
+    await expect(page.getByTestId('pagamento-aviso')).toContainText('conexão foi recusada');
+    await expect(page.getByTestId('revisao-pedido')).toHaveCount(0);
+  });
+
+  test('refresh mantém o que foi digitado mesmo com campo ainda inválido', async ({ page }) => {
+    await prepararSessao(page);
+    await page.getByLabel('Código de indicação').fill('AMIGO10');
+    await page.getByLabel('E-mail', { exact: true }).fill('');
+    await page.reload();
+
+    await expect(page.getByLabel('Código de indicação')).toHaveValue('AMIGO10');
+    await expect(page.getByLabel('E-mail', { exact: true })).toHaveValue('');
   });
 
   test('pedido de outro usuário não mostra dados', async ({ page }) => {
