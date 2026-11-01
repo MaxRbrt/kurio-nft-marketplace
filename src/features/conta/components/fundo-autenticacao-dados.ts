@@ -152,7 +152,7 @@ export const ELEMENTOS_FUNDO: ElementoFundo[] = [
   },
   {
     tipo: 'texto',
-    x: 911,
+    x: 881,
     y: 496,
     w: 109,
     h: 20,
@@ -166,7 +166,7 @@ export const ELEMENTOS_FUNDO: ElementoFundo[] = [
   },
   {
     tipo: 'texto',
-    x: 1021,
+    x: 991,
     y: 496,
     w: 190,
     h: 20,

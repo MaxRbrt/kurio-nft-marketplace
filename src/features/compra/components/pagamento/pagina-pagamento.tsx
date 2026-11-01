@@ -17,6 +17,7 @@ import { useResumoCompra } from '../../usar-cotacao';
 import { useEnviarPedido, useRetomadaPedido } from '../../usar-pedido';
 import {
   useDadosPagamento,
+  ORDEM_DOS_CAMPOS,
   useFormularioPagamento,
   type FormularioPagamento,
 } from '../../usar-pagamento';
@@ -25,6 +26,8 @@ import { ColunaCompra } from './coluna-compra';
 import { FormularioColecionador } from './formulario-colecionador';
 import { PagamentoMobile } from './pagamento-mobile';
 import { RevisaoPedido } from './revisao-pedido';
+
+const ESPERA_FOLHA_MS = 100;
 
 // ====================================================================
 // 1. ASSINATURA DOS VALORES
@@ -73,6 +76,7 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
   const [assinaturaRevisada, setAssinaturaRevisada] = useState<string | null>(null);
   const [folhaAberta, setFolhaAberta] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [pediuConexao, setPediuConexao] = useState(false);
   const [preparando, setPreparando] = useState(false);
   const cotacaoAtual = resumo.cotacao.data;
   const valoresMudaram =
@@ -81,6 +85,7 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
   async function prosseguir() {
     setFolhaAberta(false);
     setAviso(null);
+    setPediuConexao(false);
     setPreparando(true);
 
     const garantia = await estado.garantirCarteira();
@@ -94,7 +99,7 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
 
     if (estado.carteira && !estado.conexao.conectada) {
       setPreparando(false);
-      setAviso('Conecte a carteira para continuar.');
+      setPediuConexao(true);
 
       return;
     }
@@ -110,10 +115,22 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
     }
   }
 
-  const confirmar = estado.formulario.handleSubmit(prosseguir, () => {
-    if (!desktop) {
-      setFolhaAberta(true);
+  const confirmar = estado.formulario.handleSubmit(prosseguir, (erros) => {
+    const primeiroErro = ORDEM_DOS_CAMPOS.find((campo) => erros[campo]);
+
+    if (desktop) {
+      if (primeiroErro) {
+        estado.formulario.setFocus(primeiroErro);
+      }
+
+      return;
     }
+
+    setFolhaAberta(true);
+    window.setTimeout(
+      () => primeiroErro && estado.formulario.setFocus(primeiroErro),
+      ESPERA_FOLHA_MS,
+    );
   });
 
   function enviarPedido(dados: FormularioPagamento) {
@@ -164,6 +181,8 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
     ) : null;
   const falhaRetomada =
     retomando && envio.isError && !revisando ? 'Não foi possível retomar a compra anterior.' : null;
+  const avisoConexao =
+    pediuConexao && !estado.conexao.conectada ? 'Conecte a carteira para continuar.' : null;
 
   if (!desktop) {
     return (
@@ -174,7 +193,7 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
           estado={estado}
           carteiras={carteiras}
           confirmar={() => void confirmar()}
-          aviso={aviso ?? falhaRetomada}
+          aviso={aviso ?? avisoConexao ?? falhaRetomada}
           ocupado={ocupado}
         />
         <Sheet open={folhaAberta} onOpenChange={setFolhaAberta}>
@@ -226,7 +245,7 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
             resumo={resumo}
             estado={estado}
             confirmar={() => void confirmar()}
-            aviso={aviso ?? falhaRetomada}
+            aviso={aviso ?? avisoConexao ?? falhaRetomada}
             ocupado={ocupado}
           />
         </div>

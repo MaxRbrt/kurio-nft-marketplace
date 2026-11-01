@@ -1,5 +1,5 @@
 import { Rodape } from '@/components/layout/rodape';
-import { AbasCatalogo, OrdemCatalogo } from './barra-catalogo';
+import { BuscaAtiva, AbasCatalogo, OrdemCatalogo } from './barra-catalogo';
 import { BuscaMobile } from './busca-mobile';
 import { GradeNfts } from './grade-nfts';
 import { Hero } from './hero';
@@ -74,6 +74,7 @@ export function PaginaInicial() {
                 <OrdemCatalogo />
               </div>
             </div>
+            <BuscaAtiva />
             <GradeNfts />
           </div>
         </section>

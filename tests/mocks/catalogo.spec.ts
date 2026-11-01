@@ -25,7 +25,7 @@ test('lista paginada segue o contrato e tem as 4 páginas do layout', async ({ p
   expect(corpo.itens[0]).not.toHaveProperty('emAlta');
 });
 
-test('filtros combinam e facetas ignoram categoria e rede', async ({ page }) => {
+test('filtros combinam e cada faceta respeita o outro grupo', async ({ page }) => {
   const { corpo } = await chamarApi(
     page,
     'GET',
@@ -40,8 +40,9 @@ test('filtros combinam e facetas ignoram categoria e rede', async ({ page }) => 
     expect(nft.rede).toBe('polygon');
   }
 
-  const somaFacetas = Object.values(lista.facetas.redes).reduce((a, b) => a + b, 0);
-  expect(somaFacetas).toBe(36);
+  const somaRedes = Object.values(lista.facetas.redes).reduce((a, b) => a + b, 0);
+  expect(somaRedes).toBe(8);
+  expect(lista.facetas.redes.polygon).toBe(lista.itens.length);
 });
 
 test('busca, vazio e faixa de preço incluem as pontas', async ({ page }) => {

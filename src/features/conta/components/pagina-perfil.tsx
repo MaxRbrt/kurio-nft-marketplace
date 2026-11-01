@@ -25,7 +25,8 @@ const obrigatorio = (mensagem: string) => z.string().trim().min(1, mensagem);
 // ====================================================================
 // 1. VALIDAÇÃO
 // Obrigatórios seguem os asteriscos do frame. A troca de senha só entra
-// em jogo se algum dos três campos foi preenchido.
+// em jogo com a senha nova preenchida: o navegador costuma preencher a
+// atual sozinho, e isso não pode impedir de salvar o perfil.
 // ====================================================================
 const formularioPerfilSchema = z
   .object({
@@ -40,7 +41,7 @@ const formularioPerfilSchema = z
     confirmarNovaSenha: z.string(),
   })
   .superRefine(({ senhaAtual, novaSenha, confirmarNovaSenha }, contexto) => {
-    if (!senhaAtual && !novaSenha && !confirmarNovaSenha) {
+    if (!novaSenha && !confirmarNovaSenha) {
       return;
     }
 

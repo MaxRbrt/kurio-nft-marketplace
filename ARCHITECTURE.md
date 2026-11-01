@@ -158,6 +158,13 @@ Já feito: divisão por rota, imagens WebP com `srcset`, pré-carregamento da im
 - "Lista de interesse" não tem frame próprio e também avisa. Os favoritos persistem e aparecem nos cartões e no detalhe.
 - Abaixo de 1024 px vale o desenho mobile. Tablet usa a coluna mobile centrada em 414 px, pois não há frame.
 - Filtro selecionado usa sublinhado além da cor, para não depender só dela.
+- Abaixo de 414 px, a arte do destaque e o vão das abas encolhem, e o texto mantém a largura. Em 414 px ficam como no frame.
+- Nomes longos quebram em até 2 linhas no mobile, para o número do NFT não sumir. "Golden Frequency #071" ocupa 2 linhas em 414 px.
+- Entre 480 e 1023 px, a arte do cartão ocupa a largura dele.
+- O carrinho desktop troca "ID do token" por "Edição" só quando o mesmo NFT aparece em duas edições.
+- Filtrar mantém a posição da tela; trocar de página volta ao início do catálogo.
+- "Ver no Etherscan" é o texto do frame para Ethereum. Em Polygon e Solana, o botão e o link simulado usam Polygonscan e Solscan.
+- Fechar o login volta à tela de origem. Em acesso direto, vai à Início.
 
 ## Desvios do Figma
 
@@ -223,7 +230,7 @@ Os comentários deixados no arquivo do Figma foram usados como lista do que conf
 
 ### Reproduzidos como estão no frame
 
-- O fundo atrás do modal de Login e Cadastro no desktop é uma composição própria do frame, diferente da Início. Ele é reproduzido a partir dos nós do frame, como elemento decorativo, inerte e fora da árvore acessível.
+- O fundo atrás do modal de Login e Cadastro no desktop é uma composição própria do frame, diferente da Início. Ele é reproduzido a partir dos nós do frame, como elemento decorativo, inerte e fora da árvore acessível. A única mudança é o "Ordenar por", recuado 30 px para o texto não ser cortado nem ficar sob a seta.
 - A Início desktop não mostra o selo RARO; os frames de Login e o mobile mostram, e cada tela segue o seu frame.
 - Textos e rótulos ficam como desenhados, inclusive "Contrato" e "Direitos autorais" trocados no Detalhe.
 - Violet Nomad aparece com o token #0009 no Carrinho e #0314 no Pagamento. Um NFT tem um token só, e a aplicação usa #0314 nas duas telas.

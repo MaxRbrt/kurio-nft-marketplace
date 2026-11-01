@@ -8,8 +8,9 @@ function Slider({
   value,
   min = 0,
   max = 100,
+  rotulosPuxadores,
   ...props
-}: React.ComponentProps<typeof SliderPrimitive.Root>) {
+}: React.ComponentProps<typeof SliderPrimitive.Root> & { rotulosPuxadores?: string[] }) {
   const _values = React.useMemo(
     () =>
       Array.isArray(value)
@@ -35,7 +36,7 @@ function Slider({
     >
       <SliderPrimitive.Track
         data-slot="slider-track"
-        className="relative grow overflow-hidden rounded-full bg-primary/40 data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
+        className="relative grow overflow-hidden rounded-full bg-primary data-horizontal:h-1 data-horizontal:w-full data-vertical:h-full data-vertical:w-1"
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
@@ -46,7 +47,8 @@ function Slider({
         <SliderPrimitive.Thumb
           data-slot="slider-thumb"
           key={index}
-          className="relative block size-3 shrink-0 rounded-full border border-ring bg-white ring-ring/50 transition-[color,box-shadow] select-none after:absolute after:-inset-2 hover:ring-3 focus-visible:ring-3 focus-visible:outline-hidden active:ring-3 disabled:pointer-events-none disabled:opacity-50"
+          aria-label={rotulosPuxadores?.[index]}
+          className="relative block size-[21px] shrink-0 cursor-grab rounded-full border-[3px] border-background bg-primary select-none after:absolute after:-inset-1 hover:bg-primaria-clara focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring active:cursor-grabbing disabled:pointer-events-none disabled:opacity-50"
         />
       ))}
     </SliderPrimitive.Root>

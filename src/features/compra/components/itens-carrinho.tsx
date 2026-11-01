@@ -15,15 +15,17 @@ function textoEstoque(item: ItemCarrinho) {
 }
 
 type PropsItem = { item: ItemCarrinho; aoRemover: () => void };
+type PropsLinha = PropsItem & { mostrarEdicao: boolean };
 type PropsItens = { itens?: ItemCarrinho[]; aoRemover: () => void };
 
 // ====================================================================
 // 1. LINHA DO DESKTOP
 // Colunas nas posições do frame (431,25; 569,5; 705,75 e 854). Estoque
 // abaixo do pedido troca o ID do token por um aviso em texto, sem
-// depender só de cor, e finalizar fica bloqueado pela cotação.
+// depender só de cor, e finalizar fica bloqueado pela cotação. O mesmo
+// NFT em duas edições mostra a edição, para as linhas não ficarem iguais.
 // ====================================================================
-function LinhaDesktop({ item, aoRemover }: PropsItem) {
+function LinhaDesktop({ item, aoRemover, mostrarEdicao }: PropsLinha) {
   const acoes = useItemCarrinho(item, aoRemover);
 
   return (
@@ -46,7 +48,9 @@ function LinhaDesktop({ item, aoRemover }: PropsItem) {
               {textoEstoque(item)}
             </p>
           ) : (
-            <p className="mt-1.5 text-sm leading-4 text-secundaria">ID do token: {item.tokenId}</p>
+            <p className="mt-1.5 text-sm leading-4 text-secundaria">
+              {mostrarEdicao ? `Edição: ${item.rotuloEdicao}` : `ID do token: ${item.tokenId}`}
+            </p>
           )}
         </div>
       </td>
@@ -131,7 +135,12 @@ export function TabelaCarrinho({ itens, aoRemover }: PropsItens) {
       </thead>
       <tbody role="rowgroup" className="mt-3 flex flex-col gap-3">
         {itens?.map((item) => (
-          <LinhaDesktop key={item.id} item={item} aoRemover={aoRemover} />
+          <LinhaDesktop
+            key={item.id}
+            item={item}
+            aoRemover={aoRemover}
+            mostrarEdicao={itens.filter(({ nftId }) => nftId === item.nftId).length > 1}
+          />
         ))}
         {!itens &&
           Array.from({ length: TOTAL_ESQUELETOS }, (_, indice) => (
@@ -147,6 +156,7 @@ export function TabelaCarrinho({ itens, aoRemover }: PropsItens) {
 // ====================================================================
 // 3. CARTÃO DO MOBILE
 // Medidas do frame. O preço do cartão é o total do item, como no frame.
+// Botões presos à direita, para caberem em telas menores que o frame.
 // Passo entre cartões uniforme e lixeira em todos eles, acima do "+":
 // o frame a desenha só em um cartão, sobre o botão (ver ARCHITECTURE.md).
 // ====================================================================
@@ -174,7 +184,7 @@ function CartaoMobile({ item, aoRemover }: PropsItem) {
           className="size-[100px] rounded-[14px] object-cover"
         />
       </Link>
-      <p className="absolute top-[13px] left-[109px] max-w-[200px] truncate text-[15px] leading-4 font-bold">
+      <p className="absolute top-[13px] left-[109px] max-w-[calc(100%-158px)] truncate text-[15px] leading-4 font-bold">
         {item.nome}
       </p>
       {acoes.acimaDoEstoque ? (
@@ -200,7 +210,7 @@ function CartaoMobile({ item, aoRemover }: PropsItem) {
         aria-label={`Remover ${item.nome} do carrinho`}
         disabled={acoes.ocupado}
         onClick={acoes.remover}
-        className="absolute top-2 left-[318px] text-primary disabled:opacity-50"
+        className="absolute top-2 right-4 text-primary disabled:opacity-50"
       >
         <IconeLixeira />
       </button>
@@ -209,7 +219,7 @@ function CartaoMobile({ item, aoRemover }: PropsItem) {
         aria-label={`Diminuir quantidade de ${item.nome}`}
         disabled={!acoes.podeDiminuir}
         onClick={acoes.diminuir}
-        className={`${classeBotao} left-[261px] disabled:cursor-not-allowed`}
+        className={`${classeBotao} right-[73px] disabled:cursor-not-allowed`}
       >
         <span
           aria-hidden
@@ -219,7 +229,7 @@ function CartaoMobile({ item, aoRemover }: PropsItem) {
       <output
         aria-live="polite"
         data-testid="item-quantidade-mobile"
-        className="absolute top-[38px] left-[285px] flex h-6 w-[33px] items-center justify-center text-base leading-[22px]"
+        className="absolute top-[38px] right-10 flex h-6 w-[33px] items-center justify-center text-base leading-[22px]"
       >
         {item.quantidade}
       </output>
@@ -228,7 +238,7 @@ function CartaoMobile({ item, aoRemover }: PropsItem) {
         aria-label={`Aumentar quantidade de ${item.nome}`}
         disabled={!acoes.podeAumentar}
         onClick={acoes.aumentar}
-        className={`${classeBotao} left-[318px] text-[21px] leading-4 disabled:opacity-50`}
+        className={`${classeBotao} right-4 text-[21px] leading-4 disabled:opacity-50`}
       >
         <span aria-hidden>+</span>
       </button>

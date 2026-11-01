@@ -67,9 +67,17 @@ function useCompra(nft: NftDetalhe) {
 
 type Compra = ReturnType<typeof useCompra>;
 
+const LARGURA_EDICAO: Record<Edicao['rotulo'], { normal: string; ativa: string }> = {
+  '1/1': { normal: 'w-9', ativa: 'w-10' },
+  '1/10': { normal: 'w-[42px]', ativa: 'w-[46px]' },
+  '1/50': { normal: 'w-[42px]', ativa: 'w-[46px]' },
+  ABERTA: { normal: 'w-[66px]', ativa: 'w-[70px]' },
+};
+
 // ====================================================================
 // 2. PARTES COMPARTILHADAS
-// Edição e dados do token são iguais nos dois frames. Edição esgotada
+// Edição e dados do token são iguais nos dois frames. Selecionada ganha
+// 4 px, como a 1/50 do frame, sem cortar rótulo maior. Edição esgotada
 // fica riscada e desabilitada, sem depender só da cor.
 // ====================================================================
 function SeletorEdicao({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
@@ -89,13 +97,9 @@ function SeletorEdicao({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
               onClick={() => compra.escolherEdicao(edicao)}
               className={cn(
                 'h-7 rounded-full border px-1 text-sm leading-4 disabled:cursor-not-allowed disabled:line-through disabled:opacity-50',
-                edicao.rotulo === 'ABERTA'
-                  ? 'w-[66px]'
-                  : edicao.rotulo === '1/1'
-                    ? 'w-9'
-                    : 'w-[42px]',
+                LARGURA_EDICAO[edicao.rotulo][ativa ? 'ativa' : 'normal'],
                 ativa
-                  ? 'w-[46px] border-primary font-medium text-texto-destaque'
+                  ? 'border-primary font-medium text-texto-destaque'
                   : 'border-border text-muted-foreground',
               )}
             >
@@ -118,19 +122,32 @@ function DadosToken({ nft }: { nft: NftDetalhe }) {
   );
 }
 
-function AvisoEstoque({ compra }: { compra: Compra }) {
+// ====================================================================
+// 3. AVISO DE ESTOQUE
+// Esgotada é impedimento, em coral. Limite é só informação, no tom do
+// texto secundário. Ocupa o vão entre quantidade e botões, sem encostar.
+// ====================================================================
+function AvisoEstoque({ compra, className }: { compra: Compra; className?: string }) {
+  const noLimite = !compra.esgotada && compra.quantidade >= compra.edicao.disponivel;
+
   return (
-    <p role="status" className="text-sm leading-5 text-texto-coral empty:hidden">
-      {compra.esgotada ? 'Edição indisponível' : ''}
-      {!compra.esgotada && compra.quantidade >= compra.edicao.disponivel
-        ? 'Limite disponível atingido'
-        : ''}
+    <p
+      role="status"
+      data-testid="aviso-estoque"
+      className={cn(
+        'text-xs leading-4 empty:hidden',
+        compra.esgotada ? 'text-texto-coral' : 'text-muted-foreground',
+        className,
+      )}
+    >
+      {compra.esgotada && 'Edição indisponível'}
+      {noLimite && 'Limite disponível atingido'}
     </p>
   );
 }
 
 // ====================================================================
-// 3. GALERIA DO DESKTOP
+// 4. GALERIA DO DESKTOP
 // Miniaturas de 100, com a segunda selecionada como no frame. A lupa abre
 // a imagem ampliada em diálogo, com foco preso e fechamento por Esc.
 // ====================================================================
@@ -191,6 +208,7 @@ function Galeria({ nft }: { nft: NftDetalhe }) {
 
       <Dialog open={ampliada} onOpenChange={setAmpliada}>
         <DialogContent
+          classeFundo="bg-black/60"
           className="w-[640px] max-w-[90vw] bg-card p-4 sm:max-w-[640px]"
           onCloseAutoFocus={(evento) => {
             evento.preventDefault();
@@ -213,7 +231,7 @@ function Galeria({ nft }: { nft: NftDetalhe }) {
 }
 
 // ====================================================================
-// 4. TELA DO DESKTOP
+// 5. TELA DO DESKTOP
 // Coordenadas do frame Desktop / Detalhes. Abaixo de 1200 px as colunas
 // empilham, para não haver overflow em larguras sem frame.
 // ====================================================================
@@ -298,9 +316,9 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
                 </button>
               </div>
 
-              <AvisoEstoque compra={compra} />
+              <AvisoEstoque compra={compra} className="mt-3 flex-1 px-3 text-center" />
 
-              <div className="flex gap-2">
+              <div className="ml-auto flex gap-2">
                 <button
                   type="button"
                   disabled={compra.esgotada || compra.ocupado}
@@ -417,7 +435,7 @@ function ConteudoDesktop({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
 }
 
 // ====================================================================
-// 5. TELA DO MOBILE
+// 6. TELA DO MOBILE
 // Medidas do frame Mobile / Detalhes: imagem, painel sobreposto e barra
 // de compra fixa no rodapé da tela, sem a barra de navegação.
 // ====================================================================
@@ -482,6 +500,7 @@ function ConteudoMobile({ nft, compra }: { nft: NftDetalhe; compra: Compra }) {
         <div className="mt-3">
           <SeletorEdicao nft={nft} compra={compra} />
         </div>
+        <AvisoEstoque compra={compra} className="mt-2" />
         <div className="mt-3">
           <DadosToken nft={nft} />
         </div>
@@ -556,7 +575,7 @@ function DetalheCarregado({ nft }: { nft: NftDetalhe }) {
 }
 
 // ====================================================================
-// 6. CARREGAMENTO, ERRO E INEXISTENTE
+// 7. CARREGAMENTO, ERRO E INEXISTENTE
 // Skeleton nas dimensões do frame, para não haver salto de layout. A
 // chave por id faz cada NFT começar com a própria seleção.
 // ====================================================================

@@ -5,6 +5,7 @@ import {
   SelectItem,
   SelectTrigger,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 import { IconeSetaBaixo } from '@/components/icones/icones';
 import type { ParametrosNfts } from '@/contracts/catalogo/nfts';
 import { ROTULOS_ABA, ROTULOS_ORDEM } from '../busca';
@@ -33,7 +34,7 @@ export function AbasCatalogo({ className = '' }: { className?: string }) {
 
   return (
     <ul
-      className={`flex gap-4 text-sm leading-4 lg:gap-5 lg:text-[15px] lg:font-medium ${className}`}
+      className={`flex w-full gap-[clamp(4px,calc((100%-312px)/2),16px)] text-sm leading-4 [scrollbar-width:none] max-lg:-mb-1 max-lg:overflow-x-auto max-lg:pb-1 lg:w-auto lg:gap-5 lg:text-[15px] lg:font-medium ${className}`}
     >
       {abas.map((aba) => (
         <li key={aba}>
@@ -56,12 +57,41 @@ export function AbasCatalogo({ className = '' }: { className?: string }) {
 }
 
 // ====================================================================
-// 2. ORDENAÇÃO
+// 2. BUSCA ATIVA
+// No desktop o campo fica recolhido: este aviso mostra que a lista está
+// filtrada e oferece a saída. Sem busca, não ocupa espaço.
+// ====================================================================
+export function BuscaAtiva() {
+  const { busca, alterarFiltros } = useFiltrosCatalogo();
+
+  if (!busca.busca) {
+    return null;
+  }
+
+  return (
+    <p
+      data-testid="busca-ativa"
+      className="mb-6 hidden items-center gap-2 text-[15px] leading-5 lg:flex"
+    >
+      <span>Busca: {busca.busca}</span>
+      <button
+        type="button"
+        onClick={() => alterarFiltros({ busca: undefined })}
+        className="text-texto-destaque underline"
+      >
+        Limpar busca
+      </button>
+    </p>
+  );
+}
+
+// ====================================================================
+// 3. ORDENAÇÃO
 // Rótulo, valor e seta em linha, alinhados à direita da grade. No frame a
 // seta fica sobre o fim do valor; aqui vem depois dele, desvio documentado
 // no ARCHITECTURE.md. O menu abre alinhado à direita.
 // ====================================================================
-export function OrdemCatalogo() {
+export function OrdemCatalogo({ empilhado = false }: { empilhado?: boolean }) {
   const { busca, alterarFiltros } = useFiltrosCatalogo();
   const ordem = busca.ordem ?? 'recentes';
   const ordens = Object.keys(ROTULOS_ORDEM) as Ordem[];
@@ -75,9 +105,12 @@ export function OrdemCatalogo() {
     >
       <SelectTrigger
         aria-label="Ordenar por"
-        className="flex h-[18px] items-center gap-0 rounded-none border-0 bg-transparent p-0 text-[15px] leading-5 whitespace-nowrap shadow-none data-[size=default]:h-[18px] dark:bg-transparent [&>svg:last-child]:hidden"
+        className={cn(
+          'flex h-[18px] items-center gap-0 rounded-none border-0 bg-transparent p-0 text-[15px] leading-5 whitespace-nowrap shadow-none data-[size=default]:h-[18px] dark:bg-transparent [&>svg:last-child]:hidden',
+          empilhado && 'h-auto flex-wrap data-[size=default]:h-auto',
+        )}
       >
-        <span className="mr-px">Ordenar por:</span>
+        <span className={empilhado ? 'w-full text-left' : 'mr-px'}>Ordenar por:</span>
         <span>{ROTULOS_ORDEM[ordem]}</span>
         <IconeSetaBaixo className="ml-1 text-foreground" />
       </SelectTrigger>

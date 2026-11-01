@@ -23,6 +23,7 @@ type PropsCampoCupom = {
   resumo: ResumoCompra;
   sufixo: string;
   classes: { caixa: string; campo: string; botao: string };
+  focarAoAbrir?: boolean;
 };
 
 // ====================================================================
@@ -31,7 +32,7 @@ type PropsCampoCupom = {
 // fica somente leitura e o botão passa a remover. O erro é ligado ao
 // campo e anunciado, e não depende só de cor.
 // ====================================================================
-export function CampoCupom({ resumo, sufixo, classes }: PropsCampoCupom) {
+export function CampoCupom({ resumo, sufixo, classes, focarAoAbrir }: PropsCampoCupom) {
   const [digitado, setDigitado] = useState('');
   const aplicado = resumo.cupomAplicado;
   const erroId = `cupom-erro-${sufixo}`;
@@ -61,6 +62,7 @@ export function CampoCupom({ resumo, sufixo, classes }: PropsCampoCupom) {
           aria-describedby={resumo.erroCupom ? erroId : undefined}
           readOnly={Boolean(aplicado)}
           autoComplete="off"
+          autoFocus={focarAoAbrir}
           placeholder="Digite o código promocional..."
           value={aplicado ?? digitado}
           onChange={(evento) => setDigitado(evento.target.value)}

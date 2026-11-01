@@ -299,3 +299,32 @@ for (const largura of [390, 768, 1024, 1440]) {
     expect(excesso).toBeLessThanOrEqual(0);
   });
 }
+
+// ====================================================================
+// FAIXA DE PREÇO
+// O puxador segue o frame, e o valor nunca passa de 12,30 ETH.
+// ====================================================================
+test.describe('faixa de preço', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test('puxadores nas posições do frame e teto de 12,30 no teclado', async ({ page }) => {
+    await page.goto('/');
+    const painel = page.getByRole('region', { name: 'Faixa de preço' });
+    const minimo = page.getByRole('slider', { name: 'Preço mínimo em ETH' });
+    const maximo = page.getByRole('slider', { name: 'Preço máximo em ETH' });
+
+    await expect(maximo).toBeVisible();
+
+    const caixaMinimo = await minimo.boundingBox();
+    const caixaMaximo = await maximo.boundingBox();
+
+    expect(Math.abs((caixaMinimo?.x ?? 0) - 152)).toBeLessThanOrEqual(1);
+    expect(Math.abs((caixaMaximo?.x ?? 0) - 334)).toBeLessThanOrEqual(1);
+
+    await maximo.focus();
+    await page.keyboard.press('End');
+    await page.keyboard.press('ArrowRight');
+    await expect(painel).toContainText('0,02 - 12,30 ETH');
+    await expect(maximo).toHaveAttribute('aria-valuemax', '16.01');
+  });
+});

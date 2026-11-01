@@ -38,17 +38,28 @@ const obrigatorio = (mensagem: string) => z.string().trim().min(1, mensagem);
 const formularioPagamentoSchema = z.object({
   nomeExibicao: obrigatorio('Informe o nome de exibição'),
   nomeUsuario: obrigatorio('Informe o nome de usuário'),
-  rede: redeSchema,
+  rede: z.enum(redeSchema.options, { error: 'Selecione uma rede' }),
   nomePerfil: obrigatorio('Informe o nome do perfil'),
   endereco: z.string().regex(/^0x[0-9a-fA-F]{40}$/, 'Endereço 0x inválido'),
   carteiraSecundaria: z.string().trim(),
-  tipo: tipoCarteiraSchema,
+  tipo: z.enum(tipoCarteiraSchema.options, { error: 'Selecione uma carteira' }),
   codigoIndicacao: obrigatorio('Informe o código de indicação'),
   email: z.email('E-mail inválido'),
   sufixoEns: z.enum(SUFIXOS_ENS),
   observacao: z.string().trim(),
 });
 export type FormularioPagamento = z.infer<typeof formularioPagamentoSchema>;
+
+export const ORDEM_DOS_CAMPOS: Array<keyof FormularioPagamento> = [
+  'nomeExibicao',
+  'nomeUsuario',
+  'rede',
+  'nomePerfil',
+  'endereco',
+  'tipo',
+  'codigoIndicacao',
+  'email',
+];
 
 const rascunhoSchema = formularioPagamentoSchema.partial();
 const chaveRascunho = (usuarioId: string) => `kurio:rascunho-pagamento:${usuarioId}`;
@@ -153,7 +164,7 @@ export function useFormularioPagamento(perfil: Perfil, carteiras: Carteira[]) {
   const formulario = useForm<FormularioPagamento>({
     resolver: zodResolver(formularioPagamentoSchema),
     defaultValues: valoresIniciais(usuarioId, perfil, principal),
-    shouldFocusError: true,
+    shouldFocusError: false,
   });
   const { control, setValue, getValues, subscribe } = formulario;
   const tipo = useWatch({ control, name: 'tipo' });

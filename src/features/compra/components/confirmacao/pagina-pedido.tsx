@@ -33,6 +33,8 @@ function transacaoCurta(id: string) {
   return `${id.slice(0, 6)}…${id.slice(-4)}`;
 }
 
+const NOME_EXPLORADOR = { ethereum: 'Etherscan', polygon: 'Polygonscan', solana: 'Solscan' };
+
 const nomeDaRede = (pedido: Pedido) =>
   REDES.find(({ valor }) => valor === pedido.rede)?.rotulo ?? pedido.rede;
 const nomeDaCarteira = (pedido: Pedido) =>
@@ -149,7 +151,9 @@ function ConteudoPedido({ pedido }: { pedido: Pedido }) {
                 <div className="min-w-0">
                   <p className="truncate text-base leading-4 font-bold">{item.nome}</p>
                   <p className="mt-1.5 truncate text-sm leading-4 text-secundaria">
-                    ID do token: {item.tokenId}
+                    {pedido.itens.filter(({ nftId }) => nftId === item.nftId).length > 1
+                      ? `Edição: ${item.rotuloEdicao}`
+                      : `ID do token: ${item.tokenId}`}
                   </p>
                   <p className="mt-1 text-sm leading-4 text-muted-foreground sm:hidden">
                     (x {item.quantidade})
@@ -201,12 +205,13 @@ function ConteudoPedido({ pedido }: { pedido: Pedido }) {
               rel="noreferrer"
               className="flex h-12 w-[186px] items-center justify-center rounded-[5px] bg-primary text-base leading-4 font-bold text-primary-foreground hover:bg-primaria-clara"
             >
-              Ver no Etherscan
+              Ver no {NOME_EXPLORADOR[pedido.rede]}
             </a>
           )}
           {pedido.estado === 'recusado' && (
             <Link
               to="/pagamento"
+              search={{ cupom: pedido.cupom ?? undefined }}
               className="flex h-12 w-[186px] items-center justify-center rounded-[5px] bg-primary text-base leading-4 font-bold text-primary-foreground hover:bg-primaria-clara"
             >
               Tentar novamente

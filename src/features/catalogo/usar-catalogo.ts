@@ -13,6 +13,8 @@ function useBuscaCatalogo() {
 // 1. ALTERAÇÃO DOS FILTROS
 // Regra em um lugar só: mudar qualquer filtro volta à primeira página.
 // O campo de busca usa replace, para digitar não encher o histórico.
+// Filtrar não tira o usuário do lugar; trocar de página volta ao início
+// do catálogo, para os novos cartões aparecerem na tela.
 // ====================================================================
 export function useFiltrosCatalogo() {
   const busca = useBuscaCatalogo();
@@ -24,6 +26,7 @@ export function useFiltrosCatalogo() {
         to: '/',
         search: (anterior) => ({ ...anterior, ...mudanca, pagina: undefined }),
         replace: opcoes.substituir,
+        resetScroll: false,
       });
     },
     [navigate],
@@ -34,7 +37,8 @@ export function useFiltrosCatalogo() {
       void navigate({
         to: '/',
         search: (anterior) => ({ ...anterior, pagina: pagina > 1 ? pagina : undefined }),
-      });
+        resetScroll: false,
+      }).then(() => document.getElementById('catalogo')?.scrollIntoView());
     },
     [navigate],
   );

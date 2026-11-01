@@ -49,8 +49,8 @@ function lerParametros(url: URL) {
 
 // ====================================================================
 // 2. FILTROS
-// Combinam entre si. As facetas ignoram categoria e rede: mostram as
-// opções disponíveis dentro da busca, do preço e da aba atuais.
+// Combinam entre si. Cada grupo conta o que o outro grupo deixa passar:
+// o número ao lado da opção é o que aparece ao marcá-la, sem somar a própria.
 // ====================================================================
 function passaNaBase(nft: NftBanco, parametros: ParametrosNfts) {
   const busca = parametros.busca?.trim().toLowerCase();
@@ -86,13 +86,18 @@ function passaNosFiltros(nft: NftBanco, parametros: ParametrosNfts) {
   return categoriaAceita && redeAceita;
 }
 
-function contarFacetas(nfts: NftBanco[]) {
+function contarFacetas(nfts: NftBanco[], parametros: ParametrosNfts) {
   const categorias = Object.fromEntries(categoriaSchema.options.map((opcao) => [opcao, 0]));
   const redes = Object.fromEntries(redeSchema.options.map((opcao) => [opcao, 0]));
 
   for (const nft of nfts) {
-    categorias[nft.categoria] += 1;
-    redes[nft.rede] += 1;
+    if (!parametros.redes || parametros.redes.includes(nft.rede)) {
+      categorias[nft.categoria] += 1;
+    }
+
+    if (!parametros.categorias || parametros.categorias.includes(nft.categoria)) {
+      redes[nft.rede] += 1;
+    }
   }
 
   return { categorias, redes };
@@ -157,7 +162,7 @@ export const handlersNfts = [
           totalItens: filtrados.length,
           totalPaginas: Math.ceil(filtrados.length / tamanhoPagina),
         },
-        facetas: contarFacetas(base),
+        facetas: contarFacetas(base, parametros),
       }),
     );
   }),

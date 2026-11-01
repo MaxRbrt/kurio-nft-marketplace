@@ -7,6 +7,11 @@ import { donoUsuario, lerEdicao } from './carrinhos';
 import { lerBanco, salvarBanco } from './estado';
 
 const ESPERA_PAGAMENTO_MS = 1_500;
+const EXPLORADOR_POR_REDE = {
+  ethereum: 'https://etherscan.io',
+  polygon: 'https://polygonscan.com',
+  solana: 'https://solscan.io',
+};
 
 // ====================================================================
 // 1. EFEITOS DA CONFIRMAÇÃO
@@ -71,7 +76,7 @@ export function resolverPedido(id: string, resultado: 'confirmado' | 'recusado')
           estado: 'confirmado',
           versao,
           idTransacao,
-          urlExplorador: `https://etherscan.io/tx/${idTransacao}`,
+          urlExplorador: `${EXPLORADOR_POR_REDE[pedido.rede]}/tx/${idTransacao}`,
           confirmadoEm: agora,
         }
       : {

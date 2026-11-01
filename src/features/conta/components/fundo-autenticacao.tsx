@@ -105,7 +105,7 @@ export function FundoAutenticacao() {
           <div key={indice} style={estiloDe(elemento)} className="absolute" />
         ),
       )}
-      <IconeSetaBaixo className="absolute top-[498px] left-[1189px] text-foreground" />
+      <IconeSetaBaixo className="absolute top-[498px] left-[1183px] text-foreground" />
       <IconeCarrinhoAcao className="absolute top-[816px] left-[729px] text-foreground" />
       <IconeFavorito ativo={false} className="absolute top-[816px] left-[775px] text-foreground" />
       <IconeBusca className="absolute top-[815px] left-[822px] text-foreground" />
