@@ -215,7 +215,6 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 | Início, desktop          | Artigos do diário terminam em x = 1264, e a página vai até 1320                                 | Quatro artigos de 282 px ocupam toda a largura, com a altura e as quebras de texto do frame               | Grade empurrada para a esquerda, sem alinhar com as outras seções |
 | Rodapé, desktop          | "Enviar" 6 px e "METAMASK • ..." 4 px à direita do centro das caixas                            | Textos centrados                                                                                          | Item visivelmente fora do centro                                  |
 | Cadastro, mobile         | Só o campo "Nome de usuário" com o texto de exemplo centrado                                    | Texto à esquerda, como nos outros campos                                                                  | Campos iguais com alinhamentos diferentes                         |
-| Cabeçalho                | Divisória em Início, Login e Perfil; sem ela em Detalhe e Carrinho                              | Divisória em todas as telas                                                                               | Mesmo componente não muda de tela para tela                       |
 | Carrinho, mobile         | Lixeira só no 3º cartão, sobre o botão "+"                                                      | Lixeira em todos os cartões, acima do "+"                                                                 | O botão ficava encoberto, e remover é função de todo item         |
 | Carrinho, mobile         | Cada arte duplicada, com a de cima em `multiply` e deslocada até 2 px, o que escurece a imagem  | Uma imagem só, com as cores das outras telas                                                              | O mesmo NFT não pode mudar de cor entre telas                     |
 | Carrinho, mobile         | Cartões em y = 88, 208, 330 e 450 (vãos de 20 e 22 px)                                          | Vão de 20 px entre todos                                                                                  | Lista dinâmica não tem posição própria por item                   |
@@ -314,7 +313,7 @@ O arquivo tem 62 comentários de outros candidatos, 2 deles vazios, agrupados aq
 | Início, desktop    | Texto sem alinhamento em "NFT EM DESTAQUE"       | Corrigido: títulos centrados                                            |
 | Início, desktop    | "EXPLORAR" fora do centro                        | Corrigido: texto centrado                                               |
 | Início, desktop    | Seletor do destaque muito perto                  | Corrigido: 16 px abaixo                                                 |
-| Início, desktop    | Divisória só em algumas telas                    | Corrigido: divisória em todas                                           |
+| Início, desktop    | Divisória só em algumas telas                    | Mantido: cada tela como no frame; Detalhe, Carrinho e Pagamento não têm |
 | Início, desktop    | Cartão com fundo de outra cor                    | Mantido: é o fundo do cartão no frame                                   |
 | Início, desktop    | Coleções fora de ordem alfabética                | Mantido: ordem do frame                                                 |
 | Início, desktop    | Filtros poderiam usar checkboxes                 | Mantido: filtros já são combináveis; seleção por cor e estado anunciado |
@@ -377,6 +376,10 @@ As quatro artes dos NFTs vêm do arquivo do Figma, convertidas para WebP em 320,
 - Revisão antes do envio: modal no padrão da Confirmação, exigido pelo enunciado.
 - Conexão da carteira: "Desconectar", "Conectar" e a recusa aparecem na opção escolhida, no desktop, e no menu de três pontos, no mobile.
 - Campos obrigatórios seguem os asteriscos do frame, inclusive "Código de indicação".
+
+### Fundo do login com barra de rolagem
+
+Ao abrir o modal, a barra de rolagem some e a página reserva o espaço dela, o que afastava o fundo 7,5 px do modal no Windows. O modal desconta metade dessa reserva, para manter a posição do frame: arte 405 px e título 305 px em relação à borda esquerda do modal.
 
 ### Ajustes de acessibilidade
 
