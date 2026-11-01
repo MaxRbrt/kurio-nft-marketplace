@@ -295,6 +295,21 @@ test.describe('estados', () => {
 test.describe('mobile 414', () => {
   test.use({ viewport: { width: 414, height: 896 } });
 
+  test('favorito alinhado ao topo da arte e na cor do frame', async ({ page }) => {
+    await page.goto('/');
+
+    const cartao = page.getByTestId('cartao-nft').first();
+    const botao = cartao.getByRole('button', { name: /^Favoritar/ });
+
+    await expect(botao).toBeVisible();
+
+    const caixaBotao = await botao.boundingBox();
+    const caixaArte = await cartao.getByRole('img').first().boundingBox();
+
+    expect(caixaBotao?.y).toBe(caixaArte?.y);
+    await expect(botao).toHaveCSS('color', 'rgb(210, 138, 76)');
+  });
+
   test('blocos nas posições do frame mobile', async ({ page }) => {
     const hero = await caixa(page, 'hero-mobile');
     const primeiro = await caixa(page, 'cartao-nft');

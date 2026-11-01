@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import { CABECALHO_VISITANTE } from '@/contracts/compra/carrinho';
 import { converterErro, ErroApi } from './erros';
 import { lerToken, lerVisitanteId } from './identidade';
@@ -20,7 +20,15 @@ export const clienteApi = axios.create({
 // ====================================================================
 // 2. INTERCEPTADORES
 // Toda requisição leva sessão ou visitante. Toda falha sai como ErroApi.
+// Resposta com corpo que não é JSON não veio da API, como a página HTML da
+// hospedagem: vira falha transitória, e a consulta tenta de novo.
 // ====================================================================
+function respostaForaDaApi(resposta: AxiosResponse) {
+  const tipo = String(resposta.headers['content-type'] ?? '');
+
+  return Boolean(resposta.data) && !tipo.includes('application/json');
+}
+
 clienteApi.interceptors.request.use((configuracao) => {
   const token = lerToken();
 
@@ -34,7 +42,19 @@ clienteApi.interceptors.request.use((configuracao) => {
 });
 
 clienteApi.interceptors.response.use(
-  (resposta) => resposta,
+  (resposta) => {
+    if (respostaForaDaApi(resposta)) {
+      return Promise.reject(
+        new ErroApi(
+          resposta.status,
+          'FALHA_TRANSITORIA',
+          'Não foi possível concluir. Tente novamente.',
+        ),
+      );
+    }
+
+    return resposta;
+  },
   (erro: unknown) => {
     const convertido = converterErro(erro);
     const rota = axios.isAxiosError(erro) ? (erro.config?.url ?? '') : '';

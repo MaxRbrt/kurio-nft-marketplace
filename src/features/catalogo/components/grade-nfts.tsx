@@ -74,7 +74,7 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
         aria-label={`Favoritar ${nft.nome}`}
         aria-pressed={favorito}
         onClick={alternar}
-        className="absolute top-3 right-[10px] flex size-7 items-center justify-center rounded-full border border-border bg-muted text-texto-destaque lg:hidden"
+        className="absolute top-4 right-[10px] flex size-7 items-center justify-center rounded-full border border-border bg-muted text-primary lg:hidden"
       >
         <IconeFavorito ativo={favorito} className="size-3.5" />
       </button>

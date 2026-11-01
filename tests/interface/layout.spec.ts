@@ -237,7 +237,8 @@ test('abertura some quando a aplicação monta', async ({ page }) => {
 // FRAMES: DIVISÓRIA DO CABEÇALHO E FUNDO DO LOGIN
 // A divisória só aparece nas telas cujo frame a desenha. O fundo do login
 // segue o frame também com barra de rolagem real, que o navegador de
-// teste esconde por padrão: arte 405 px e título 305 px antes do modal.
+// teste esconde por padrão: arte 405 px depois da borda do modal e título
+// 305 px antes dela. O modal fica em pixel inteiro, para o texto não borrar.
 // ====================================================================
 test.describe('frames do desktop', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
@@ -310,6 +311,7 @@ test.describe('frames do desktop', () => {
 
       return {
         barra: getComputedStyle(document.body).getPropertyValue('--removed-body-scroll-bar-size'),
+        modal: caixaModal?.x ?? 0,
         arte: (arte?.x ?? 0) - (caixaModal?.x ?? 0),
         titulo: (titulo?.x ?? 0) - (caixaModal?.x ?? 0),
       };
@@ -318,7 +320,60 @@ test.describe('frames do desktop', () => {
     await navegador.close();
 
     expect(parseFloat(medidas.barra)).toBeGreaterThan(0);
-    expect(Math.abs(medidas.arte - 405)).toBeLessThanOrEqual(0.5);
-    expect(Math.abs(medidas.titulo + 305)).toBeLessThanOrEqual(0.5);
+    expect(Number.isInteger(medidas.modal)).toBe(true);
+    expect(medidas.arte).toBe(405);
+    expect(medidas.titulo).toBe(-305);
+  });
+});
+
+// ====================================================================
+// SERVICE WORKER DESLIGADO PELO NAVEGADOR
+// Aba parada faz o navegador desligar o worker, que perde o registro da
+// página. Ao religar, as chamadas à API não podem ir para a rede.
+// ====================================================================
+test.describe('service worker desligado pelo navegador', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  async function desligarWorker(pagina: Page) {
+    const sessao = await pagina.context().newCDPSession(pagina);
+
+    await sessao.send('ServiceWorker.enable');
+    await sessao.send('ServiceWorker.stopAllWorkers');
+  }
+
+  test('catálogo segue funcionando ao clicar', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+    await desligarWorker(page);
+
+    await page.getByRole('button', { name: 'Página 2' }).click();
+    await expect(page).toHaveURL(/pagina=2/);
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+    await expect(page.getByTestId('nfts-erro')).toHaveCount(0);
+  });
+
+  test('consulta sem clique do usuário também recupera', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+    await desligarWorker(page);
+
+    await page.evaluate(() => {
+      history.pushState({}, '', '/?pagina=3');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+
+    await expect(page).toHaveURL(/pagina=3/);
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible({ timeout: 8000 });
+    await expect(page.getByTestId('nfts-erro')).toHaveCount(0);
+  });
+
+  test('comprar segue funcionando', async ({ page }) => {
+    await page.goto('/nfts/nft-01');
+    await expect(page.getByRole('button', { name: 'COMPRAR', exact: true })).toBeVisible();
+    await desligarWorker(page);
+
+    await page.getByRole('button', { name: 'COMPRAR', exact: true }).click();
+    await expect(page).toHaveURL(/\/carrinho/);
+    await expect(page.getByTestId('item-carrinho').first()).toBeVisible();
   });
 });
