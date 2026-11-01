@@ -193,7 +193,7 @@ export function PagamentoMobile({
                   )}
                 </span>
                 <span className="absolute top-[25px] left-[65px] text-sm leading-4">{rotulo}</span>
-                <span className="absolute top-[25px] left-[326px]">
+                <span className="absolute top-[25px] right-4">
                   <MarcadorOpcao marcada={marcada} miolo="size-2" apagado />
                 </span>
               </label>

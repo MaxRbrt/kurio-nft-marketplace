@@ -276,7 +276,7 @@ function FormularioPerfilCarregado({ perfil }: { perfil: Perfil }) {
               nome="sufixoEns"
               texto=".eth"
               opcoes={OPCOES_SUFIXO_ENS}
-              classeCaixa="w-[78px] shrink-0 pr-0 pl-2.5 text-[15px]"
+              classeCaixa="w-auto min-w-[78px] shrink-0 pr-7 pl-2.5 text-[15px]"
               classeSeta="right-[4px] size-5 text-foreground"
             />
             <Entrada id="perfil-ens" erro={errors.nomeEns?.message} {...register('nomeEns')} />

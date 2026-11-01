@@ -19,7 +19,8 @@ const TAMANHO_PAGINA_LAYOUT = 9;
 // Frame: 258 x 300 no desktop e 175 x 200 no mobile. A arte fica centrada
 // e o preço 6 px abaixo do nome em todos os cartões: o frame varia isso
 // por cartão, desvio documentado no ARCHITECTURE.md. Sem RARO no desktop,
-// como na Início. Ações do desktop aparecem com mouse ou foco.
+// como na Início. Ações do desktop aparecem com mouse ou foco. Nome
+// longo quebra linha em vez de ser cortado.
 // ====================================================================
 const CLASSE_ACAO = 'flex size-[35px] rounded border border-border bg-muted text-foreground';
 
@@ -48,7 +49,7 @@ function CartaoNft({ nft, prioridade }: { nft: NftResumo; prioridade: boolean })
         </div>
         <h3
           data-testid="cartao-nome"
-          className="mt-2 line-clamp-2 pl-2 text-[15px] leading-5 lg:mt-3 lg:line-clamp-none lg:truncate lg:pl-0 lg:text-base lg:leading-4"
+          className="mt-2 pl-2 text-[15px] leading-5 break-words lg:mt-3 lg:pl-0 lg:text-base lg:leading-4"
         >
           {nft.nome}
         </h3>
@@ -137,6 +138,11 @@ function GradeEsqueleto() {
   );
 }
 
+// ====================================================================
+// 3. PAGINAÇÃO
+// No desktop fica à direita, como no frame. O frame mobile termina antes
+// dela: no celular fica centrada, ao alcance do polegar e longe da borda.
+// ====================================================================
 function Paginacao({ pagina, totalPaginas }: { pagina: number; totalPaginas: number }) {
   const { irParaPagina } = useFiltrosCatalogo();
   const paginas = Array.from({ length: totalPaginas }, (_, indice) => indice + 1);
@@ -146,7 +152,10 @@ function Paginacao({ pagina, totalPaginas }: { pagina: number; totalPaginas: num
   }
 
   return (
-    <nav aria-label="Paginação" className="mt-16 flex justify-end gap-2 lg:mt-[94px]">
+    <nav
+      aria-label="Paginação"
+      className="mt-16 flex justify-center gap-2 lg:mt-[94px] lg:justify-end"
+    >
       {paginas.map((numero) => (
         <button
           key={numero}
@@ -177,7 +186,7 @@ function Paginacao({ pagina, totalPaginas }: { pagina: number; totalPaginas: num
 }
 
 // ====================================================================
-// 3. GRADE
+// 4. GRADE
 // Desktop em 3 colunas. No mobile, 2 colunas com a direita 32 px abaixo,
 // como no frame. Só a primeira linha é prioritária, para o LCP.
 // ====================================================================

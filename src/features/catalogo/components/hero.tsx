@@ -17,6 +17,8 @@ function PontosCarrossel({ className }: { className: string }) {
 // 1. HERO
 // Cada largura segue seu frame, inclusive no texto: o desktop e o mobile
 // têm títulos diferentes no layout. A imagem principal é o LCP da tela.
+// No mobile, abaixo de 338 px o título diminui junto com a tela para não
+// encostar na arte; acima disso fica nos 18 px do frame.
 // ====================================================================
 export function Hero() {
   return (
@@ -72,7 +74,7 @@ export function Hero() {
         />
         <div className="relative px-4 pt-[5.5px]">
           <p className="text-xs leading-4 font-medium">Bem-vindo à Kurio</p>
-          <p className="mt-1.5 text-lg leading-[29px] font-bold whitespace-pre-line">
+          <p className="mt-1.5 text-[length:min(18px,calc(11.1vw-19.6px))] leading-[29px] font-bold whitespace-pre-line">
             {'SEJA DONO DA\nCULTURA DIGITAL'}
           </p>
           <p className="mt-1.5 w-[min(188px,calc(100%-98px))] text-xs leading-[18px] text-muted-foreground">

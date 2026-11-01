@@ -3,6 +3,7 @@ import { IconeLixeira } from '@/components/icones/icones';
 import type { ItemCarrinho } from '@/contracts/compra/carrinho';
 import { ImagemNft } from '@/features/catalogo/components/imagem-nft';
 import { formatarEth } from '@/lib/eth';
+import { cn } from '@/lib/utils';
 import { useItemCarrinho } from '../usar-carrinho';
 import { BotaoQuantidade } from './botao-quantidade';
 
@@ -156,19 +157,23 @@ export function TabelaCarrinho({ itens, aoRemover }: PropsItens) {
 // ====================================================================
 // 3. CARTÃO DO MOBILE
 // Medidas do frame. O preço do cartão é o total do item, como no frame.
-// Botões presos à direita, para caberem em telas menores que o frame.
 // Passo entre cartões uniforme e lixeira em todos eles, acima do "+":
 // o frame a desenha só em um cartão, sobre o botão (ver ARCHITECTURE.md).
+// Os textos ficam no fluxo, nas mesmas posições do frame: nome longo
+// quebra linha e o cartão cresce, em vez de cortar. Abaixo de 375 px,
+// onde quantidade e textos não cabem lado a lado, a quantidade desce
+// para uma linha própria.
 // ====================================================================
 function CartaoMobile({ item, aoRemover }: PropsItem) {
   const acoes = useItemCarrinho(item, aoRemover);
   const classeBotao =
-    'absolute top-[38px] flex size-6 items-center justify-center rounded-[31px] border border-border bg-muted';
+    'flex size-6 items-center justify-center rounded-[31px] border border-border bg-muted';
+  const classeEdicao = 'mt-[6px] pr-[89px] text-sm leading-4 max-[374px]:pr-0';
 
   return (
     <li
       data-testid="item-carrinho-mobile"
-      className="relative h-[100px] rounded-[14px] bg-card shadow-[0_6px_20px_rgba(10,6,4,0.45)]"
+      className="relative flex min-h-[100px] flex-col rounded-[14px] bg-card pt-[13px] pr-4 pb-[15px] pl-[109px] shadow-[0_6px_20px_rgba(10,6,4,0.45)]"
     >
       <Link
         to="/nfts/$nftId"
@@ -184,24 +189,17 @@ function CartaoMobile({ item, aoRemover }: PropsItem) {
           className="size-[100px] rounded-[14px] object-cover"
         />
       </Link>
-      <p className="absolute top-[13px] left-[109px] max-w-[calc(100%-158px)] truncate text-[15px] leading-4 font-bold">
-        {item.nome}
-      </p>
+      <p className="pr-8 text-[15px] leading-4 font-bold break-words">{item.nome}</p>
       {acoes.acimaDoEstoque ? (
-        <p
-          role="status"
-          className="absolute top-[35px] left-[109px] text-sm leading-4 text-texto-coral"
-        >
+        <p role="status" className={cn(classeEdicao, 'text-texto-coral')}>
           {item.disponivel === 0 ? 'Esgotada' : `Só ${item.disponivel}`}
         </p>
       ) : (
-        <p className="absolute top-[35px] left-[109px] text-sm leading-4 text-muted-foreground">
-          Edição: {item.rotuloEdicao}
-        </p>
+        <p className={cn(classeEdicao, 'text-muted-foreground')}>Edição: {item.rotuloEdicao}</p>
       )}
       <p
         data-testid="item-total-mobile"
-        className="absolute top-[69px] left-[109px] text-lg leading-4 font-bold text-texto-destaque"
+        className="mt-[18px] text-lg leading-4 font-bold text-texto-destaque"
       >
         {formatarEth(item.subtotal)}
       </p>
@@ -214,34 +212,36 @@ function CartaoMobile({ item, aoRemover }: PropsItem) {
       >
         <IconeLixeira />
       </button>
-      <button
-        type="button"
-        aria-label={`Diminuir quantidade de ${item.nome}`}
-        disabled={!acoes.podeDiminuir}
-        onClick={acoes.diminuir}
-        className={`${classeBotao} right-[73px] disabled:cursor-not-allowed`}
-      >
-        <span
-          aria-hidden
-          className={`h-0.5 w-[8.88px] ${acoes.podeDiminuir ? 'bg-foreground' : 'bg-borda-suave'}`}
-        />
-      </button>
-      <output
-        aria-live="polite"
-        data-testid="item-quantidade-mobile"
-        className="absolute top-[38px] right-10 flex h-6 w-[33px] items-center justify-center text-base leading-[22px]"
-      >
-        {item.quantidade}
-      </output>
-      <button
-        type="button"
-        aria-label={`Aumentar quantidade de ${item.nome}`}
-        disabled={!acoes.podeAumentar}
-        onClick={acoes.aumentar}
-        className={`${classeBotao} right-4 text-[21px] leading-4 disabled:opacity-50`}
-      >
-        <span aria-hidden>+</span>
-      </button>
+      <div className="absolute top-[38px] right-4 flex max-[374px]:static max-[374px]:mt-3 max-[374px]:self-start">
+        <button
+          type="button"
+          aria-label={`Diminuir quantidade de ${item.nome}`}
+          disabled={!acoes.podeDiminuir}
+          onClick={acoes.diminuir}
+          className={`${classeBotao} disabled:cursor-not-allowed`}
+        >
+          <span
+            aria-hidden
+            className={`h-0.5 w-[8.88px] ${acoes.podeDiminuir ? 'bg-foreground' : 'bg-borda-suave'}`}
+          />
+        </button>
+        <output
+          aria-live="polite"
+          data-testid="item-quantidade-mobile"
+          className="flex h-6 w-[33px] items-center justify-center text-base leading-[22px]"
+        >
+          {item.quantidade}
+        </output>
+        <button
+          type="button"
+          aria-label={`Aumentar quantidade de ${item.nome}`}
+          disabled={!acoes.podeAumentar}
+          onClick={acoes.aumentar}
+          className={`${classeBotao} text-[21px] leading-4 disabled:opacity-50`}
+        >
+          <span aria-hidden>+</span>
+        </button>
+      </div>
     </li>
   );
 }

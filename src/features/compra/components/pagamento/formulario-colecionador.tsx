@@ -147,7 +147,7 @@ export function FormularioColecionador({ estado }: { estado: EstadoPagamento }) 
             texto=".eth"
             opcoes={OPCOES_SUFIXO_ENS}
             control={estado.formulario.control}
-            classeCaixa="w-[78px] pr-0 pl-2.5 text-[15px]"
+            classeCaixa="w-auto min-w-[78px] shrink-0 pr-7 pl-2.5 text-[15px]"
             classeSeta="right-[6px] size-[18px] text-foreground"
           />
         </CampoRotulado>

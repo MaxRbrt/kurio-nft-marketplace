@@ -13,7 +13,7 @@ Requer Node 24 e npm 11.
 
 ```bash
 npm ci
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run dev
 ```
 
@@ -99,12 +99,13 @@ Entre como Ana, adicione um NFT ao carrinho e vá ao pagamento. Use o painel (`?
 
 ## Testes
 
-Cobrem os 12 itens do enunciado, em Chromium, nos viewports desktop e mobile:
+Cobrem os 12 itens do enunciado, em Chromium, nos viewports desktop e mobile. A responsividade roda também no WebKit, com o perfil do iPhone 15, que reproduz o Safari:
 
 | Pasta              | Conteúdo                                                                          |
 | ------------------ | --------------------------------------------------------------------------------- |
 | `tests/interface`  | Fluxos pela interface: catálogo, detalhe, conta, carrinho, compra, acessibilidade |
 | `tests/visual`     | Regressão visual de início, detalhe, carrinho e pagamento                         |
+| `tests/responsivo` | Oito telas de 320 a 1440 px sem texto cortado, sobreposto ou fora da tela         |
 | `tests/mocks`      | Contratos da API simulada, idempotência e cenários                                |
 | `tests/tempo-real` | Socket.IO: eventos, reconexão e heartbeat                                         |
 | `tests/contratos`  | Schemas zod                                                                       |
