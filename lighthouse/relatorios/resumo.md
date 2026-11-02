@@ -4,10 +4,10 @@ Mediana de 3 medições por página e perfil. Em negrito: abaixo da meta (Perfor
 
 | Página | Perfil | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| inicio | mobile | 92 | 100 | 100 | 100 | 3229 ms | 0.000 | 103 ms |
-| inicio | desktop | 99 | 100 | 100 | 100 | 914 ms | 0.000 | 0 ms |
-| detalhe | mobile | 92 | 100 | 100 | 100 | 3222 ms | 0.000 | 79 ms |
-| detalhe | desktop | 99 | 100 | 100 | 100 | 911 ms | 0.000 | 0 ms |
+| inicio | mobile | 92 | 100 | 100 | 100 | 3213 ms | 0.000 | 106 ms |
+| inicio | desktop | 99 | 100 | 100 | 100 | 891 ms | 0.000 | 0 ms |
+| detalhe | mobile | 92 | 100 | 100 | 100 | 3223 ms | 0.000 | 45 ms |
+| detalhe | desktop | 99 | 100 | 100 | 100 | 901 ms | 0.000 | 0 ms |
 
 ## Condições
 
