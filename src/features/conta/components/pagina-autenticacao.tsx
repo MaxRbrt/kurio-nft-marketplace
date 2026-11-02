@@ -8,10 +8,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { IconeFechar } from '@/components/icones/icones';
+import { PaginaInicial } from '@/features/catalogo/components/pagina-inicial';
 import { cn } from '@/lib/utils';
 import type { BuscaAutenticacao } from '../destino';
 import { FormularioCadastro } from './formulario-cadastro';
-import { FundoAutenticacao } from './fundo-autenticacao';
 import { FormularioLogin } from './formulario-login';
 
 type Modo = 'login' | 'cadastro';
@@ -48,8 +48,8 @@ const TEXTOS: Record<Modo, { titulo: string; subtitulo: string }> = {
 // O foco entra no próprio diálogo, sem destacar campo que o frame não
 // destaca. Radix prende o foco e fecha com Esc; a rota segue própria.
 // Em tela mais baixa que o frame, o modal cabe na tela e rola por dentro.
-// O centro desconta a reserva da barra de rolagem e cai em pixel inteiro,
-// como o fundo: em meio pixel, o texto do modal borra.
+// O centro desconta a reserva da barra de rolagem e cai em pixel inteiro:
+// em meio pixel, o texto do modal borra.
 // ====================================================================
 function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo) {
   const aba = (destino: Modo, rotulo: string) => (
@@ -165,6 +165,11 @@ type PropsConteudo = {
   aoFechar: () => void;
 };
 
+// ====================================================================
+// 3. ROTA DE LOGIN E CADASTRO
+// No desktop, o modal abre sobre a Início real, que não muda ao abrir: fica
+// inerte e fora da árvore acessível. No mobile, a tela é própria.
+// ====================================================================
 export function PaginaAutenticacao({ modo, busca }: { modo: Modo; busca: BuscaAutenticacao }) {
   const navigate = useNavigate();
   const router = useRouter();
@@ -187,7 +192,9 @@ export function PaginaAutenticacao({ modo, busca }: { modo: Modo; busca: BuscaAu
 
   return (
     <>
-      <FundoAutenticacao />
+      <div aria-hidden inert>
+        <PaginaInicial />
+      </div>
       <ModalAutenticacao {...propriedades} />
     </>
   );

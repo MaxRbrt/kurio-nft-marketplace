@@ -234,14 +234,36 @@ test('abertura some quando a aplicação monta', async ({ page }) => {
 });
 
 // ====================================================================
-// FRAMES: DIVISÓRIA DO CABEÇALHO E FUNDO DO LOGIN
-// A divisória só aparece nas telas cujo frame a desenha. O fundo do login
-// segue o frame também com barra de rolagem real, que o navegador de
-// teste esconde por padrão: arte 405 px depois da borda do modal e título
-// 305 px antes dela. O modal fica em pixel inteiro, para o texto não borrar.
+// FRAMES: DIVISÓRIA DO CABEÇALHO E INÍCIO ATRÁS DO LOGIN
+// A divisória só aparece nas telas cujo frame a desenha. Abrir o login não
+// muda nada atrás do modal, também com barra de rolagem real, que o navegador
+// de teste esconde por padrão. O modal fica centrado na Início e em pixel
+// inteiro, para o texto não borrar.
 // ====================================================================
 test.describe('frames do desktop', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
+
+  async function medirInicio(pagina: Page) {
+    return pagina.evaluate(() => {
+      const seletores = [
+        '[data-testid=cabecalho-logo]',
+        '[data-testid=hero]',
+        '[data-testid=hero] h1',
+        '[data-testid=hero] img',
+        '[data-testid=coluna-lateral]',
+        '[data-testid=coluna-grade]',
+        '[data-testid=cartao-nome]',
+      ];
+
+      return seletores.map((seletor) => {
+        const elemento = document.querySelector(seletor);
+        const caixa = elemento?.getBoundingClientRect();
+        const texto = elemento instanceof HTMLElement ? elemento.innerText : '';
+
+        return { seletor, x: caixa?.x, y: caixa?.y, largura: caixa?.width, texto };
+      });
+    });
+  }
 
   for (const caminho of ['/nfts/nft-01', '/carrinho']) {
     test(`${caminho} sem divisória no cabeçalho, como no frame`, async ({ page }) => {
@@ -277,7 +299,7 @@ test.describe('frames do desktop', () => {
     await expect(page.getByTestId('cabecalho-divisoria')).toBeVisible();
   });
 
-  test('fundo do login alinhado ao modal com barra de rolagem real', async ({
+  test('abrir o login mantém a Início parada e o modal centrado com barra de rolagem real', async ({
     playwright,
     baseURL,
   }) => {
@@ -286,7 +308,13 @@ test.describe('frames do desktop', () => {
     });
     const pagina = await navegador.newPage({ viewport: { width: 1440, height: 900 } });
 
-    await pagina.goto(`${baseURL}/login`);
+    await pagina.goto(`${baseURL}/`);
+    await expect(pagina.getByTestId('cartao-nome').first()).toBeVisible();
+    await pagina.evaluate(() => window.scrollTo({ top: 20, behavior: 'instant' }));
+
+    const antes = await medirInicio(pagina);
+
+    await pagina.getByTestId('cabecalho-entrar').click();
 
     const modal = pagina.getByTestId('modal-autenticacao');
 
@@ -295,34 +323,29 @@ test.describe('frames do desktop', () => {
       Promise.all(elemento.getAnimations().map(({ finished }) => finished)),
     );
 
+    const depois = await medirInicio(pagina);
+    const inerte = await pagina.locator('[inert] [data-testid=hero]').count();
     const medidas = await pagina.evaluate(() => {
       const caixaModal = document
         .querySelector('[data-testid=modal-autenticacao]')
         ?.getBoundingClientRect();
-      const arte = [...document.querySelectorAll('img')]
-        .map((imagem) => imagem.getBoundingClientRect())
-        .find((caixa) => Math.round(caixa.width) === 450);
-      const titulo = [...document.querySelectorAll('*')]
-        .find(
-          (elemento) =>
-            elemento.children.length === 0 && elemento.textContent?.includes('SEJA DONO DO FUTURO'),
-        )
-        ?.getBoundingClientRect();
+      const caixaHero = document.querySelector('[data-testid=hero]')?.getBoundingClientRect();
 
       return {
         barra: getComputedStyle(document.body).getPropertyValue('--removed-body-scroll-bar-size'),
         modal: caixaModal?.x ?? 0,
-        arte: (arte?.x ?? 0) - (caixaModal?.x ?? 0),
-        titulo: (titulo?.x ?? 0) - (caixaModal?.x ?? 0),
+        centroModal: (caixaModal?.x ?? 0) + (caixaModal?.width ?? 0) / 2,
+        centroHero: (caixaHero?.x ?? 0) + (caixaHero?.width ?? 0) / 2,
       };
     });
 
     await navegador.close();
 
+    expect(depois).toEqual(antes);
+    expect(inerte).toBe(1);
     expect(parseFloat(medidas.barra)).toBeGreaterThan(0);
     expect(Number.isInteger(medidas.modal)).toBe(true);
-    expect(medidas.arte).toBe(405);
-    expect(medidas.titulo).toBe(-305);
+    expect(Math.abs(medidas.centroModal - medidas.centroHero)).toBeLessThanOrEqual(0.5);
   });
 });
 
