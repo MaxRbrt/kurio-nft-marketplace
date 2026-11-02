@@ -8,7 +8,8 @@ import { devices, type Project } from '@playwright/test';
 // deitados. iPhone e iPad rodam
 // no WebKit, que reproduz o Safari; Android, no Chromium. O enunciado
 // pede no mínimo 390, 768 e 1440, todos incluídos. No desktop, as
-// alturas são as de notebooks comuns, inclusive a baixa de 768 px.
+// alturas são as de notebooks comuns, inclusive a baixa de 768 px. O
+// 720 x 450 é o que uma tela de 1440 x 900 vira com zoom de 200%.
 // ====================================================================
 const APARELHOS = [
   'iPhone SE',
@@ -45,6 +46,7 @@ const APARELHOS = [
 ];
 
 const TELAS_DESKTOP = [
+  { largura: 720, altura: 450 },
   { largura: 1024, altura: 768 },
   { largura: 1280, altura: 800 },
   { largura: 1440, altura: 900 },

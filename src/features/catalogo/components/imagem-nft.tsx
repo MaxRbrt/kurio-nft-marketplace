@@ -9,6 +9,8 @@ type PropsImagemNft = Omit<ComponentProps<'img'>, 'src' | 'srcSet'> & {
 // 1. IMAGEM RESPONSIVA
 // O navegador escolhe entre 320, 640 e 960 px de largura pelo tamanho
 // exibido. Largura e altura reservam o espaço e evitam salto de layout.
+// Imagem que só aparece em um layout usa 1px no outro: escondida, ela ainda
+// é baixada, e assim fica com o menor arquivo em vez de competir com o LCP.
 // ====================================================================
 export function ImagemNft({ url, sizes, alt = '', ...props }: PropsImagemNft) {
   const base = url.replace(/-\d+\.webp$/, '');

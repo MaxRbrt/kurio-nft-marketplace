@@ -139,20 +139,42 @@ Processamento de cada evento (`lib/tempo-real/processador.ts`), sempre nesta ord
 
 Banco em memória salvo em `localStorage` (`kurio:banco:v3`), validado ao carregar. Ao mudar a forma dos dados, a versão da chave sobe. `resetar` restaura tudo. Toda alteração de NFT passa por uma função central, que muda o dado, sobe a versão, salva e publica o evento. Cenários são determinísticos, sem `Math.random`. O painel (`?painel=1`) usa as mesmas rotas de controle e não toca em estado da interface.
 
+O navegador desliga o service worker quando a aba fica parada, e o worker do MSW guarda só em memória as páginas ativas. Ao religar, ele não reconhece a página, e as chamadas iriam para a rede. Por isso, em `src/mocks/manter-ativos.ts`, cada chamada do Axios espera o worker confirmar o registro da página. Voltar à aba e interagir também registram, o que cobre o painel de cenários, que usa `fetch` direto. Uma resposta com corpo que não é JSON vira falha transitória, e a consulta tenta de novo.
+
+O cookie store do MSW usa o `tough-cookie`, que pede o domínio registrável ao `tldts`, com a lista mundial de sufixos. Como a API simulada autentica por Bearer e não grava cookies, `vite.config.ts` troca esse pacote por `src/mocks/dominio-registravel.ts`, que usa os dois últimos rótulos do domínio.
+
 ## Lighthouse
 
 Mediana de 3 medições por página e perfil em [`lighthouse/relatorios/resumo.md`](lighthouse/relatorios/resumo.md).
 
-Desktop atinge as quatro metas. **Performance no mobile fica abaixo de 90.** LCP e FCP são a causa, com CLS e TBT dentro do esperado:
+**As quatro metas são atingidas nas duas páginas e nos dois perfis, no modo padrão do Lighthouse, que simula rede e CPU.** Performance fica em 92 nas duas páginas no mobile, variando de 91 a 93 entre execuções, e em 99 no desktop. Accessibility, Best Practices e SEO ficam em 100. No mobile, LCP de cerca de 3,2 s, CLS 0,000 e TBT de até 103 ms.
 
-- O pacote do MSW e do Socket.IO (cerca de 164 KB) precisa subir antes da aplicação, para a primeira requisição já ser interceptada e o `socket.io-client` capturar o WebSocket certo. Sob a rede simulada de 4G lenta, isso atrasa a primeira pintura. É um custo só da demonstração: com um backend real, esse pacote não existe.
-- O enunciado pede a auditoria com os mocks e sem simplificações, então o pacote fica na medição.
+A nota mobile começou em 84. Causas encontradas nos relatórios e corrigidas, medindo a cada passo:
+
+| Causa                                                                                                                         | Correção                                                                                            | Início / detalhe |
+| ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------- |
+| Situação inicial                                                                                                              |                                                                                                     | 83 / 84          |
+| Pacote dos mocks com 164 KB, a maior parte a lista mundial de sufixos de domínio (`tldts`), usada só pelo cookie store do MSW | Substituto leve por alias, pois a simulação autentica por Bearer. O pacote caiu para 54 KB          | 89 / 89          |
+| Tela em branco até o JavaScript montar a aplicação                                                                            | Abertura com a marca no próprio HTML. FCP de 2,2 s para cerca de 1,3 s                              | 91 / 90          |
+| Imagem de 960 px da galeria desktop, escondida no celular, baixada com prioridade                                             | `sizes` de 1 px no layout em que a imagem não aparece. Sem efeito na nota, 47 KB a menos no detalhe | 91 / 90          |
+| 9 arquivos de contratos e validação, compartilhados entre mocks e aplicação                                                   | Agrupados em um só. LCP do início de 3,4 s para 3,2 s, e do detalhe de 3,6 s para 3,3 s             | 92 / 91          |
+| Skeleton do detalhe mobile em outra posição que o conteúdo final                                                              | Skeleton com as medidas do layout real. CLS de 0,039 para 0,000                                     | 92 / 91          |
+
+Nada foi retirado da aplicação para medir: a auditoria roda com mocks, tempo real, fontes e imagens da entrega, e as mudanças valem para o build publicado.
+
+Limites que continuam:
+
+- O LCP mobile segue acima dos 2,5 s recomendados. O pacote do MSW precisa subir antes da aplicação, para a primeira requisição já ser interceptada e o `socket.io-client` capturar o WebSocket certo. É um custo da demonstração: com um backend real, esse pacote não existe.
+- O relatório ainda aponta cerca de 290 ms de CSS bloqueando a renderização e 32 KiB de JavaScript sem uso no pacote dos mocks.
 - Testado e descartado: pré-carregar os pacotes com `modulepreload` piorou a nota de 84 para 81.
+- A nota depende da máquina e do modo de medir. Tudo abaixo vale para `localhost`, em um PC de 16 núcleos. No modo padrão, mobile 92. Com rede e CPU limitadas de verdade (`throttlingMethod: 'devtools'`), mobile 72 (início) e 82 (detalhe), com LCP de 4,4 e 4,1 s e TBT de 444 e 187 ms. Com a máquina ocupada por outra carga, o modo padrão cai para 60 e 58, e a limitação real, para cerca de 50 a 60. O resultado em uma máquina mais lenta pode ficar abaixo da meta.
+- Depois que o service worker do MSW assume, os arquivos da aplicação aparecem com 0 KB nos relatórios, então a simulação não conta o peso deles.
 
-Já feito: divisão por rota, imagens WebP com `srcset`, pré-carregamento da imagem principal, fonte local e dimensões reservadas para evitar deslocamento.
+Já feito antes: divisão por rota, imagens WebP com `srcset`, pré-carregamento da imagem principal, fonte local e dimensões reservadas para evitar deslocamento.
 
 ## Limitações e decisões de UX
 
+- Contraste: o axe não aponta violação em 10 telas, em 414, 768 e 1440 px, mas não decide texto sobre gradiente. Esses 26 casos foram medidos por pixel. Ficam abaixo de 4,5:1, em parte da área, com as cores do frame: no destaque mobile, "Descubra NFTs selecionados" (de 2,8 a 4,4), "Bem-vindo à Kurio" e o título (a partir de 4,1), e "EXPLORAR" no limite; no carrinho mobile, "Aplicar" (de 2,8 a 3,7).
 - Blockchain, extensões de carteira e pagamentos são simulados. Transação e link do Etherscan são fictícios.
 - Itens fora do escopo (Atividade, Ofertas, links editoriais, newsletter, redes sociais, "Mercado") avisam que estão indisponíveis, sem aparentar sucesso.
 - "Lista de interesse" não tem frame próprio e também avisa. Os favoritos persistem e aparecem nos cartões e no detalhe.
@@ -179,7 +201,7 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 | Tela                     | O que o frame mostra                                                                            | O que a aplicação faz                                                                                     | Motivo                                                            |
 | ------------------------ | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | Início, desktop          | Cartão da 3ª linha, ao centro, sem nome e sem preço                                             | Todo cartão mostra nome e preço                                                                           | Sem nome e preço o cartão não informa o que é vendido             |
-| Início, mobile           | Só o primeiro cartão tem o botão de favorito; nos outros ele fica escondido atrás do cartão     | Todo cartão tem favorito                                                                                  | O favorito é uma função do catálogo, não um enfeite de um cartão  |
+| Início, mobile           | Só o primeiro cartão tem o botão de favorito; nos outros ele fica escondido atrás do cartão     | Todo cartão tem favorito, alinhado ao topo da arte, como no 1º cartão                                     | O favorito é uma função do catálogo, não um enfeite de um cartão  |
 | Início, mobile           | A 2ª linha repete "Emerald Ape #042" e "Sage Nomad #009" com outras artes                       | Cada cartão mostra o próprio NFT                                                                          | Repetir o nome com outra arte seria dado falso                    |
 | Detalhe, mobile          | Edições "1/10, 1/10, 1/50, ABERTA"                                                              | Edições "1/1, 1/10, 1/50, ABERTA", como no desktop                                                        | Rótulo repetido faria comprar uma edição achando que é outra      |
 | Início, desktop          | Seta de "Ordenar por" desenhada sobre as últimas letras de "recentemente"                       | Seta logo depois do valor, com o grupo alinhado à direita da grade                                        | Texto encoberto parece defeito                                    |
@@ -195,7 +217,6 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 | Início, desktop          | Artigos do diário terminam em x = 1264, e a página vai até 1320                                 | Quatro artigos de 282 px ocupam toda a largura, com a altura e as quebras de texto do frame               | Grade empurrada para a esquerda, sem alinhar com as outras seções |
 | Rodapé, desktop          | "Enviar" 6 px e "METAMASK • ..." 4 px à direita do centro das caixas                            | Textos centrados                                                                                          | Item visivelmente fora do centro                                  |
 | Cadastro, mobile         | Só o campo "Nome de usuário" com o texto de exemplo centrado                                    | Texto à esquerda, como nos outros campos                                                                  | Campos iguais com alinhamentos diferentes                         |
-| Cabeçalho                | Divisória em Início, Login e Perfil; sem ela em Detalhe e Carrinho                              | Divisória em todas as telas                                                                               | Mesmo componente não muda de tela para tela                       |
 | Carrinho, mobile         | Lixeira só no 3º cartão, sobre o botão "+"                                                      | Lixeira em todos os cartões, acima do "+"                                                                 | O botão ficava encoberto, e remover é função de todo item         |
 | Carrinho, mobile         | Cada arte duplicada, com a de cima em `multiply` e deslocada até 2 px, o que escurece a imagem  | Uma imagem só, com as cores das outras telas                                                              | O mesmo NFT não pode mudar de cor entre telas                     |
 | Carrinho, mobile         | Cartões em y = 88, 208, 330 e 450 (vãos de 20 e 22 px)                                          | Vão de 20 px entre todos                                                                                  | Lista dinâmica não tem posição própria por item                   |
@@ -231,7 +252,7 @@ A regra é seguir o Figma. Só há desvio quando o próprio frame tem um erro ev
 
 ### Larguras sem frame
 
-Os frames têm 1440 px no desktop e 414 px no mobile, com medidas fixas. Nas larguras intermediárias, as medidas do frame viram teto: o layout é igual ao frame na largura dele e se adapta abaixo, sem cortar texto nem sobrepor elementos. O teste `tests/responsivo/telas.spec.ts` confere dez telas e estados (inclusive filtros e a folha do pagamento abertos) em 28 perfis de aparelho do Playwright, de 320 a 984 px, e em desktop de 1024 x 768, 1280 x 800 e 1440 x 900; iPhone e iPad rodam no WebKit. Ele falha com texto cortado, sobreposto, colado na borda ou fora da tela, controle espremido, diálogo que não cabe na tela ou conteúdo atrás da barra inferior.
+Os frames têm 1440 px no desktop e 414 px no mobile, com medidas fixas. Nas larguras intermediárias, as medidas do frame viram teto: o layout é igual ao frame na largura dele e se adapta abaixo, sem cortar texto nem sobrepor elementos. O teste `tests/responsivo/telas.spec.ts` confere doze telas e estados (inclusive filtros, a folha do pagamento e o recibo) em 31 perfis de aparelho do Playwright, de 320 a 984 px e três deles deitados, e em desktop de 1024 x 768, 1280 x 800 e 1440 x 900, além de 720 x 450, que é a tela de 1440 x 900 com zoom de 200%; iPhone e iPad rodam no WebKit. Ele falha com texto cortado, sobreposto, colado na borda ou fora da tela, controle espremido, diálogo que não cabe na tela ou conteúdo atrás da barra inferior.
 
 | Tela                          | Largura                    | Adaptação                                                                                                                        |
 | ----------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -254,6 +275,8 @@ Os frames têm 1440 px no desktop e 414 px no mobile, com medidas fixas. Nas lar
 | Pagamento, mobile             | todas                      | Os campos da folha não encolhem para caber: a folha rola e o botão "Continuar" mantém 60 px                                      |
 | Pagamento, mobile             | abaixo de 1024 px          | Texto de exemplo "ENS ou carteira (opcional)" na folha, como em Carteiras; "Trocar carteira" não encolhe e o título quebra linha |
 | Início, mobile                | todas                      | Folha de filtros com 320 px, limitada à largura da tela                                                                          |
+
+- O recibo no mobile deixa o nome do NFT quebrar linha, em vez de cortá-lo abaixo de 375 px.
 
 ### Pontos do arquivo verificados e mantidos
 
@@ -278,7 +301,7 @@ Os comentários deixados no arquivo do Figma foram usados como lista do que conf
 
 ### Comentários do arquivo, um a um
 
-O arquivo tem 62 comentários de outros candidatos, 2 deles vazios, agrupados aqui por assunto. Cada um foi conferido no frame. "Corrigido" tem linha na tabela de desvios ou em "Larguras sem frame"; "Mantido" foi medido e está coerente, ou é preferência de desenho; "Respondido" é uma pergunta resolvida pelo comportamento da aplicação.
+O arquivo tem 62 comentários de outros candidatos, 2 deles vazios, agrupados aqui por assunto. Cada um foi conferido no frame. "Corrigido" tem linha nas tabelas de desvios ou em "Larguras sem frame"; "Mantido" foi medido e está coerente, ou é preferência de desenho; "Respondido" é uma pergunta resolvida pelo comportamento da aplicação.
 
 | Tela               | Comentário                                       | Situação                                                                |
 | ------------------ | ------------------------------------------------ | ----------------------------------------------------------------------- |
@@ -288,18 +311,18 @@ O arquivo tem 62 comentários de outros candidatos, 2 deles vazios, agrupados aq
 | Início, desktop    | Fundo sai da imagem; fundo descentrado           | Corrigido: arte centrada nos cartões                                    |
 | Início, desktop    | Falta de uniformidade na 2ª linha                | Corrigido: arte e distância do preço iguais                             |
 | Início, desktop    | Falta de padding em "METAMASK"; centrar botão    | Corrigido: textos centrados no rodapé                                   |
-| Início, desktop    | Falta margem em "Explorar"                       | Corrigido: recuos iguais nas promoções                                  |
+| Início, desktop    | Falta margem em "Explorar"                       | Mantido: 4 px entre o texto e a seta, como no frame                     |
 | Início, desktop    | Texto sem alinhamento em "NFT EM DESTAQUE"       | Corrigido: títulos centrados                                            |
 | Início, desktop    | "EXPLORAR" fora do centro                        | Corrigido: texto centrado                                               |
 | Início, desktop    | Seletor do destaque muito perto                  | Corrigido: 16 px abaixo                                                 |
-| Início, desktop    | Divisória só em algumas telas                    | Corrigido: divisória em todas                                           |
+| Início, desktop    | Divisória só em algumas telas                    | Mantido: cada tela como no frame; Detalhe, Carrinho e Pagamento não têm |
 | Início, desktop    | Cartão com fundo de outra cor                    | Mantido: é o fundo do cartão no frame                                   |
 | Início, desktop    | Coleções fora de ordem alfabética                | Mantido: ordem do frame                                                 |
 | Início, desktop    | Filtros poderiam usar checkboxes                 | Mantido: filtros já são combináveis; seleção por cor e estado anunciado |
 | Início, desktop    | Faixa de preço imprecisa                         | Mantido: controle do frame                                              |
 | Início, desktop    | Letras em vez de ícones nos serviços             | Mantido: desenho do frame                                               |
 | Início, desktop    | Botão de voltar na página 2                      | Respondido: números levam às páginas anteriores                         |
-| Início, desktop    | Opções de ordenação                              | Respondido: recentes, menor e maior preço                               |
+| Início, desktop    | Opções de ordenação                              | Respondido: recentes, menor preço, maior preço e nome                   |
 | Início, mobile     | Imagem sobre o destaque                          | Corrigido: imagem removida                                              |
 | Início, mobile     | Falta de margem nas abas                         | Corrigido: 16 px entre as abas                                          |
 | Início, mobile     | Itens não nivelados                              | Corrigido: colunas niveladas                                            |
@@ -337,9 +360,13 @@ O arquivo tem 62 comentários de outros candidatos, 2 deles vazios, agrupados aq
 | Arquivo            | Cores em hexadecimal e tema claro                | Mantido: o arquivo só traz tema escuro                                  |
 | Arquivo            | Sem frames de tablet e de mobile em três telas   | Corrigido: adaptação em "Larguras sem frame"                            |
 
+### Assets
+
+As quatro artes dos NFTs vêm do arquivo do Figma, convertidas para WebP em 320, 640 e 960 px de largura, e são reutilizadas pelos NFTs do catálogo simulado. Os ícones dos frames são SVGs exportados deles. Ícones sem frame, como o olho de "senha visível" e os internos dos componentes shadcn/ui, vêm do `lucide-react`. A fonte é Roboto Mono, servida localmente pelo pacote `@fontsource-variable/roboto-mono`. Nenhum asset do arquivo foi trocado por outro.
+
 ### Reproduzidos como estão no frame
 
-- O fundo atrás do modal de Login e Cadastro no desktop é uma composição própria do frame, diferente da Início. Ele é reproduzido a partir dos nós do frame, como elemento decorativo, inerte e fora da árvore acessível. A única mudança é o "Ordenar por", recuado 30 px para o texto não ser cortado nem ficar sob a seta.
+- O fundo atrás do modal de Login e Cadastro no desktop é uma composição própria do frame, diferente da Início. Ele é reproduzido a partir dos nós do frame, como elemento decorativo, inerte e fora da árvore acessível. Diferenças: o "Ordenar por" fica recuado 30 px, para o texto não ser cortado nem ficar sob a seta; a descrição fica em uma linha; e a coluna da direita é recortada 5 px na borda dos 1200 px.
 - A Início desktop não mostra o selo RARO; os frames de Login e o mobile mostram, e cada tela segue o seu frame.
 - Textos e rótulos ficam como desenhados, inclusive "Contrato" e "Direitos autorais" trocados no Detalhe.
 - Violet Nomad aparece com o token #0009 no Carrinho e #0314 no Pagamento. Um NFT tem um token só, e a aplicação usa #0314 nas duas telas.
@@ -347,11 +374,19 @@ O arquivo tem 62 comentários de outros candidatos, 2 deles vazios, agrupados aq
 
 ### Estados sem frame
 
+- Abertura: até o JavaScript montar a aplicação, o HTML mostra só a marca "KURIO" centrada no fundo escuro, sem ocupar layout depois de montar. Se um pacote não baixar ou a inicialização passar de 15 s, ela vira um aviso com "Tentar de novo".
 - Revisão antes do envio: modal no padrão da Confirmação, exigido pelo enunciado.
 - Conexão da carteira: "Desconectar", "Conectar" e a recusa aparecem na opção escolhida, no desktop, e no menu de três pontos, no mobile.
 - Campos obrigatórios seguem os asteriscos do frame, inclusive "Código de indicação".
 
+### Fundo do login com barra de rolagem
+
+Ao abrir o modal, a barra de rolagem some e a página reserva o espaço dela, o que afastava o fundo 7,5 px do modal no Windows. O modal desconta metade dessa reserva, para manter a posição do frame: arte 405 px depois da borda esquerda do modal e título 305 px antes dela. Modal e fundo arredondam o centro para o pixel inteiro, pois em meio pixel o texto borra.
+
 ### Ajustes de acessibilidade
 
+- O seletor de sufixo ENS não tem rótulo próprio no frame e recebe o nome acessível "Sufixo do nome ENS".
+- "Taxa estimada" fica dentro da lista de valores como par de termo e descrição, com o termo só para leitores de tela.
+- Em tela de toque, o texto digitado nos campos usa 16 px, para o iOS não ampliar a página ao focar (ver "Mudanças depois de testar em celular real").
 - Ao abrir o modal de Login ou Cadastro, o foco vai para o próprio diálogo, e não para um campo: o frame de Cadastro não destaca campo nenhum. A borda laranja da senha no frame de Login é o estado de foco.
 - O olho de "mostrar senha" no estado visível não tem desenho no Figma e usa um ícone de biblioteca no mesmo tamanho.

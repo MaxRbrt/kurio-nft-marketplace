@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { ANA, chamarApi, entrar } from '../apoio/api';
+import { ANA, chamarApi, criarPedidoConfirmado, entrar } from '../apoio/api';
 import { auditarFimDaPagina, auditarLayout } from '../apoio/auditoria-layout';
 
 // ====================================================================
@@ -7,7 +7,7 @@ import { auditarFimDaPagina, auditarLayout } from '../apoio/auditoria-layout';
 // Cada tela roda em todos os aparelhos de PROJETOS_RESPONSIVOS
 // (aparelhos.ts), um projeto do Playwright por aparelho.
 // ====================================================================
-type Estado = 'inicial' | 'filtros' | 'folha-pagamento' | 'revisao';
+type Estado = 'inicial' | 'filtros' | 'folha-pagamento' | 'revisao' | 'recibo';
 type Tela = { rota: string; sessao: boolean; estado: Estado };
 
 const TELAS: Tela[] = [
@@ -22,6 +22,7 @@ const TELAS: Tela[] = [
   { rota: '/pagamento', sessao: true, estado: 'revisao' },
   { rota: '/perfil', sessao: true, estado: 'inicial' },
   { rota: '/carteiras', sessao: true, estado: 'inicial' },
+  { rota: '/pedidos', sessao: true, estado: 'recibo' },
 ];
 
 const ITENS_CARRINHO = [
@@ -100,7 +101,7 @@ async function abrirRevisao(pagina: Page, desktop: boolean) {
 async function abrirEstado(pagina: Page, estado: Estado) {
   const desktop = (pagina.viewportSize()?.width ?? 0) >= 1024;
 
-  if (estado === 'inicial') {
+  if (estado === 'inicial' || estado === 'recibo') {
     return true;
   }
   if (estado === 'revisao') {
@@ -132,8 +133,13 @@ async function auditarTela(pagina: Page, tela: Tela) {
   if (tela.sessao) {
     await prepararSessao(pagina);
   }
-  await pagina.goto(tela.rota);
+  const rota = tela.estado === 'recibo' ? await criarPedidoConfirmado(pagina) : tela.rota;
+
+  await pagina.goto(rota);
   await aguardarSimulacao(pagina);
+  if (tela.estado === 'recibo') {
+    await expect(pagina.getByTestId('pedido-titulo')).toHaveText(/Seus NFTs/, { timeout: 10_000 });
+  }
   await expect(pagina.locator('[aria-busy="true"]')).toHaveCount(0);
   await expect(
     pagina.locator('main, [role="dialog"]').filter({ visible: true }).first(),

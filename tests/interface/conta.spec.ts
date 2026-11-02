@@ -86,6 +86,9 @@ test.describe('desktop 1440', () => {
 
   test('modal de cadastro nas medidas do Figma', async ({ page }) => {
     await page.goto('/cadastro');
+    await page
+      .getByTestId('modal-autenticacao')
+      .evaluate((modal) => Promise.all(modal.getAnimations().map(({ finished }) => finished)));
 
     const modal = await caixa(page, '[data-testid=modal-autenticacao]');
     const usuario = await caixa(page, '#cadastro-usuario');
@@ -192,6 +195,15 @@ test.describe('login', () => {
 });
 
 test.describe('rotas privadas', () => {
+  for (const destino of ['//site.test', '/\\site.test', 'https://site.test']) {
+    test(`login não aceita redirecionar para ${destino}`, async ({ page }) => {
+      await page.goto(`/login?redirect=${encodeURIComponent(destino)}`);
+      await preencherLogin(page, ANA);
+      await expect(page.getByTestId('cabecalho-conta')).toBeVisible();
+      await expect(page).toHaveURL(/localhost:4173\/$/);
+    });
+  }
+
   for (const rota of ['/carteiras', '/pedidos/pedido-1']) {
     test(`${rota} sem sessão leva ao login`, async ({ page }) => {
       await page.goto(rota);

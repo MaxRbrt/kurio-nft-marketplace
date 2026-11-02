@@ -48,6 +48,8 @@ const TEXTOS: Record<Modo, { titulo: string; subtitulo: string }> = {
 // O foco entra no próprio diálogo, sem destacar campo que o frame não
 // destaca. Radix prende o foco e fecha com Esc; a rota segue própria.
 // Em tela mais baixa que o frame, o modal cabe na tela e rola por dentro.
+// O centro desconta a reserva da barra de rolagem e cai em pixel inteiro,
+// como o fundo: em meio pixel, o texto do modal borra.
 // ====================================================================
 function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo) {
   const aba = (destino: Modo, rotulo: string) => (
@@ -75,7 +77,7 @@ function ModalAutenticacao({ modo, busca, aoConcluir, aoFechar }: PropsConteudo)
         }}
         data-testid="modal-autenticacao"
         className={cn(
-          'block w-[500px] max-w-[500px] translate-y-0 gap-0 rounded-none bg-card p-0 ring-0 sm:max-w-[500px]',
+          'left-[round(down,calc(50%-var(--removed-body-scroll-bar-size,0px)/2),1px)] block w-[500px] max-w-[500px] translate-y-0 gap-0 rounded-none bg-card p-0 ring-0 sm:max-w-[500px]',
           'overflow-y-auto',
           modo === 'login'
             ? 'top-[160px] max-h-[calc(100dvh-176px)] min-h-[min(600px,calc(100dvh-176px))]'

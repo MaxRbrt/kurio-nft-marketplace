@@ -115,6 +115,7 @@ type PropsSeletor<Campos extends FieldValues> = {
   control: Control<Campos>;
   nome: Path<Campos>;
   texto: string;
+  rotulo?: string;
   opcoes: ReadonlyArray<{ valor: string; rotulo: string }>;
   erro?: string;
   aoEscolher?: (valor: string) => void;
@@ -125,13 +126,15 @@ type PropsSeletor<Campos extends FieldValues> = {
 // ====================================================================
 // 3. SELETOR
 // Select do shadcn com a aparência dos frames. Teclado e foco vêm do
-// Radix. Cada frame define a largura da caixa e a posição da seta.
+// Radix. Cada frame define a largura da caixa e a posição da seta. Seletor
+// sem rótulo próprio na tela recebe o nome acessível por `rotulo`.
 // ====================================================================
 export function Seletor<Campos extends FieldValues>({
   id,
   control,
   nome,
   texto,
+  rotulo,
   opcoes,
   erro,
   aoEscolher,
@@ -153,6 +156,7 @@ export function Seletor<Campos extends FieldValues>({
           <SelectTrigger
             id={id}
             ref={field.ref}
+            aria-label={rotulo}
             aria-invalid={Boolean(erro)}
             aria-describedby={erro ? `${id}-erro` : undefined}
             className={cn(

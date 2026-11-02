@@ -213,6 +213,44 @@ test.describe('compra no desktop', () => {
     expect(await totalDePedidos(page)).toBe(0);
   });
 
+  test('edição esgotada na revisão não vira pedido e avisa', async ({ page }) => {
+    await prepararSessao(page);
+    await abrirRevisao(page);
+    await controlar(page, 'nfts/nft-05', { edicaoId: 'nft-05-1-50', disponivel: 0 });
+
+    await expect(page.getByTestId('anuncio-tempo-real')).toContainText('Violet Nomad');
+    await page.getByRole('button', { name: 'Confirmar pedido' }).click({ force: true });
+
+    await expect(page.getByTestId('revisao-pedido').getByRole('alert').first()).toBeVisible({
+      timeout: 8000,
+    });
+    expect(await totalDePedidos(page)).toBe(0);
+  });
+
+  test('cupom que expira na revisão explica, tira o desconto e exige novo aceite', async ({
+    page,
+  }) => {
+    await prepararSessao(page, ANA, ITENS, '/pagamento?cupom=KURIO10');
+    await expect(page.getByRole('button', { name: 'Desconectar' })).toBeVisible();
+    await preencherCodigo(page);
+    await page.getByRole('button', { name: 'Confirmar compra' }).click();
+    await expect(page.getByTestId('revisao-pedido')).toBeVisible();
+    await expect(page.getByTestId('revisao-total')).toHaveText('9.664 ETH');
+    await controlar(page, 'cupons/KURIO10/expirar');
+    await page.getByRole('button', { name: 'Confirmar pedido' }).click({ force: true });
+
+    await expect(page.getByTestId('revisao-mudou')).toContainText('Código promocional expirado', {
+      timeout: 8000,
+    });
+    await expect(page.getByTestId('revisao-total')).toHaveText('10.736 ETH');
+    expect(await totalDePedidos(page)).toBe(0);
+
+    await page.getByRole('button', { name: 'Aceitar novos valores' }).click();
+    await page.getByRole('button', { name: 'Confirmar pedido' }).click();
+    await expect(page).toHaveURL(/\/pedidos\/pedido-1/);
+    await expect(page.getByTestId('recibo-total')).toHaveText('10.736 ETH');
+  });
+
   test('carrinho aberto reflete preço e estoque recebidos', async ({ page }) => {
     await prepararSessao(page, ANA, ITENS, '/carrinho');
     await expect(page.getByTestId('resumo-total')).toHaveText('10.736 ETH');

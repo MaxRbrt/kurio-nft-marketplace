@@ -44,7 +44,7 @@ jobs:
 
       - name: Rodar a suíte
         if: ${{ !inputs.gerar_baselines }}
-        run: npx playwright test
+        run: npx playwright test --reporter=list,html
 
       - uses: actions/upload-artifact@v4
         if: always()

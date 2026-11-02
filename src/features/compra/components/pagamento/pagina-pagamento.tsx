@@ -173,6 +173,7 @@ function PagamentoCarregado({ cupom, perfil, carteiras }: PropsPagamento) {
       aberta={revisando}
       cotacao={cotacaoAtual}
       valoresMudaram={valoresMudaram}
+      avisoCupom={resumo.erroCupom}
       atualizando={resumo.cotacao.isFetching}
       dados={estado.formulario.getValues()}
       enviando={envio.isPending}

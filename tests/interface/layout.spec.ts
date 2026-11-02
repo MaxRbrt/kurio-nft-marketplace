@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { chamarApi } from '../apoio/api';
+import { ANA, chamarApi, entrar } from '../apoio/api';
 
 // ====================================================================
 // 1. MEDIDAS DO FIGMA
@@ -188,3 +188,192 @@ for (const largura of [390, 768, 1440]) {
     expect(excesso).toBeLessThanOrEqual(0);
   });
 }
+
+test.describe('abertura antes do JavaScript', () => {
+  test.use({ serviceWorkers: 'block' });
+
+  test('marca aparece sem depender do JavaScript', async ({ page }) => {
+    await page.route('**/assets/*.js', (rota) => rota.abort());
+    await page.goto('/');
+
+    await expect(page.getByText('KURIO')).toBeVisible();
+  });
+});
+
+test.describe('falha ao iniciar', () => {
+  const PACOTE_DOS_MOCKS = '**/assets/browser-*.js';
+
+  test('pacote que não baixa mostra aviso, e tentar de novo recupera', async ({ page }) => {
+    await page.route(PACOTE_DOS_MOCKS, (rota) => rota.abort());
+    await page.goto('/');
+    await expect(page.getByRole('alert')).toContainText('Não foi possível iniciar');
+
+    await page.unroute(PACOTE_DOS_MOCKS);
+    await page.getByRole('button', { name: 'Tentar de novo' }).click();
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+  });
+
+  test('inicialização presa além do limite também avisa', async ({ page }) => {
+    await page.clock.install();
+    await page.route(PACOTE_DOS_MOCKS, () => undefined);
+    await page.goto('/', { waitUntil: 'commit' });
+
+    await expect(async () => {
+      await page.clock.runFor(15_000);
+      await expect(page.getByRole('alert')).toContainText('Não foi possível iniciar', {
+        timeout: 500,
+      });
+    }).toPass();
+  });
+});
+
+test('abertura some quando a aplicação monta', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+  await expect(page.locator('.abertura')).toHaveCount(0);
+});
+
+// ====================================================================
+// FRAMES: DIVISÓRIA DO CABEÇALHO E FUNDO DO LOGIN
+// A divisória só aparece nas telas cujo frame a desenha. O fundo do login
+// segue o frame também com barra de rolagem real, que o navegador de
+// teste esconde por padrão: arte 405 px depois da borda do modal e título
+// 305 px antes dela. O modal fica em pixel inteiro, para o texto não borrar.
+// ====================================================================
+test.describe('frames do desktop', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  for (const caminho of ['/nfts/nft-01', '/carrinho']) {
+    test(`${caminho} sem divisória no cabeçalho, como no frame`, async ({ page }) => {
+      await page.goto(caminho);
+      await expect(page.getByTestId('cabecalho-logo')).toBeVisible();
+      await expect(page.getByTestId('cabecalho-divisoria')).toHaveCount(0);
+    });
+  }
+
+  test('/pagamento sem divisória no cabeçalho, como no frame', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('socket-estado').waitFor({ state: 'attached' });
+
+    const token = await entrar(page, ANA);
+
+    await chamarApi(
+      page,
+      'POST',
+      '/api/carrinho/itens',
+      { nftId: 'nft-01', edicaoId: 'nft-01-1-50', quantidade: 1 },
+      token,
+    );
+    await page.evaluate((valor) => localStorage.setItem('kurio:token', valor), token);
+    await page.goto('/pagamento');
+
+    await expect(page.getByRole('button', { name: 'Confirmar compra' })).toBeVisible();
+    await expect(page.getByTestId('cabecalho-logo')).toBeVisible();
+    await expect(page.getByTestId('cabecalho-divisoria')).toHaveCount(0);
+  });
+
+  test('início com divisória no cabeçalho, como no frame', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('cabecalho-divisoria')).toBeVisible();
+  });
+
+  test('fundo do login alinhado ao modal com barra de rolagem real', async ({
+    playwright,
+    baseURL,
+  }) => {
+    const navegador = await playwright.chromium.launch({
+      ignoreDefaultArgs: ['--hide-scrollbars'],
+    });
+    const pagina = await navegador.newPage({ viewport: { width: 1440, height: 900 } });
+
+    await pagina.goto(`${baseURL}/login`);
+
+    const modal = pagina.getByTestId('modal-autenticacao');
+
+    await expect(modal).toBeVisible();
+    await modal.evaluate((elemento) =>
+      Promise.all(elemento.getAnimations().map(({ finished }) => finished)),
+    );
+
+    const medidas = await pagina.evaluate(() => {
+      const caixaModal = document
+        .querySelector('[data-testid=modal-autenticacao]')
+        ?.getBoundingClientRect();
+      const arte = [...document.querySelectorAll('img')]
+        .map((imagem) => imagem.getBoundingClientRect())
+        .find((caixa) => Math.round(caixa.width) === 450);
+      const titulo = [...document.querySelectorAll('*')]
+        .find(
+          (elemento) =>
+            elemento.children.length === 0 && elemento.textContent?.includes('SEJA DONO DO FUTURO'),
+        )
+        ?.getBoundingClientRect();
+
+      return {
+        barra: getComputedStyle(document.body).getPropertyValue('--removed-body-scroll-bar-size'),
+        modal: caixaModal?.x ?? 0,
+        arte: (arte?.x ?? 0) - (caixaModal?.x ?? 0),
+        titulo: (titulo?.x ?? 0) - (caixaModal?.x ?? 0),
+      };
+    });
+
+    await navegador.close();
+
+    expect(parseFloat(medidas.barra)).toBeGreaterThan(0);
+    expect(Number.isInteger(medidas.modal)).toBe(true);
+    expect(medidas.arte).toBe(405);
+    expect(medidas.titulo).toBe(-305);
+  });
+});
+
+// ====================================================================
+// SERVICE WORKER DESLIGADO PELO NAVEGADOR
+// Aba parada faz o navegador desligar o worker, que perde o registro da
+// página. Ao religar, as chamadas à API não podem ir para a rede.
+// ====================================================================
+test.describe('service worker desligado pelo navegador', () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  async function desligarWorker(pagina: Page) {
+    const sessao = await pagina.context().newCDPSession(pagina);
+
+    await sessao.send('ServiceWorker.enable');
+    await sessao.send('ServiceWorker.stopAllWorkers');
+  }
+
+  test('catálogo segue funcionando ao clicar', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+    await desligarWorker(page);
+
+    await page.getByRole('button', { name: 'Página 2' }).click();
+    await expect(page).toHaveURL(/pagina=2/);
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+    await expect(page.getByTestId('nfts-erro')).toHaveCount(0);
+  });
+
+  test('consulta sem clique do usuário também recupera', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible();
+    await desligarWorker(page);
+
+    await page.evaluate(() => {
+      history.pushState({}, '', '/?pagina=3');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+
+    await expect(page).toHaveURL(/pagina=3/);
+    await expect(page.getByTestId('cartao-nome').first()).toBeVisible({ timeout: 8000 });
+    await expect(page.getByTestId('nfts-erro')).toHaveCount(0);
+  });
+
+  test('comprar segue funcionando', async ({ page }) => {
+    await page.goto('/nfts/nft-01');
+    await expect(page.getByRole('button', { name: 'COMPRAR', exact: true })).toBeVisible();
+    await desligarWorker(page);
+
+    await page.getByRole('button', { name: 'COMPRAR', exact: true }).click();
+    await expect(page).toHaveURL(/\/carrinho/);
+    await expect(page.getByTestId('item-carrinho').first()).toBeVisible();
+  });
+});

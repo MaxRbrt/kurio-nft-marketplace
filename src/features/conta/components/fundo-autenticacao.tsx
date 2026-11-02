@@ -77,15 +77,16 @@ function estiloDe(elemento: ElementoFundo): CSSProperties {
 // 2. FUNDO DO LOGIN E DO CADASTRO NO DESKTOP
 // Nos frames, o modal fica sobre uma composição própria da página, que
 // difere da Início. É decorativa: fora da árvore acessível e inerte, sem
-// foco nem clique. Mede 1200 x 1900, abaixo do cabeçalho, centrada; em
-// tela mais estreita as laterais são recortadas, sem rolagem lateral.
+// foco nem clique. Mede 1200 x 1900, abaixo do cabeçalho, centrada em pixel
+// inteiro; em tela mais estreita as laterais são recortadas, sem rolagem
+// lateral.
 // ====================================================================
 export function FundoAutenticacao() {
   return (
     <div aria-hidden inert className="overflow-x-clip">
       <div
         data-testid="fundo-autenticacao"
-        className="relative left-1/2 mt-3 h-[1900px] w-[1200px] -translate-x-1/2 overflow-hidden whitespace-pre"
+        className="relative left-[round(down,50%,1px)] mt-3 h-[1900px] w-[1200px] -translate-x-1/2 overflow-hidden whitespace-pre"
       >
         {ELEMENTOS_FUNDO.map((elemento, indice) =>
           elemento.tipo === 'imagem' ? (

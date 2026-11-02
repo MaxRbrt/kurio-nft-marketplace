@@ -10,6 +10,21 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, './src'),
+      tldts: path.resolve(import.meta.dirname, './src/mocks/dominio-registravel.ts'),
+    },
+  },
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'contratos',
+              test: /[\\/]src[\\/]contracts[\\/]|[\\/]node_modules[\\/](zod|big\.js)[\\/]/,
+            },
+          ],
+        },
+      },
     },
   },
 });
