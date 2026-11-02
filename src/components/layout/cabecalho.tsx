@@ -118,6 +118,7 @@ export function Cabecalho() {
           ) : (
             <Link
               to="/login"
+              resetScroll={false}
               data-testid="cabecalho-entrar"
               className="flex h-[35px] w-[100px] items-center justify-center gap-1 rounded-md bg-primary text-base font-medium text-primary-foreground hover:bg-primaria-clara"
             >
