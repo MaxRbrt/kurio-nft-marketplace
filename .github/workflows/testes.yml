@@ -18,6 +18,8 @@ jobs:
   testes:
     runs-on: ubuntu-latest
     timeout-minutes: 70
+    env:
+      VITE_ENABLE_MOCKS: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
